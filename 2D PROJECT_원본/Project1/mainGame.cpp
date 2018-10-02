@@ -2,6 +2,7 @@
 #include "mainGame.h"
 #include "effectManager.h"
 #include "titleScene.h"
+#include "bossScene.h"
 #include "pixelCollision.h"
 
 void mainGame::setBackBuffer()
@@ -26,7 +27,11 @@ HRESULT mainGame::init()
 	m_pTitleScene = new titleScene;
 	SCENEMANAGER->addScene("title", m_pTitleScene);
 
-	SCENEMANAGER->changeScene("title");
+	m_pBossScene = new bossScene;
+	SCENEMANAGER->addScene("boos", m_pBossScene);
+
+
+	SCENEMANAGER->changeScene("boos");
 
 	setBackBuffer();
 

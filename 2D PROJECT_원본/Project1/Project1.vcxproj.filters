@@ -171,11 +171,11 @@
     <ClInclude Include="missile.h">
       <Filter>MainGame\missile</Filter>
     </ClInclude>
-    <ClInclude Include="bossManager.h">
-      <Filter>MainGame\boss</Filter>
-    </ClInclude>
     <ClInclude Include="boss.h">
       <Filter>MainGame\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="bossScene.h">
+      <Filter>2DGameFramework\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -269,11 +269,11 @@
     <ClCompile Include="missile.cpp">
       <Filter>MainGame\missile</Filter>
     </ClCompile>
-    <ClCompile Include="bossManager.cpp">
-      <Filter>MainGame\boss</Filter>
-    </ClCompile>
     <ClCompile Include="boss.cpp">
       <Filter>MainGame\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="bossScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
