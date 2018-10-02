@@ -55,6 +55,12 @@
     <Filter Include="2DGameFramework\ui">
       <UniqueIdentifier>{9099d684-5815-4c7b-8817-038fe38e6585}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\enemy">
+      <UniqueIdentifier>{f977e3a2-8483-4f98-a826-72ef924a2afa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\missile">
+      <UniqueIdentifier>{705bdbe6-1212-4dee-9230-f772510a6848}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -147,6 +153,21 @@
     <ClInclude Include="uiImageView.h">
       <Filter>2DGameFramework\ui</Filter>
     </ClInclude>
+    <ClInclude Include="introScene.h">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="enemyManager.h">
+      <Filter>MainGame\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>MainGame\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="missileManager.h">
+      <Filter>MainGame\missile</Filter>
+    </ClInclude>
+    <ClInclude Include="missile.h">
+      <Filter>MainGame\missile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -223,6 +244,21 @@
     </ClCompile>
     <ClCompile Include="uiImageView.cpp">
       <Filter>2DGameFramework\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="introScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="enemyManager.cpp">
+      <Filter>MainGame\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy.cpp">
+      <Filter>MainGame\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="missileManager.cpp">
+      <Filter>MainGame\missile</Filter>
+    </ClCompile>
+    <ClCompile Include="missile.cpp">
+      <Filter>MainGame\missile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

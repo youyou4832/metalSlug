@@ -1,0 +1,105 @@
+#include "stdafx.h"
+#include "missile.h"
+//#include "player.h"
+
+HRESULT missile::init(int charNum)
+{
+	m_fAngle = PI / 2;
+	m_fRange = WINSIZEY - 72;
+	m_fSpeed = 8.0f;
+	m_fX = 0.0f;
+	m_fY = 0.0f;
+	m_fFiredX = 0.0f;
+	m_fFiredY = 0.0f;
+	m_isFire = false;
+	m_charNum = charNum;
+	//memset(&m_rc, 3, sizeof(m_rc));
+	ZeroMemory(&m_rc, sizeof(m_rc));
+	maxCN = 2;
+	isFind = false;
+	if (g_saveData.selected_player_id == 1) {
+		m_pImg = IMAGEMANAGER->findImage("mutal");
+	}
+
+	return S_OK;
+}
+
+HRESULT missile::init(const char * szImageName, float speed,
+	float x, float y, float angle, float range, int charNum)
+{
+	m_fAngle = angle;
+	m_fRange = range;
+	m_fSpeed = speed;
+	m_fX = x;
+	m_fY = y;
+	m_fFiredX = x;
+	m_fFiredY = y;
+	m_isFire = false;
+	m_charNum = charNum;
+	//memset(&m_rc, 3, sizeof(m_rc));
+	ZeroMemory(&m_rc, sizeof(m_rc));
+
+	m_pImg = IMAGEMANAGER->findImage(szImageName);
+
+	return S_OK;
+}
+
+void missile::release()
+{
+}
+
+void missile::update()
+{
+	move();
+}
+
+void missile::render(HDC hdc, int charNum)
+{
+	if (m_isFire)
+	{
+		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+	}
+}
+
+void missile::fire(float x, float y)
+{
+	if (!m_isFire)
+	{
+		m_isFire = true;
+		// 시작 위치
+		m_fFiredX = m_fX = x;
+		m_fFiredY = m_fY = y;
+
+
+		// 플레이어의 위치를 알아야 각도를 구할 수 있다
+		/*if (m_pTarget)
+		{
+			m_fAngle = MY_UTIL::getAngle(
+				m_fX, m_fY,
+				m_pTarget->getX(), m_pTarget->getY());
+		}*/
+	}
+}
+
+void missile::move()
+{
+	if (m_isFire)
+	{
+		m_fX += cosf(m_fAngle) * m_fSpeed;
+		m_fY += -sinf(m_fAngle) * m_fSpeed;
+
+		if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
+			m_isFire = false;
+		}
+
+	}
+}
+
+missile::missile()
+{
+}
+
+
+missile::~missile()
+{
+}

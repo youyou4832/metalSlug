@@ -1,5 +1,5 @@
 #pragma once
-#include "scene.h";
+#include "scene.h"
 class button;
 
 class titleScene : public scene

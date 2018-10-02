@@ -64,7 +64,7 @@ void soundManager::play(string soundName, float volume)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			m_system->playSound(FMOD_CHANNEL_FREE, m_sound[index], false, &m_channel[index]);
 
@@ -81,7 +81,7 @@ void soundManager::stop(string soundName)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			m_channel[index]->stop();
 			break;
@@ -96,7 +96,7 @@ void soundManager::pause(string soundName)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			m_channel[index]->setPaused(true);
 			break;
@@ -110,7 +110,7 @@ void soundManager::resume(string soundName)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			m_channel[index]->setPaused(false);
 			break;
@@ -125,7 +125,7 @@ bool soundManager::isPlaying(string soundName)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			int index = 0;
 
@@ -144,7 +144,7 @@ bool soundManager::isPause(string soundName)
 	int index = 0;
 	for (auto p : m_mapSounds)
 	{
-		if (p.first == soundName);
+		if (p.first == soundName)
 		{
 			m_channel[index]->getPaused(&isPause);
 			break;
