@@ -61,6 +61,9 @@
     <Filter Include="MainGame\missile">
       <UniqueIdentifier>{705bdbe6-1212-4dee-9230-f772510a6848}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\boss">
+      <UniqueIdentifier>{f3a4fbcc-1d2d-400a-b4d9-1a302456266a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -168,6 +171,12 @@
     <ClInclude Include="missile.h">
       <Filter>MainGame\missile</Filter>
     </ClInclude>
+    <ClInclude Include="bossManager.h">
+      <Filter>MainGame\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="boss.h">
+      <Filter>MainGame\boss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -259,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="missile.cpp">
       <Filter>MainGame\missile</Filter>
+    </ClCompile>
+    <ClCompile Include="bossManager.cpp">
+      <Filter>MainGame\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="boss.cpp">
+      <Filter>MainGame\boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
