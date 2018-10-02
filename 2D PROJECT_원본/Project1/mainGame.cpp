@@ -12,7 +12,7 @@ void mainGame::setBackBuffer()
 
 HRESULT mainGame::init()
 {
-	hdc = GetDC(g_hWnd);	// ÁÖÈ£½Ü ¹Ùº¸
+	hdc = GetDC(g_hWnd);
 
 	//HANDLE hTimer = (HANDLE)SetTimer(g_hWnd, 1, 10, NULL);
 	KEYMANAGER->init();
