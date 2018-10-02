@@ -163,6 +163,7 @@
     <ClInclude Include="missile.h" />
     <ClInclude Include="missileManager.h" />
     <ClInclude Include="pixelCollision.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="progressBar.h" />
     <ClInclude Include="Project1.h" />
     <ClInclude Include="randomFunction.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="missile.cpp" />
     <ClCompile Include="missileManager.cpp" />
     <ClCompile Include="pixelCollision.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="progressBar.cpp" />
     <ClCompile Include="Project1.cpp" />
     <ClCompile Include="scene.cpp" />

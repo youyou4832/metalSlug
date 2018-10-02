@@ -61,6 +61,9 @@
     <Filter Include="MainGame\missile">
       <UniqueIdentifier>{705bdbe6-1212-4dee-9230-f772510a6848}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\player">
+      <UniqueIdentifier>{c7e818dc-5986-455e-9b13-b8417298555f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -168,6 +171,9 @@
     <ClInclude Include="missile.h">
       <Filter>MainGame\missile</Filter>
     </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>MainGame\player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -259,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="missile.cpp">
       <Filter>MainGame\missile</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>MainGame\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
