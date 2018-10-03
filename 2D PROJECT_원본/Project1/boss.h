@@ -46,7 +46,7 @@ private:
 	int		m_nCurrFrameY;
 	int		m_nCount;
 
-	bool isAlive;
+
 
 	// 미사일 매니저
 	missileManager*	m_pMissileMgr;

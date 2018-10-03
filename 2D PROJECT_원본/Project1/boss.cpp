@@ -12,23 +12,23 @@ HRESULT boss::init()
 	m_attack = SMASH;
 
 	//º¸½º ÀÌ¹ÌÁö »ðÀÔ(230*207 12¾¿ ÃÑ 7°³)
-	m_pimgBoss = IMAGEMANAGER->addImage("move", "image/boss/boss.bmp",
-		2760, 1449, 12, 1, true, RGB(255, 0, 255));
+	m_pimgBoss = IMAGEMANAGER->addImage("move", "image/boss/Boss.bmp",
+		2760, 1449, true, RGB(255, 0, 255));
 	m_pMoveAni = new animation;
 	m_pMoveAni->init(m_pimgBoss->getWidth(), m_pimgBoss->getHeight(),
-		m_pimgBoss->getFrameWidth(), m_pimgBoss->getFrameHeight());
-	m_pMoveAni->setPlayFrame(false, true);
-	m_pMoveAni->setFPS(15);
+		230, 207);
+	m_pMoveAni->setPlayFrame(0,12, false, false);
+	m_pMoveAni->setFPS(5);
 
 	m_nCurrFrameX = 0;
 	m_nCurrFrameY = 0;
 
 	m_fSpeed = 5.0f;
-	m_fX = 30;
-	m_fY = WINSIZEY / 2;
+	m_fX = 0;
+	m_fY = WINSIZEY-830;
 
-	m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth() / 4, m_pimgBoss->getHeight() / 4);
-	m_nCurrHP = m_nMaxHP = 100;
+	/*m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth() / 4, m_pimgBoss->getHeight() / 4);
+	m_nCurrHP = m_nMaxHP = 100;*/
 	return S_OK;
 }
 
@@ -38,18 +38,17 @@ void boss::release()
 
 void boss::update()
 {
-	if (isAlive == true)
-	{
+	
 		m_pMoveAni->start();
-	}
+		m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
+	
 }
 
 void boss::render(HDC hdc)
 {
-	if (isAlive == true)
-	{
-		m_pimgBoss->aniRender(hdc, (m_fX - m_pimgBoss->getFrameWidth() / 2), m_fY - (m_pimgBoss->getFrameHeight() / 2), m_pMoveAni);
-	}
+	
+		m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4);
+	
 }
 
 void boss::damaged(int damage)
