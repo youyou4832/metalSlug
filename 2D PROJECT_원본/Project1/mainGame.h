@@ -5,7 +5,7 @@ class endScene;
 class selectScene;
 class gameoverScene;
 class loadingScene;
-class uiTestScene;
+class TestScene;
 class pixelCollision;
 class tileMap;
 
@@ -27,7 +27,7 @@ private:
 	selectScene*	m_pSelectScene;
 	gameoverScene*	m_pGameoverScene;
 	loadingScene*	m_pLoadingScene;
-	uiTestScene*	m_pUiTestScene;
+	TestScene*		m_pTestScene;
 	pixelCollision*	m_pPixelCollisionScene;
 	tileMap*		m_pTileMapScene;
 

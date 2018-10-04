@@ -20,8 +20,9 @@ private:
 	bool	m_isPlaying;					// 현재 플레이 여부
 
 public:
-	HRESULT	init(int totalWidth, int totalHeight,
-		int frameWidth, int frameHeight);
+	HRESULT	init(int totalWidth, int totalHeight, int frameWidth, int frameHeight);
+
+	HRESULT init(int totalWidth, int totalHeight, int frameWidth, int frameHeight, int startY);
 
 	// 세팅
 	void setDefPlayFrame(bool reverse = false, bool loop = false);		// 기본 세팅
@@ -46,7 +47,13 @@ public:
 	// 0 == m_vecPlayList[m_nNowPlayIdx];
 
 	inline int getFrameWidth() { return m_nFrameWidth; }
+	inline void setFrameWidth(int frameWidth) { m_nFrameWidth = frameWidth; }	
+
 	inline int getFrameHeight() { return m_nFrameHeight; }
+	inline void setFrameHeight( int frameHeight ) { m_nFrameHeight = frameHeight; }
+
+	inline float getFrameUpdateSec() { return m_fFrameUpdateSec; }
+	inline void setFrameUpdateSec(float frameUpdateSec) { m_fFrameUpdateSec = frameUpdateSec; }
 
 	inline bool getIsPlaying() { return m_isPlaying; }
 

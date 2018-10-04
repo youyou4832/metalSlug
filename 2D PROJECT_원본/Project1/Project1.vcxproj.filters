@@ -174,6 +174,9 @@
     <ClInclude Include="player.h">
       <Filter>MainGame\player</Filter>
     </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -269,6 +272,9 @@
     <ClCompile Include="player.cpp">
       <Filter>MainGame\player</Filter>
     </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Project1.rc">
@@ -282,5 +288,10 @@
     <Image Include="Project1.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="20181004 수정사항.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
   </ItemGroup>
 </Project>

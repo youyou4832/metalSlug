@@ -2,6 +2,7 @@
 #include "mainGame.h"
 #include "effectManager.h"
 #include "titleScene.h"
+#include "TestScene.h"
 #include "pixelCollision.h"
 
 void mainGame::setBackBuffer()
@@ -13,6 +14,7 @@ void mainGame::setBackBuffer()
 HRESULT mainGame::init()
 {
 	hdc = GetDC(g_hWnd);
+	setBackBuffer();
 
 	//HANDLE hTimer = (HANDLE)SetTimer(g_hWnd, 1, 10, NULL);
 	KEYMANAGER->init();
@@ -24,11 +26,12 @@ HRESULT mainGame::init()
 	SOUNDMANAGER->init();
 	
 	m_pTitleScene = new titleScene;
-	SCENEMANAGER->addScene("title", m_pTitleScene);
+	m_pTestScene = new TestScene;
 
-	SCENEMANAGER->changeScene("title");
+	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
+	SCENEMANAGER->addScene("testScene", m_pTestScene);
 
-	setBackBuffer();
+	SCENEMANAGER->changeScene("testScene");
 
 	// 필요한 리소스 미리 로드
 

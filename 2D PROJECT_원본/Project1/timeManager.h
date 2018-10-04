@@ -14,6 +14,8 @@ public:
 	void update(float lockFPS = 0.0f);
 	void render(HDC hdc);
 
+	inline timer * getTimer() { return m_timer; }
+
 	timeManager();
 	~timeManager();
 };

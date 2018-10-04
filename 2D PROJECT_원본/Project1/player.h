@@ -2,8 +2,8 @@
 
 class player
 {
-				/*
-				186(31)-240 6개 캐릭터 등장 0-
+			/*
+			186(31)-240 6개 캐릭터 등장 0-
 			124* 29(4개) 캐릭터 기본 상태  0-
 			384(32)- 28 12개 캐릭터 상반신 달리기 0-
 			160(32) -35 6개 캐릭터 점프 상반신	0-
@@ -55,11 +55,72 @@ class player
 			84(21)* 16 (4개) 캐릭터 대기 하 모션  0-
 			372(31)- 20 12개 캐릭터 달리기 하반신 0-
 			126(26)-24 6개 제자리 점프 하반신	0-
-			198(33)-21 6개 캐릭터 하반신 앞 점프	0
+			198(33)-21 6개 캐릭터 하반신 앞 점프	0-
 			*/
 
+// 상체
+#define UPPER_AppearWidth	186
+#define UPPER_AppearHeight	240
+#define UPPER_AppearY		0
+#define UPPER_AppearFrame	6
 
-	// 상체
+#define UPPER_IdleWidth		124
+#define UPPER_IdleHeight	29
+#define UPPER_IdleY			UPPER_AppearY + UPPER_AppearHeight
+#define UPPER_IdleFrame		4
+
+#define UPPER_MoveWidth		384
+#define UPPER_MoveHeight	28
+#define UPPER_MoveY			UPPER_IdleY + UPPER_IdleHeight
+#define UPPER_MoveFrame		12
+
+#define UPPER_JumpWidth		160
+#define UPPER_JumpHeight	35
+#define UPPER_JumpY			UPPER_MoveY + UPPER_MoveHeight
+#define UPPER_JumpFrame		6
+
+#define UPPER_JumpMoveWidth		160
+#define UPPER_JumpMoveHeight	35
+#define UPPER_JumpMoveY			UPPER_JumpY + UPPER_JumpHeight
+#define UPPER_JumpMoveFrame		6
+
+#define UPPER_SitWidth			87
+#define UPPER_SitHeight			41
+#define UPPER_SitY				UPPER_JumpMoveY + UPPER_JumpMoveHeight
+#define UPPER_SitFrame			3
+
+#define UPPER_SitIdleWidth		124
+#define UPPER_SitIdleHeight		27
+#define UPPER_SitIdleY			UPPER_SitY + UPPER_SitHeight
+#define UPPER_SitIdleFrame		4
+
+#define UPPER_SitMoveWidth		245
+#define UPPER_SitMoveHeight		24
+#define UPPER_SitMoveY			UPPER_SitIdleY + UPPER_SitIdleHeight
+#define UPPER_SitMoveFrame		7
+
+// 하체
+#define LOWER_IdleWidth			84
+#define LOWER_IdleHeight		16
+#define LOWER_IdleY				1451
+#define LOWER_IdleFrame			4
+
+#define LOWER_MoveWidth			372
+#define LOWER_MoveHeight		20
+#define LOWER_MoveY				1467
+#define LOWER_MoveFrame			12
+
+#define LOWER_JumpWidth			126
+#define LOWER_JumpHeight		24
+#define LOWER_JumpY				1487
+#define LOWER_JumpFrame			6
+
+#define LOWER_JumpMoveWidth		198
+#define LOWER_JumpMoveHeight	21
+#define LOWER_JumpMoveY			1511
+#define LOWER_JumpMoveFrame		6
+
+	// 상체 (Y 시작좌표)
 	enum ACT_UPPER
 	{
 		UPPER_Appear,		// 등장 186(31*240),		6FR
@@ -127,10 +188,11 @@ private:
 	float	m_fJumpSpeed;
 	float	m_fGravity;
 
-	int		m_nActUpper;
-	int		m_nActLower;
-	int		m_nDir;		// 캐릭터가 바라보는 방향
-	int		m_nSelectCharacter;	// 캐릭터 선택
+	short	m_nActUpper;	// 상체 행동
+	short	m_nActLower;	// 하체 행동
+	short	m_nDir;			// 캐릭터가 바라보는 방향
+
+	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 
 public:
 	HRESULT init();
