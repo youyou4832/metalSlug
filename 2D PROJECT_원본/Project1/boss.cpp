@@ -17,8 +17,8 @@ HRESULT boss::init()
 	m_pMoveAni = new animation;
 	m_pMoveAni->init(m_pimgBoss->getWidth(), m_pimgBoss->getHeight(),
 		230, 207);
-	m_pMoveAni->setPlayFrame(0,12, false, false);
-	m_pMoveAni->setFPS(5);
+	m_pMoveAni->setPlayFrame(0, 12, false, true);
+	m_pMoveAni->setFPS(15);
 
 	m_nCurrFrameX = 0;
 	m_nCurrFrameY = 0;
@@ -27,6 +27,10 @@ HRESULT boss::init()
 	m_fX = 0;
 	m_fY = WINSIZEY-830;
 
+	if (m_isAlive == true)
+	{
+		m_pMoveAni->start();
+	}
 	/*m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth() / 4, m_pimgBoss->getHeight() / 4);
 	m_nCurrHP = m_nMaxHP = 100;*/
 	return S_OK;
@@ -34,21 +38,19 @@ HRESULT boss::init()
 
 void boss::release()
 {
+
 }
 
 void boss::update()
-{
-	
-		m_pMoveAni->start();
-		m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
-	
+{	
+	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());	
 }
 
 void boss::render(HDC hdc)
 {
-	
-		m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4);
-	
+
+	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4);
+
 }
 
 void boss::damaged(int damage)
