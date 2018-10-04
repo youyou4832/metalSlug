@@ -11,7 +11,7 @@ HRESULT boss::init()
 	m_isAlive = false;
 
 	m_state = NOMAL;
-	m_move = IDLEMOVE;
+	m_move = MOVE;
 
 	//보스 이미지 삽입(230*207 12씩 총 7개)
 	m_pimgBoss = IMAGEMANAGER->addImage("move", "image/boss/Boss.bmp",
@@ -30,6 +30,8 @@ HRESULT boss::init()
 
 	m_fX = -20;
 	m_fY = 1035;
+
+	m_nCount = 0;
 
 	
 	/*if (m_isAlive == true)
@@ -68,21 +70,52 @@ void boss::update()
 
 		if (m_isAlive && !m_isAppear)
 		{
-			if (m_move == IDLEMOVE &&(m_fX >= -280 && m_fX < WINSIZEX / 2.5))
+			if (m_move == MOVE) // 제자리 걸음
 			{
+				m_fX += m_fSpeed;
+
+				if (m_nCount == 30)
+				{
+					m_move = BACKMOVE;
+
+				}
+				m_nCount += 1;
+			}
+
+			if (m_move == BACKMOVE && (m_fX >= -280 && m_fX < WINSIZEX / 2.5))
+			{
+				m_nCount = 0;
 				m_fX -= m_fSpeed;
 
-				if (m_fX == -280)
-					m_move = SMALLMOVE;
+				if (m_fX == -280) m_move = RUSHMOVE;
+				//m_move = SMALLMOVE;
 			}
+
+			//if (m_move == IDLEMOVE &&(m_fX >= -280 && m_fX < WINSIZEX / 2.5))
+			//{
+			//	m_fX -= m_fSpeed;
+
+			//	if (m_fX == -280) m_move = RUSHMOVE;
+			//		//m_move = SMALLMOVE;
+			//}
 
 			if (m_move == SMALLMOVE && m_fX < 100)
 			{
 				int speedup = 2;
 				m_fX += (m_fSpeed+speedup);
 
-				/*if (m_fX == 100)
-					m_move = IDLEMOVE;*/
+				if (m_fX >= 100)
+					m_move = MOVE;
+
+			}
+
+			if (m_move == RUSHMOVE && m_fX < 250)
+			{
+				int speedup = 2;
+				m_fX += (m_fSpeed + speedup);
+
+				if (m_fX >= 250)
+					m_move = MOVE;
 
 			}
 			
@@ -101,7 +134,7 @@ void boss::update()
 void boss::render(HDC hdc)
 {
 
-	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,3.5);
+	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4.0);
 
 }
 

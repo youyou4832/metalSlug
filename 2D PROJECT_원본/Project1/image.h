@@ -84,7 +84,7 @@ public:
 	// ∑ª¥ı
 	void render(HDC hdc, int destX, int destY);
 	void render(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1);
-
+	void render(HDC hdc, float destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1);
 	// «¡∑π¿” ∑ª¥ı
 	void frameRender(HDC hdc, int destX, int destY,
 		int currFrameX, int currFrameY);

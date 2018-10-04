@@ -17,10 +17,11 @@ enum pattern {
 };
 
 enum movebing {
-	IDLEMOVE, // 원점으로 이동
 	MOVE, // 제라리 걸음 이동
+	IDLEMOVE, // 원점으로 이동
 	SMALLMOVE, // 약간 약진 이동
-	RUSHMOVE // 대쉬 이동
+	RUSHMOVE, // 대쉬 이동
+	BACKMOVE
 };
 
 
