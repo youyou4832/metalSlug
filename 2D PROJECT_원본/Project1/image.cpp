@@ -411,7 +411,7 @@ void image::alphaRender(HDC hdc, int destX, int destY, BYTE alpha)
 	}
 }
 
- void image::aniRender(HDC hdc, int destX, int destY, animation * ani, int scalar)
+ void image::aniRender(HDC hdc, int destX, int destY, animation * ani, float scalar)
 {
 	render(hdc, destX, destY,
 		ani->getFramePos().x, ani->getFramePos().y,

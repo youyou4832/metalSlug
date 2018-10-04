@@ -8,8 +8,10 @@ class bossScene :public scene
 {
 private:
 	image	*	m_pimgBG;
+	image	*	m_pimgSubBG;
 	boss	*	m_pBoss;
 	
+	float m_mapSpeed;
 
 public:
 	virtual HRESULT init();

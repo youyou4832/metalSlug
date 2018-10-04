@@ -10,16 +10,17 @@ enum state {
 
 enum pattern {
 	IDLE,
-	MOVE,
 	ATTACK,
+	DOUBLEFIRE,
+	CANNFIRE,
 	DIE
 };
 
-enum attack {
-	SMASH,
-	RUSH,
-	FIRE,
-	BULLET
+enum movebing {
+	IDLEMOVE, // 원점으로 이동
+	MOVE, // 제라리 걸음 이동
+	SMALLMOVE, // 약간 약진 이동
+	RUSHMOVE // 대쉬 이동
 };
 
 
@@ -39,13 +40,14 @@ private:
 
 	RECT	m_rc;
 	float	m_fSpeed;
+	float m_upspeed;
+
 	float	m_fX;
 	float	m_fY;
 
 	int		m_nCurrFrameX;
 	int		m_nCurrFrameY;
 	int		m_nCount;
-
 
 
 	// 미사일 매니저
@@ -56,10 +58,12 @@ private:
 	int				m_nCurrHP;
 	int				m_nMaxHP;
 
-	state			m_state;
-	pattern			m_pattern;
-	attack			m_attack;
+	state			m_state;	// 보스의 상태를 위한 변수
+	pattern			m_pattern;	// 보스의 패턴을  받는 변수
+	movebing		m_move;		// 보스으 무브 패턴을 받는 변수
 
+
+	bool m_isAppear;
 	bool m_isAlive;
 	// 타겟
 	/*	플레이어클래스*	m_pTarget;*/

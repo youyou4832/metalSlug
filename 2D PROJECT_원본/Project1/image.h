@@ -94,7 +94,7 @@ public:
 	void alphaRender(HDC hdc, int destX, int destY, BYTE alpha);
 
 	// 애니메이션 렌더
-	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1);
+	void aniRender(HDC hdc, int destX, int destY, animation* ani, float scalar = 1);
 
 	void setTransColor(bool trans, COLORREF transColor);
 
