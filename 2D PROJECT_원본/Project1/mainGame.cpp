@@ -34,7 +34,7 @@ HRESULT mainGame::init()
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
 
 	m_pBossScene = new bossScene;
-	SCENEMANAGER->addScene("boos", m_pBossScene);
+	SCENEMANAGER->addScene("bossScene", m_pBossScene);
 
 	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
 	SCENEMANAGER->addScene("testScene", m_pTestScene);

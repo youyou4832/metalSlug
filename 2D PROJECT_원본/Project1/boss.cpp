@@ -33,14 +33,11 @@ HRESULT boss::init()
 
 	m_nCount = 0;
 
+	m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth(), m_pimgBoss->getHeight());
 	
-	/*if (m_isAlive == true)
-	{
-		m_pMoveAni->start();
-	}*/
 
-	/*m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth() / 4, m_pimgBoss->getHeight() / 4);
-	m_nCurrHP = m_nMaxHP = 100;*/
+
+	m_nCurrHP = m_nMaxHP = 100;
 	return S_OK;
 }
 
@@ -65,6 +62,25 @@ void boss::update()
 
 	}
 
+	move();
+
+	/*if (m_fX  >-380 && m_fX < WINSIZEX / 2.5)
+	{
+		m_fX -= m_fSpeed;
+	}*/
+
+	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
+}
+
+void boss::render(HDC hdc)
+{
+
+	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4.0);
+
+}
+
+void boss::move()
+{
 	if (m_state == NOMAL)
 	{
 
@@ -102,7 +118,7 @@ void boss::update()
 			if (m_move == SMALLMOVE && m_fX < 100)
 			{
 				int speedup = 2;
-				m_fX += (m_fSpeed+speedup);
+				m_fX += (m_fSpeed + speedup);
 
 				if (m_fX >= 100)
 					m_move = MOVE;
@@ -118,24 +134,10 @@ void boss::update()
 					m_move = MOVE;
 
 			}
-			
+
 		}
-		
+
 	}
-
-	/*if (m_fX  >-380 && m_fX < WINSIZEX / 2.5)
-	{
-		m_fX -= m_fSpeed;
-	}*/
-
-	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
-}
-
-void boss::render(HDC hdc)
-{
-
-	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4.0);
-
 }
 
 void boss::damaged(int damage)

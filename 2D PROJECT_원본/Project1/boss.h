@@ -73,6 +73,7 @@ public:
 	void release();
 	void update();
 	void render(HDC hdc);
+	void move();
 
 	inline RECT getRect() { return m_rc; }
 	inline float getX() { return m_fX; }
