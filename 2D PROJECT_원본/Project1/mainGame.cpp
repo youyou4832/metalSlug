@@ -39,7 +39,7 @@ HRESULT mainGame::init()
 	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
 	SCENEMANAGER->addScene("testScene", m_pTestScene);
 
-	SCENEMANAGER->changeScene("introScene");
+	SCENEMANAGER->changeScene("testScene");
 
 	// 필요한 리소스 미리 로드
 

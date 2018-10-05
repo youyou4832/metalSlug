@@ -465,7 +465,6 @@ void image::alphaRender(HDC hdc, int destX, int destY, BYTE alpha)
 	}
 }
 
- void image::aniRender(HDC hdc, int destX, int destY, animation * ani, float scalar)
 void image::aniRender(HDC hdc, int destX, int destY, animation * ani, int scalar, bool reverse /*false*/)
 {
 	render(hdc, destX, destY,
