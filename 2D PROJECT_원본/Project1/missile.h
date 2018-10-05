@@ -19,15 +19,9 @@ protected:
 	float	m_fRange;
 	bool	m_isFire;
 
-	m_tagState m_move;
-	m_tagState d_move;
-	m_tagState s_cursor;
-	m_tagState s_move;
-
-	int playerBulletFrameX = 0;
+	m_tagState special_bullet;
 	int m_charNum;
-	SYNTHESIZE(bool, isFind, isFind);
-	SYNTHESIZE(int, maxCN, MaxCN);
+
 	SYNTHESIZE(float, m_fSpeed, fSpeed);
 
 public:
@@ -46,6 +40,9 @@ public:
 	inline bool getIsFire() { return m_isFire; }
 	//inline void setTarget(player* pTarget) { m_pTarget = pTarget; }
 	inline void setAngle(float angle) { m_fAngle = angle; }
+
+	void ani_specialBullet();
+
 	missile();
 	virtual ~missile();
 };

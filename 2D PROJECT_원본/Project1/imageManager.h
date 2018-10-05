@@ -28,6 +28,9 @@ public:
 	image* addImage(std::string strKey, const char* szFileName, 
 		int width, int height, int frameX, int frameY,
 		bool trans, COLORREF transColor);
+	image* addImage(std::string strKey, const char* szFileName, float x, float y,
+		int width, int height, int frameX, int frameY,
+		bool trans, COLORREF transColor);
 	image* findImage(std::string strKey);
 	bool deleteImage(std::string strKey);
 	bool deleteImageAll();

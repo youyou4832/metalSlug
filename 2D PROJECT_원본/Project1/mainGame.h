@@ -1,13 +1,7 @@
 #pragma once
 class titleScene;
-class battleScene;
-class endScene;
-class selectScene;
-class gameoverScene;
-class loadingScene;
-class uiTestScene;
+class introScene;
 class pixelCollision;
-class tileMap;
 
 class mainGame
 {
@@ -22,14 +16,8 @@ private:
 	char m_szText[128];
 	// scene list
 	titleScene*		m_pTitleScene;
-	battleScene*	m_pBattleScene;
-	endScene*		m_pEndScene;
-	selectScene*	m_pSelectScene;
-	gameoverScene*	m_pGameoverScene;
-	loadingScene*	m_pLoadingScene;
-	uiTestScene*	m_pUiTestScene;
+	introScene*		m_pIntroScene;
 	pixelCollision*	m_pPixelCollisionScene;
-	tileMap*		m_pTileMapScene;
 
 public:
 	int m_nScene;

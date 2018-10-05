@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "mainGame.h"
-#include "effectManager.h"
+//#include "effectManager.h"
 #include "titleScene.h"
+#include "introScene.h"
 #include "pixelCollision.h"
 
 void mainGame::setBackBuffer()
@@ -12,7 +13,7 @@ void mainGame::setBackBuffer()
 
 HRESULT mainGame::init()
 {
-	hdc = GetDC(g_hWnd);	// ÁÖÈ£½Ü ¹Ùº¸
+	hdc = GetDC(g_hWnd);
 
 	//HANDLE hTimer = (HANDLE)SetTimer(g_hWnd, 1, 10, NULL);
 	KEYMANAGER->init();
@@ -26,7 +27,10 @@ HRESULT mainGame::init()
 	m_pTitleScene = new titleScene;
 	SCENEMANAGER->addScene("title", m_pTitleScene);
 
-	SCENEMANAGER->changeScene("title");
+	m_pIntroScene = new introScene;
+	SCENEMANAGER->addScene("intro", m_pIntroScene);
+
+	SCENEMANAGER->changeScene("intro");
 
 	setBackBuffer();
 
@@ -72,6 +76,7 @@ LRESULT mainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 			PostQuitMessage(0);
 			return 0;
 		}
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;

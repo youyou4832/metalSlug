@@ -81,6 +81,26 @@ image * imageManager::addImage(std::string strKey,
 	return img;
 }
 
+image * imageManager::addImage(std::string strKey, const char * szFileName, float x, float y, int width, int height, int frameX, int frameY, bool trans, COLORREF transColor)
+{
+	image* img = findImage(strKey);
+	if (img)	return img;
+
+	img = new image;
+
+	if (FAILED(img->init(
+		szFileName, x, y, width, height,
+		frameX, frameY, trans, transColor)))
+	{
+		delete img;
+		return NULL;
+	}
+
+	m_map.insert(std::make_pair(strKey, img));
+
+	return img;
+}
+
 image * imageManager::findImage(std::string strKey)
 {
 	// 찾으면 해당 원소의 주소가 리턴, 없으면 m_map.end()가 리턴

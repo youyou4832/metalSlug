@@ -99,9 +99,7 @@ void missileManager::fire(float x, float y, int charNum) // 플레이어 총알 init
 		pMissile->init(charNum);
 		m_vecMissile.push_back(pMissile);
 	}
-	pMissile->setisFind(false);
 	pMissile->setAngle(PI / 2);
-	pMissile->setMaxCN(2);
 	pMissile->fire(x, y);
 
 }
