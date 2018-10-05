@@ -76,6 +76,7 @@ void boss::render(HDC hdc)
 {
 
 	m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni,4.0);
+	m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth(), m_pimgBoss->getHeight());
 
 }
 
