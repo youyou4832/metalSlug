@@ -20,12 +20,14 @@ private:
 	bool	m_isPlaying;					// 현재 플레이 여부
 
 public:
-	HRESULT	init(int totalWidth, int totalHeight,
-		int frameWidth, int frameHeight);
+	HRESULT	init(int totalWidth, int totalHeight, int frameWidth, int frameHeight);
+
+	HRESULT init(int totalWidth, int totalHeight, int frameWidth, int frameHeight, int startY);
 
 	// 세팅
 	void setDefPlayFrame(bool reverse = false, bool loop = false);		// 기본 세팅
 	void setPlayFrame(int* arrPlay, int arrLen, bool loop = false);		//
+	void setPlayFrameReverse(int start, int end, bool reverse, bool loop);
 	void setPlayFrame(int start, int end, bool reverse = false, bool loop = false);
 	void setFPS(int fps);	// 초당 갱신 횟수 설정
 
@@ -46,7 +48,13 @@ public:
 	// 0 == m_vecPlayList[m_nNowPlayIdx];
 
 	inline int getFrameWidth() { return m_nFrameWidth; }
+	inline void setFrameWidth(int frameWidth) { m_nFrameWidth = frameWidth; }	
+
 	inline int getFrameHeight() { return m_nFrameHeight; }
+	inline void setFrameHeight( int frameHeight ) { m_nFrameHeight = frameHeight; }
+
+	inline float getFrameUpdateSec() { return m_fFrameUpdateSec; }
+	inline void setFrameUpdateSec(float frameUpdateSec) { m_fFrameUpdateSec = frameUpdateSec; }
 
 	inline bool getIsPlaying() { return m_isPlaying; }
 

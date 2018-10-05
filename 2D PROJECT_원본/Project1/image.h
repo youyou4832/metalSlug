@@ -83,7 +83,7 @@ public:
 
 	// ∑ª¥ı
 	void render(HDC hdc, int destX, int destY);
-	void render(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1);
+	void render(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1, bool reverse = false);
 
 	// «¡∑π¿” ∑ª¥ı
 	void frameRender(HDC hdc, int destX, int destY,
@@ -94,7 +94,7 @@ public:
 	void alphaRender(HDC hdc, int destX, int destY, BYTE alpha);
 
 	// æ÷¥œ∏ﬁ¿Ãº« ∑ª¥ı
-	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1);
+	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1, bool reverse = false);
 
 	void setTransColor(bool trans, COLORREF transColor);
 

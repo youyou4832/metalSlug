@@ -51,6 +51,38 @@ HRESULT animation::init(int totalWidth, int totalHeight, int frameWidth, int fra
 	return S_OK;
 }
 
+HRESULT animation::init(int totalWidth, int totalHeight, int frameWidth, int frameHeight, int startY)
+{
+	// 가로 프레임 수
+	m_nFrameWidth = frameWidth;
+	int numWidth = totalWidth / m_nFrameWidth;
+
+	// 세로 프레임 수
+	m_nFrameHeight = frameHeight;
+	int numHeight = totalHeight / m_nFrameHeight;
+
+	// 총 프레임 수
+	m_nFrameNum = numWidth * numHeight;
+
+	// 프레임 위치 리스트 셋팅
+	m_vecFrameList.clear();
+
+	for (int i = 0; i < numHeight; i++)
+	{
+		for (int j = 0; j < numWidth; j++)
+		{
+			POINT framePos;
+			framePos.x = j * m_nFrameWidth;
+			framePos.y = i * m_nFrameHeight + startY;
+
+			// 프레임 위치 리스트에 추가한다
+			m_vecFrameList.push_back(framePos);
+		}
+	}
+
+	return S_OK;
+}
+
 void animation::setDefPlayFrame(bool reverse, bool loop)
 {
 	// 루프 여부
@@ -98,6 +130,32 @@ void animation::setPlayFrame(int * arrPlay, int arrLen, bool loop)
 	}
 }
 
+void animation::setPlayFrameReverse(int start, int end, bool reverse, bool loop)
+{
+	m_isLoop = loop;
+
+	m_vecPlayList.clear();
+
+	if (start == end)
+	{
+		return;
+	}
+
+	// 역 <- 애니메이션
+
+	for (int i = end - 1; i >= start; i--)
+	{
+		m_vecPlayList.push_back(i);
+	}
+
+	if (reverse)
+	{
+		for (int i = start; i < end; i++)
+		{
+			m_vecPlayList.push_back(i);
+		}
+	}
+}
 void animation::setPlayFrame(int start, int end, bool reverse, bool loop)
 {
 	m_isLoop = loop;
