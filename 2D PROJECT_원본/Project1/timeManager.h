@@ -1,5 +1,6 @@
 #pragma once
 #include "singletonBase.h"
+#include"timer.h"
 class timer;
 
 class timeManager : public singletonBase<timeManager>
@@ -13,6 +14,8 @@ public:
 	
 	void update(float lockFPS = 0.0f);
 	void render(HDC hdc);
+
+	inline float getElapsedTime() { return m_timer->getElapsedTime(); }
 
 	inline timer * getTimer() { return m_timer; }
 

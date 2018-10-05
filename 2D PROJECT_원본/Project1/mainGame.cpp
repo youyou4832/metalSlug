@@ -2,6 +2,7 @@
 #include "mainGame.h"
 #include "effectManager.h"
 #include "titleScene.h"
+#include "bossScene.h"
 #include "TestScene.h"
 #include "introScene.h"
 #include "pixelCollision.h"
@@ -31,6 +32,9 @@ HRESULT mainGame::init()
 
 	m_pIntroScene = new introScene;
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
+
+	m_pBossScene = new bossScene;
+	SCENEMANAGER->addScene("boos", m_pBossScene);
 
 	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
 	SCENEMANAGER->addScene("testScene", m_pTestScene);

@@ -64,6 +64,9 @@
     <Filter Include="MainGame\player">
       <UniqueIdentifier>{c7e818dc-5986-455e-9b13-b8417298555f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\boss">
+      <UniqueIdentifier>{f3a4fbcc-1d2d-400a-b4d9-1a302456266a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -177,6 +180,12 @@
     <ClInclude Include="TestScene.h">
       <Filter>2DGameFramework\scene</Filter>
     </ClInclude>
+    <ClInclude Include="boss.h">
+      <Filter>MainGame\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="bossScene.h">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -273,6 +282,12 @@
       <Filter>MainGame\player</Filter>
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="boss.cpp">
+      <Filter>MainGame\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="bossScene.cpp">
       <Filter>2DGameFramework\scene</Filter>
     </ClCompile>
   </ItemGroup>

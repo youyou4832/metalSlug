@@ -85,6 +85,8 @@ public:
 	void render(HDC hdc, int destX, int destY);
 	void render(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1, bool reverse = false);
 
+	void render(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1);
+	void render(HDC hdc, float destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1);
 	// 프레임 렌더
 	void frameRender(HDC hdc, int destX, int destY,
 		int currFrameX, int currFrameY);
@@ -95,6 +97,7 @@ public:
 
 	// 애니메이션 렌더
 	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1, bool reverse = false);
+	void aniRender(HDC hdc, int destX, int destY, animation* ani, float scalar = 1);
 
 	void setTransColor(bool trans, COLORREF transColor);
 
