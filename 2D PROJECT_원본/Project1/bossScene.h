@@ -9,6 +9,8 @@ class bossScene :public scene
 private:
 	image	*	m_pimgBG;
 	image	*	m_pimgSubBG;
+	
+	image	*	m_pimgbridge;
 	boss	*	m_pBoss;
 	
 	float m_mapSpeed;
