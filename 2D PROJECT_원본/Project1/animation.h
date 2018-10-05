@@ -27,6 +27,7 @@ public:
 	// 세팅
 	void setDefPlayFrame(bool reverse = false, bool loop = false);		// 기본 세팅
 	void setPlayFrame(int* arrPlay, int arrLen, bool loop = false);		//
+	void setPlayFrameReverse(int start, int end, bool reverse, bool loop);
 	void setPlayFrame(int start, int end, bool reverse = false, bool loop = false);
 	void setFPS(int fps);	// 초당 갱신 횟수 설정
 

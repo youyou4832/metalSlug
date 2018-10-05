@@ -230,7 +230,7 @@ void image::render(HDC hdc, int destX, int destY)
 }
 
 void image::render(HDC hdc, int destX, int destY, 
-	int sourX, int sourY, int sourWidth, int sourHeight, int scalar)
+	int sourX, int sourY, int sourWidth, int sourHeight, int scalar, bool reverse /*false*/)
 {
 	if (m_isTransparent)
 	{
@@ -260,12 +260,26 @@ void image::render(HDC hdc, int destX, int destY,
 		// x1 : 이미지의 시작점을 잘라낼 것인가의 가로값
 		// y1 : 이미지의 시작점을 잘라낼 것인가의 세로값
 		// rop : 복사하는 옵션 (SRCCOPY)
-		BitBlt(
-			hdc,
-			destX, destY,
-			m_pImageInfo->nWidth, m_pImageInfo->nHeight,
-			m_pImageInfo->hMemDC,
-			0, 0, SRCCOPY);
+		// rop : 색반전 : DSTINVERT
+
+		if (reverse == false)
+		{
+			BitBlt(
+				hdc,
+				destX, destY,
+				m_pImageInfo->nWidth, m_pImageInfo->nHeight,
+				m_pImageInfo->hMemDC,
+				0, 0, SRCCOPY);
+		}
+		else if (reverse == true)
+		{
+			BitBlt(
+				hdc,
+				destX, destY,
+				m_pImageInfo->nWidth, m_pImageInfo->nHeight,
+				m_pImageInfo->hMemDC,
+				0, 0, NOTSRCCOPY);
+		}
 	}
 }
 
@@ -411,11 +425,11 @@ void image::alphaRender(HDC hdc, int destX, int destY, BYTE alpha)
 	}
 }
 
-void image::aniRender(HDC hdc, int destX, int destY, animation * ani, int scalar)
+void image::aniRender(HDC hdc, int destX, int destY, animation * ani, int scalar, bool reverse /*false*/)
 {
 	render(hdc, destX, destY,
 		ani->getFramePos().x, ani->getFramePos().y,
-		ani->getFrameWidth(), ani->getFrameHeight(), scalar);
+		ani->getFrameWidth(), ani->getFrameHeight(), scalar, reverse);
 }
 
 void image::setTransColor(bool trans, COLORREF transColor)

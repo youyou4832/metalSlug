@@ -75,6 +75,7 @@ LRESULT mainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 			PostQuitMessage(0);
 			return 0;
 		}
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;

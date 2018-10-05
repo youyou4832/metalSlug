@@ -130,6 +130,32 @@ void animation::setPlayFrame(int * arrPlay, int arrLen, bool loop)
 	}
 }
 
+void animation::setPlayFrameReverse(int start, int end, bool reverse, bool loop)
+{
+	m_isLoop = loop;
+
+	m_vecPlayList.clear();
+
+	if (start == end)
+	{
+		return;
+	}
+
+	// 역 <- 애니메이션
+
+	for (int i = end - 1; i >= start; i--)
+	{
+		m_vecPlayList.push_back(i);
+	}
+
+	if (reverse)
+	{
+		for (int i = start; i < end; i++)
+		{
+			m_vecPlayList.push_back(i);
+		}
+	}
+}
 void animation::setPlayFrame(int start, int end, bool reverse, bool loop)
 {
 	m_isLoop = loop;

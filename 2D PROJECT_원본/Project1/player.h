@@ -84,10 +84,10 @@ class player
 #define UPPER_JumpMoveY			UPPER_JumpY + UPPER_JumpHeight
 #define UPPER_JumpMoveFrame		6
 
-#define UPPER_SitWidth			87
+#define UPPER_SitWidth			116
 #define UPPER_SitHeight			41
 #define UPPER_SitY				UPPER_JumpMoveY + UPPER_JumpMoveHeight
-#define UPPER_SitFrame			3
+#define UPPER_SitFrame			4
 
 #define UPPER_SitIdleWidth		124
 #define UPPER_SitIdleHeight		27
@@ -102,22 +102,22 @@ class player
 // 하체
 #define LOWER_IdleWidth			84
 #define LOWER_IdleHeight		16
-#define LOWER_IdleY				1451
+#define LOWER_IdleY				1450
 #define LOWER_IdleFrame			4
 
 #define LOWER_MoveWidth			372
 #define LOWER_MoveHeight		20
-#define LOWER_MoveY				1467
+#define LOWER_MoveY				1466
 #define LOWER_MoveFrame			12
 
 #define LOWER_JumpWidth			126
 #define LOWER_JumpHeight		24
-#define LOWER_JumpY				1487
+#define LOWER_JumpY				1486
 #define LOWER_JumpFrame			6
 
 #define LOWER_JumpMoveWidth		198
 #define LOWER_JumpMoveHeight	21
-#define LOWER_JumpMoveY			1511
+#define LOWER_JumpMoveY			1510
 #define LOWER_JumpMoveFrame		6
 
 	// 상체 (Y 시작좌표)
@@ -129,7 +129,7 @@ class player
 		UPPER_Jump,			// 점프 160(32*35),		6FR
 		UPPER_JumpMove,		// 점프 이동 160(32*35),	6FR
 
-		UPPER_Sit,			// 앉기 87(29*41),		3FR
+		UPPER_Sit,			// 앉기 116(29*41),		4FR
 		UPPER_SitIdle,		// 앉아 대기 124(31*27),	4FR
 		UPPER_SitMove,		// 앉아 이동 245(35*24),	7FR
 		
@@ -143,7 +143,7 @@ class player
 
 		UPPER_GunIdle,		// 무기 대기 152(38*29),		4FR
 		UPPER_GunMove,		// 무기 이동 516(43*31),		12FR
-		UPPER_GunSit,		// 무기 앉기 117(39*42),		3FR
+		UPPER_GunSit,		// 무기 앉기 156(39*42),		4FR
 		UPPER_GunSitIdle,	// 무기 앉아 대기 164(41*24),	4FR
 		UPPER_GunSitMove,	// 무기 앉아 이동 287(41*24),	7FR
 
@@ -164,8 +164,8 @@ class player
 	
 	enum DIR
 	{
-		DIR_Left,
 		DIR_Right,
+		DIR_Left,
 		DIR_Up,
 		DIR_Down,
 	};
@@ -173,6 +173,7 @@ class player
 	struct TagImg
 	{
 		image *		pImg;
+		image *		pImgReverse;
 		animation *	pAni;
 		RECT		rc;
 	};
@@ -184,6 +185,7 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
+	float	m_fReplaceY;
 	float	m_fSpeed;
 	float	m_fJumpSpeed;
 	float	m_fGravity;
