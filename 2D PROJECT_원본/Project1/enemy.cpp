@@ -53,10 +53,10 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 	m_fSpeed = speed;
 	isAlive = true;
 	deathCN = 0;
-	if (m_CharNum == CharInfo::sandbag) {
+	if (m_CharNum == CharInfo::i_sandbag) {
 		m_currHP = m_MaxHP = 30;
 	}
-	else if(m_CharNum == CharInfo::sniper){
+	else if(m_CharNum == CharInfo::i_sniper){
 		m_currHP = m_MaxHP = 1;
 	}
 
@@ -74,21 +74,32 @@ void enemy::release()
 
 void enemy::update()
 {
-	if (KEYMANAGER->isOnceKeyDown(VK_RETURN)) {
+	if (KEYMANAGER->isStayKeyDown(VK_RETURN)) {
 		m_currHP--;
+		s_Hit.isState = true;
+		if (m_currHP == 15) {
+			firstBreak = true;
+		}
+		if (m_currHP == 0) {
+			secondBreak = true;
+		}
 	}
+
 	if (isAlive) {
-		if (m_CharNum == CharInfo::sniper) {
+		if (m_CharNum == CharInfo::i_sniper) {
 			move();
 			sniperAnimation();
 		}
-		else if (m_CharNum == CharInfo::sandbag) {
+		else if (m_CharNum == CharInfo::i_sandbag) {
 			m_rc = RectMakeCenter(m_fX + 48, m_fY + 35, 40, 35 * 2);
-			//sandBagAnimation();
+			sandBagAnimation();
+			if (s_Hit.isState == true) {
+				sendBagHitAnimation();
+			}
 		}
 	}
 	//fire();
-
+	
 	if (m_pMissileMgr)
 		m_pMissileMgr->update();
 	
@@ -99,8 +110,8 @@ void enemy::render(HDC hdc)
 	if (isAlive) {
 		if (m_pImg)
 		{
-			Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-			if (m_CharNum == CharInfo::sniper) {
+			//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+			if (m_CharNum == CharInfo::i_sniper) {
 				if (m_currHP > 0) {
 					m_pImg->render(hdc, m_fX, m_fY, m_pImg->getFrameX()*m_pImg->getFrameWidth(), m_pImg->getFrameY(), m_pImg->getFrameWidth(), m_pImg->getHeight(), 3);
 				}
@@ -108,9 +119,31 @@ void enemy::render(HDC hdc)
 					IMAGEMANAGER->findImage("enemy_death")->render(hdc, m_fX  + 120, m_fY + 90, 44 * s_Death.index, 0, 44, 39, 3);
 				}
 			}
-			else if (m_CharNum == CharInfo::sandbag) {
-				m_pImg->render(hdc, m_fX, m_fY, 0, 0, 48, 35, 2);
+			else if (m_CharNum == CharInfo::i_sandbag) {
+				if (m_currHP > 15) {//온전한 샌드백 형태
+					if (s_Hit.isState == false) {
+						m_pImg->render(hdc, m_fX, m_fY, 0, 0, 48, 35, 2);
+					}
+					else if (s_Hit.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 48 * s_Hit.index, 35, 48, 35, 2);
+					}
+				}
+				else {//한번 부서진 샌드백
+					if (s_Hit.isState == false && secondBreak == false) {
+						m_pImg->render(hdc, m_fX, m_fY + 29, 0, 134, 48, 22, 2);
+					}
+					else if (s_Hit.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY + 29, 48 * s_Hit.index, 156, 48, 22, 2);
+					}
+				}
+				if (firstBreak == true) {//처음 샌드백 터짐
+					m_pImg->render(hdc, m_fX, m_fY - 55, 48 * s_Attack.index, 70, 48, 64, 2);
+				}
+				if (secondBreak == true) {
+					m_pImg->render(hdc, m_fX - 20, m_fY - 160, 80 * s_Attack.index, 178, 80, 119, 2);
+				}
 
+				
 			}
 		}
 
@@ -126,7 +159,7 @@ void enemy::move()
 {
 	/*m_fX += cosf(moveAngle) * m_fSpeed;
 	m_fY += -sinf(moveAngle) * m_fSpeed;*/
-	if (m_CharNum == CharInfo::sniper) {
+	if (m_CharNum == CharInfo::i_sniper) {
 		m_rc = RectMakeCenter(m_fX + (m_pImg->getFrameWidth() / 2) * 3 + 30, m_fY + (m_pImg->getHeight() / 2) * 3 + 30, m_pImg->getFrameWidth(), m_pImg->getHeight());
 	}
 
@@ -138,16 +171,7 @@ void enemy::move()
 
 void enemy::fire()
 {
-	/*m_nFireCount++;
-	if (m_nFireCount % m_nRandFireCount == 0)
-	{
-		m_pMissileMgr->fire(m_fX, m_fY,
-			PI, 5, m_CharNum);
-
-		m_nFireCount = 0;
-		m_nRandFireCount = RANDOM->getFromIntTo(150, 250);
-	}*/
-	if (m_CharNum == CharInfo::sniper) {
+	if (m_CharNum == CharInfo::i_sniper) {
 		m_pMissileMgr->fire(m_fX+ (m_pImg->getFrameWidth() / 2)*3, m_fY + (m_pImg->getHeight() / 2) * 3,
 			PI, 5, m_CharNum);
 	}
@@ -184,30 +208,53 @@ void enemy::sniperAnimation()
 
 void enemy::sandBagAnimation()
 {
-
-	if (m_currHP <= 15) {
+	if (firstBreak == true) {
 		++s_Attack.count;
 		if (s_Attack.count % 5 == 0) {
 			++s_Attack.index;
 			if (s_Attack.index == 17) {
-				fire();
-			}
-			if (s_Attack.index == 27) {
 				s_Attack.index = 0;
+				firstBreak = false;
 			}
 			s_Attack.count = 0;
-			m_pImg->setFrameX(s_Attack.index);
+		}
+	}
+	else if (secondBreak == true) {
+		++s_Attack.count;
+		if (s_Attack.count % 5 == 0) {
+			++s_Attack.index;
+			if (s_Attack.index == 20) {
+				s_Attack.index = 0;
+				secondBreak = false;
+				isAlive = false;
+			}
+			s_Attack.count = 0;
+		}
+	}
+}
+
+void enemy::sendBagHitAnimation()
+{
+	if (m_currHP > 15) {
+		++s_Hit.count;
+		if (s_Hit.count % 8 == 0) {
+			++s_Hit.index;
+			if (s_Hit.index == 2) {
+				s_Hit.index = 0;
+				s_Hit.isState = false;
+			}
+			s_Hit.count = 0;
 		}
 	}
 	else {
-		++s_Death.count;
-		if (s_Death.count % 8 == 0) {
-			++s_Death.index;
-			if (s_Death.index == 6) {
-				s_Death.index = 5;
-				deathCount();
+		++s_Hit.count;
+		if (s_Hit.count % 8 == 0) {
+			++s_Hit.index;
+			if (s_Hit.index == 2) {
+				s_Hit.index = 0;
+				s_Hit.isState = false;
 			}
-			s_Death.count = 0;
+			s_Hit.count = 0;
 		}
 	}
 }

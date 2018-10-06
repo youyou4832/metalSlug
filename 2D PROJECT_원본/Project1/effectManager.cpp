@@ -95,7 +95,7 @@ void effectManager::addEffect(string effectName, const char * imageName, int ima
 
 void effectManager::play(string effectName, int x, int y)
 {
-	vector<effect*> vecE;
+	/*vector<effect*> vecE;
 	vector<effect*>::iterator iterVE;
 
 	m_iter = m_mapEffects.find(effectName);
@@ -108,6 +108,19 @@ void effectManager::play(string effectName, int x, int y)
 		{
 			(*iterVE)->startEffect(x, y);
 			break;
+		}
+	}*/
+	m_iter = m_mapEffects.find(effectName);
+
+	if (m_iter != m_mapEffects.end())
+	{
+		vecEffect::iterator iter;
+		for (iter = m_iter->second.begin(); iter != m_iter->second.end(); iter++)
+		{
+			if ((*iter)->getIsAlive()) continue;
+
+			(*iter)->startEffect(x, y);
+			return;
 		}
 	}
 }

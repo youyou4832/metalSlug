@@ -9,10 +9,9 @@ HRESULT introScene::init()
 	IMAGEMANAGER->addImage("specialBullet", "image/enemy/cannon_effect.bmp", 0, 0, 576, 43, 16, 2, true, RGB(255, 0, 255));
 	IMAGEMANAGER->addImage("sandbag", "image/sandbag/sandbag.bmp", 0, 0, 1600, 297, 20, 6, true, RGB(255, 0, 255));
 	IMAGEMANAGER->addImage("enemy_death", "image/enemy/enemy_death.bmp", 0, 0, 264, 39, 6, 1, true, RGB(255, 0, 255));
-	// EFFECTMANAGER->addEffect("sandbagEffect");
 
 	m_enemyMgr = new enemyManager;
-	m_enemyMgr->setEnemy(1, 5, "sniper", CharInfo::sniper);
+	m_enemyMgr->setSniper("sniper", WINSIZEX / 2, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper);
 	return S_OK;
  }
 

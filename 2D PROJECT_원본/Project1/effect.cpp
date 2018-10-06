@@ -31,7 +31,7 @@ void effect::release()
 void effect::update()
 {
 	if (!m_isAlive) return;
-	m_pAnimation->frameUpdate(m_fElapsedTime);
+	m_pAnimation->frameUpdate(TIMEMANAGER->getElapsedTime());
 
 	if (!m_pAnimation->getIsPlaying())
 	{
