@@ -9,13 +9,18 @@ HRESULT bossScene::init()
 		WINSIZEX, WINSIZEY, false, 0);
 	m_pimgSubBG = IMAGEMANAGER->addImage("submap", "image/map/testBG.bmp",
 		WINSIZEX, WINSIZEY, false, 0);
+	
 	m_pimgbridge = IMAGEMANAGER->addImage("bridge", "image/map/bridge.bmp",
+		768, 69, true, RGB(255, 0, 255));
+	m_pimgSbridge = IMAGEMANAGER->addImage("bridge", "image/map/bridge.bmp",
 		768, 69, true, RGB(255, 0, 255));
 
 	m_pimgBG->setX(0);
 	m_pimgBG->setY(0);
 
-	m_mapSpeed = 0;
+	m_mapPoX = 0;
+	m_bridgeX = 1000;
+	m_SubbridgeX = 1000;
 
 	m_pBoss = new boss;
 	m_pBoss->init();
@@ -30,28 +35,30 @@ void bossScene::release()
 void bossScene::update()
 {
 	m_pBoss->update();
-	m_mapSpeed -= 5;
+	m_mapPoX -= 10;
+	m_bridgeX -= 10;
 
-	if(m_mapSpeed <= -WINSIZEX)
+	if(m_mapPoX <= -WINSIZEX)
 	{
-		m_mapSpeed = 0;
+		m_mapPoX = 0;
 	}
 	
+	if (m_bridgeX <= -(1000 + 3000))
+	{
+		m_bridgeX = 1000;
+	}
 }
 
 void bossScene::render(HDC hdc)
 { 
-	m_pimgBG->render(hdc, m_mapSpeed,0 ,0 ,0, 0, m_pimgBG->getX(), m_pimgBG->getY());
-	m_pimgSubBG->render(hdc, m_mapSpeed+1600, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
-	m_pimgbridge->render(hdc, 1000, WINSIZEY - 207, 0, 0, 100, 69, 4);
-	/*m_pimgbridge->render(hdc, 1000, WINSIZEY - 207, 0, 0, 50, 69, 4);
-	m_pimgbridge->render(hdc, 1000, WINSIZEY - 207, 50, 0, 50, 69, 4);
-	m_pimgbridge->render(hdc, 1000, WINSIZEY - 207, 100, 0, 150, 69, 4);*/
+	//맵 출력 
+	m_pimgBG->render(hdc, m_mapPoX,0 ,0 ,0, 0, m_pimgBG->getX(), m_pimgBG->getY());
+	m_pimgSubBG->render(hdc, m_mapPoX + WINSIZEX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
 
+	//다리 출력
+	//m_pimgbridge->render(hdc, m_bridgeX, WINSIZEY - 275, 0, 0, 768, 69, 4);
+	//m_pimgSbridge->render(hdc, m_SubbridgeX + 3070, WINSIZEY-275 , 0, 0, 768, 69, 4);
 
-	
-
-	//m_pimgbridge->render(hdc, 1000, WINSIZEY-207, 0, 0, 50, 69, 4);
 	m_pBoss->render(hdc);
 }
 
