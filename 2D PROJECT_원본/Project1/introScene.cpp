@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "introScene.h"
 #include "enemyManager.h"
+#include "player.h"
 
 HRESULT introScene::init()
 {
@@ -18,23 +19,31 @@ HRESULT introScene::init()
 	m_enemyMgr->setSniper("sniper", WINSIZEX / 2, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper);
 	m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 300, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon);
 	
+	// 플레이어
+	m_pPlayer = new player;
+	m_pPlayer->init();
+
+
 	return S_OK;
  }
 
 void introScene::release()
 {
 	SAFE_DELETE(m_enemyMgr);
+	SAFE_DELETE(m_pPlayer);
 }
 
 void introScene::update()
 {
 	m_enemyMgr->update();
+	m_pPlayer->update();
 }
 
 void introScene::render(HDC hdc)
 {
 	m_introMap->render(hdc, 0, 0);
 	m_enemyMgr->render(hdc);
+	m_pPlayer->render(hdc);
 }
 
 introScene::introScene()

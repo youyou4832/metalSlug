@@ -1,13 +1,15 @@
 #pragma once
 #include "scene.h"
+class player;
 class enemyManager;
 
 class introScene : public scene
 {
 private:
-	enemyManager* m_enemyMgr;
-	image* m_introMap;
-	image* m_sniper;
+	enemyManager*	m_enemyMgr;
+	player*	m_pPlayer;
+	image*	m_introMap;
+	image*	m_sniper;
 	
 public:
 	virtual HRESULT init();
