@@ -57,6 +57,15 @@ void enemyManager::setCannon(const char * textName, float x, float y, int speed,
 	m_vecEnemy.push_back(cannon);
 }
 
+void enemyManager::setNormal(const char * textName, float x, float y, int speed, int charNum)
+{
+	enemy* normal;
+	normal = new enemy;
+	normal->init(textName, PointMake(x, y), x, y, speed, charNum);
+
+	m_vecEnemy.push_back(normal);
+}
+
 enemyManager::enemyManager()
 {
 }

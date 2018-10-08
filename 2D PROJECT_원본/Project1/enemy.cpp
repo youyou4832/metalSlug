@@ -101,6 +101,9 @@ void enemy::update()
 		else if (m_CharNum == CharInfo::i_cannon) {
 			cannonAnimation();
 		}
+		else if (m_CharNum == CharInfo::i_normal) {
+			normalAnimation();
+		}
 	}
 	//fire();
 	
@@ -153,8 +156,25 @@ void enemy::render(HDC hdc)
 						m_pImg->render(hdc, m_fX, m_fY, 42 * s_Idle.index, 0, 42, 45, 3);
 					}
 					else if (s_Attack.isState == true) {
-						//m_pImg->render(hdc, m_fX, m_fY, 41 * s_Attack.index, 184, 41, 44, 3);
 						IMAGEMANAGER->findImage("cannon_Attack")->render(hdc, m_fX - 30, m_fY - 20, 58 * s_Attack.index, 0, 58, 52, 3);
+					}
+				}
+				else {
+					IMAGEMANAGER->findImage("enemy_death")->render(hdc, m_fX + 70, m_fY + 20, 44 * s_Death.index, 0, 44, 39, 3);
+				}
+			}
+			else if (m_CharNum == CharInfo::i_normal) {
+				if (m_currHP > 0) {
+					if (s_Idle.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 27 * s_Idle.index, 0, 27, 38, 3);// ±âº»
+					}
+					else if (s_Attack.isState == true) {
+						if (isDrawGun == false) {
+							m_pImg->render(hdc, m_fX  - s_Attack.index*8, m_fY - 20, 46 * s_Attack.index, 78, 46, 44, 3); // ÃÑ²¨³»±â
+						}
+						else {
+							m_pImg->render(hdc, m_fX - 100, m_fY, 61 * s_Attack.index, 122, 61, 38, 3); // »ç°Ý
+						}
 					}
 				}
 				else {
@@ -194,6 +214,10 @@ void enemy::fire()
 	else if (m_CharNum == CharInfo::i_cannon) {
 		m_pMissileMgr->fire(m_fX, m_fY+30,
 			PI, 5, m_CharNum);
+	}
+	else if (m_CharNum == CharInfo::i_normal) {
+		m_pMissileMgr->fire(m_fX - 50, m_fY,
+			PI, 8, m_CharNum);
 	}
 }
 
@@ -305,6 +329,94 @@ void enemy::cannonAnimation()
 					s_Attack.index = 0;
 					s_Attack.isState = false;
 					s_Idle.isState = true;
+				}
+				s_Attack.count = 0;
+			}
+		}
+	}
+	else {
+		++s_Death.count;
+		if (s_Death.count % 8 == 0) {
+			++s_Death.index;
+			if (s_Death.index == 6) {
+				s_Death.index = 5;
+				deathCount();
+			}
+			s_Death.count = 0;
+		}
+	}
+}
+
+void enemy::normalAnimation()
+{
+	if (m_currHP > 0) {
+		if (s_Idle.isState == true) {
+			++s_Idle.count;
+			if (s_Idle.count % 10 == 0) {
+				if (checkMax == false) {
+					++s_Idle.index;
+				}
+				else if (checkMax == true) {
+					--s_Idle.index;
+				}
+				if (s_Idle.index == 3) {
+					//s_Idle.index = 0;
+					checkMax = true;
+					/*s_Idle.isState = false;
+					s_Attack.isState = true;*/
+				}
+				else if (s_Idle.index == 0) {
+					checkMax = false;
+					AttackCN++;
+					if (AttackCN == 2) {
+						AttackCN = 0;
+						s_Idle.isState = false;
+						s_Attack.isState = true;
+
+					}
+				}
+				s_Idle.count = 0;
+			}
+		}
+		else if (s_Attack.isState == true) {
+			++s_Attack.count;
+			if (s_Attack.count % 8 == 0) {
+				if (isHaveGun == false) {
+					++s_Attack.index;
+				}
+				else {
+					--s_Attack.index;
+				}
+				/*if (s_Attack.index == 3) {
+					fire();
+				}*/
+				if (isDrawGun == false) {
+					if (s_Attack.index == 8 && isHaveGun == false) {
+						isDrawGun = true;
+						s_Attack.index = 0;
+					}
+					else if (s_Attack.index == 0 && isHaveGun == true) {
+						s_Attack.isState = false;
+						s_Idle.isState = true;
+						isHaveGun = false;
+					}
+				}
+				else {
+					if (s_Attack.index == 1 && AttackCN == 0) {
+						fire();
+					}
+					if (s_Attack.index == 3) {
+						AttackCN++;
+						if (AttackCN == 2) {
+							isDrawGun = false;
+							isHaveGun = true;
+							AttackCN = 0;
+							s_Attack.index = 7;
+						}
+						else {
+							s_Attack.index = 0;
+						}
+					}
 				}
 				s_Attack.count = 0;
 			}

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "introScene.h"
 #include "enemyManager.h"
-
+#include "player.h"
 HRESULT introScene::init()
 {
 	m_introMap = IMAGEMANAGER->addImage("introMap", "image/map/map_Intro.bmp", WINSIZEX, WINSIZEY, false, 0);
@@ -17,7 +17,11 @@ HRESULT introScene::init()
 	m_enemyMgr = new enemyManager;
 	m_enemyMgr->setSniper("sniper", WINSIZEX / 2, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper);
 	m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 300, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon);
+	m_enemyMgr->setNormal("normal", WINSIZEX / 2 - 300, WINSIZEY / 2 + 70, 5, CharInfo::i_normal);
+
+	m_player = new player;
 	
+	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
 	return S_OK;
  }
 
@@ -35,6 +39,12 @@ void introScene::render(HDC hdc)
 {
 	m_introMap->render(hdc, 0, 0);
 	m_enemyMgr->render(hdc);
+	Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
+}
+
+void introScene::collider()
+{
+
 }
 
 introScene::introScene()

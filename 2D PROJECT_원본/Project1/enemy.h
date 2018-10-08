@@ -35,6 +35,12 @@ private:
 	float moveAngle;
 	bool isAlive;
 
+	//노말 에너미
+	bool checkMax = false;
+	int AttackCN = 0;
+	bool isDrawGun = false;
+	bool isHaveGun = false;
+
 	// 미사일 매니저
 	missileManager*	m_pMissileMgr;
 	int				m_nFireCount;
@@ -67,6 +73,7 @@ public:
 	void sandBagAnimation();
 	void sendBagHitAnimation();
 	void cannonAnimation();
+	void normalAnimation();
 	void deathCount();
 
 	enemy();
