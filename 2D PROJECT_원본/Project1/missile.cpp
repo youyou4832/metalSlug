@@ -46,6 +46,11 @@ HRESULT missile::init(const char * szImageName, float speed,
 		m_pImg = IMAGEMANAGER->findImage("normalBullet");
 	}
 
+	if (m_charNum == CharInfo::i_boss)
+	{
+		m_pImg = IMAGEMANAGER->findImage("firebullet");
+	}
+
 	return S_OK;
 }
 
@@ -59,6 +64,11 @@ void missile::update()
 	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon) {
 		ani_specialBullet();
 	}
+
+	if (m_charNum == CharInfo::i_boss) {
+		ani_nomalBullet();
+	}
+
 }
 
 void missile::render(HDC hdc, int charNum)
@@ -67,12 +77,22 @@ void missile::render(HDC hdc, int charNum)
 	{
 		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 		if (charNum == CharInfo::i_sniper || charNum == CharInfo::i_cannon) {
-			m_pImg->render(hdc, m_fX, m_fY, 10 * special_bullet.index, 33, 10, 10,2);
+			m_pImg->render(hdc, m_fX, m_fY, 10 * special_bullet.index, 33, 10, 10, 2);
 		}
 		else if (charNum == CharInfo::i_normal) {
 			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 24, 24, 3);
 		}
+
+		if (charNum == CharInfo::i_boss) {
+			m_pImg->render(hdc, m_fX, m_fY, 0 + (22 * fire_bullet.index), 714, 22, 22, 4);
+		}
+
 	}
+
+	char szText[128];
+	_stprintf_s(szText, "%f", m_fAngle);
+
+	TextOut(hdc, 100, 200, szText, strlen(szText));
 }
 
 void missile::fire(float x, float y)
@@ -99,13 +119,39 @@ void missile::move()
 {
 	if (m_isFire)
 	{
-		m_fX += cosf(m_fAngle) * m_fSpeed;
-		m_fY += -sinf(m_fAngle) * m_fSpeed;
-		m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
-		if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
-			m_isFire = false;
+		if (m_charNum == CharInfo::i_boss)
+		{
+			
+			if (m_fAngle >= -1.45f)
+			{
+				
+				m_fAngle -= 0.02;
+				
+			}
+
+			m_fX += cosf(m_fAngle) * m_fSpeed;
+			m_fY += -sinf(m_fAngle) * m_fSpeed;
+			
+			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY) {
+				m_isFire = false;
+			}
+
+		}
+		
+		else
+		{
+
+			m_fX += cosf(m_fAngle) * m_fSpeed;
+			m_fY += -sinf(m_fAngle) * m_fSpeed;
+			
+
+			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
+				m_isFire = false;
+			}
 		}
 
+		m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
+		
 	}
 }
 
@@ -120,6 +166,30 @@ void missile::ani_specialBullet()
 		special_bullet.count = 0;
 	}
 }
+
+void missile::ani_nomalBullet()
+{
+	++fire_bullet.count;
+	if (fire_bullet.count % 5 == 0) {
+		++fire_bullet.index;
+		if (fire_bullet.index == 4) {
+			fire_bullet.index = 0;
+		}
+		fire_bullet.count = 0;
+	}
+}
+
+void missile::angleCount()
+{
+	++angle_count.count;
+	if (angle_count.count % 5 == 0) {
+		++angle_count.index;
+	
+		angle_count.count = 0;
+	}
+}
+
+
 
 missile::missile()
 {
