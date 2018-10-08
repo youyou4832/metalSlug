@@ -6,9 +6,11 @@ class enemyManager;
 class introScene : public scene
 {
 private:
-	player* m_player;
+	enemyManager*	m_enemyMgr;
+	player*	m_pPlayer;
+	image*	m_introMap;
+	
 	enemyManager* m_enemyMgr;
-	image* m_introMap;
 	RECT gate;
 public:
 	virtual HRESULT init();

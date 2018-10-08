@@ -1,4 +1,5 @@
 #pragma once
+class missileManager;
 
 class player
 {
@@ -99,6 +100,22 @@ class player
 #define UPPER_SitMoveY			UPPER_SitIdleY + UPPER_SitIdleHeight
 #define UPPER_SitMoveFrame		7
 
+
+#define UPPER_AttWidth			520
+#define UPPER_AttHeight			29
+#define UPPER_AttY				UPPER_SitMoveY + UPPER_SitMoveHeight
+#define UPPER_AttFrame			10
+
+	/*
+	UPPER_Att90,
+	UPPER_Att180,
+	UPPER_AttSit,
+	UPPER_Att270,
+	UPPER_Knife,
+	UPPER_KnifeSit
+	*/
+
+
 // 하체
 #define LOWER_IdleWidth			84
 #define LOWER_IdleHeight		16
@@ -179,6 +196,8 @@ class player
 	};
 
 private:
+	missileManager*	m_pMissileMgr;
+
 	TagImg		m_upper;
 	TagImg		m_lower;
 
@@ -192,7 +211,8 @@ private:
 
 	short	m_nActUpper;	// 상체 행동
 	short	m_nActLower;	// 하체 행동
-	short	m_nDir;			// 캐릭터가 바라보는 방향
+	short	m_nDir;		// 캐릭터가 바라보는 방향
+	short	m_nDirY;	// 캐릭터가 바라보는 방향
 
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 

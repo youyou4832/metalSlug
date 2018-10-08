@@ -2,6 +2,7 @@
 #include "introScene.h"
 #include "enemyManager.h"
 #include "player.h"
+
 HRESULT introScene::init()
 {
 	m_introMap = IMAGEMANAGER->addImage("introMap", "image/map/map_Intro.bmp", WINSIZEX, WINSIZEY, false, 0);
@@ -19,26 +20,34 @@ HRESULT introScene::init()
 	m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 300, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon);
 	m_enemyMgr->setNormal("normal", WINSIZEX / 2 - 300, WINSIZEY / 2 + 70, 5, CharInfo::i_normal);
 
-	m_player = new player;
 	
 	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
+	
+	// 플레이어
+	m_pPlayer = new player;
+	m_pPlayer->init();
+
+
 	return S_OK;
  }
 
 void introScene::release()
 {
 	SAFE_DELETE(m_enemyMgr);
+	SAFE_DELETE(m_pPlayer);
 }
 
 void introScene::update()
 {
 	m_enemyMgr->update();
+	m_pPlayer->update();
 }
 
 void introScene::render(HDC hdc)
 {
 	m_introMap->render(hdc, 0, 0);
 	m_enemyMgr->render(hdc);
+	m_pPlayer->render(hdc);
 	Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
 }
 

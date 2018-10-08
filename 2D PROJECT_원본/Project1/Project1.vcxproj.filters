@@ -305,7 +305,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="20181004 수정사항.txt">
+    <Text Include="수정사항 주소영.txt">
       <Filter>소스 파일</Filter>
     </Text>
   </ItemGroup>
