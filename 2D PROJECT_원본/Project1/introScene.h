@@ -10,7 +10,6 @@ private:
 	player*	m_pPlayer;
 	image*	m_introMap;
 	
-	enemyManager* m_enemyMgr;
 	RECT gate;
 public:
 	virtual HRESULT init();

@@ -301,9 +301,9 @@ void boss::change(bool ischagne)
 		++b_chagne.count;
 		if (b_chagne.count% 10 == 0)
 		{
-			++b_pattern.index;
+			++b_chagne.index;
 			
-			if (b_pattern.index == 5)
+			if (b_chagne.index == 5)
 			{
 				m_state = RAGE;
 				m_isChange = false;
