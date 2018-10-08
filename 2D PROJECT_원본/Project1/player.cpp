@@ -4,7 +4,7 @@
 #include "timer.h"
 #include "missileManager.h"
 
-HRESULT player::init()
+HRESULT player::init(float x, float y)
 {
 	// 플레이어
 	m_upper.pAni = new animation;
@@ -27,10 +27,10 @@ HRESULT player::init()
 	m_lower.pAni->stop();
 	m_lower.pAni->setFrameUpdateSec(0.1f);
 
-	m_upper.pImg->setX(WINSIZEX / 2);
-	m_upper.pImg->setY(0);
-	m_lower.pImg->setX(WINSIZEX / 2);
-	m_lower.pImg->setY(-140);
+	m_upper.pImg->setX(x);
+	m_upper.pImg->setY(y);
+	m_lower.pImg->setX(x);
+	m_lower.pImg->setY(y);
 
 	m_fSpeed = 3.0f;
 	m_fJumpSpeed = 10.0f; 

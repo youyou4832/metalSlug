@@ -4,6 +4,7 @@
 class boss;
 class animation;
 class player;
+
 class bossScene :public scene
 {
 private:

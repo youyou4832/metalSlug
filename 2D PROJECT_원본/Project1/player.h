@@ -217,7 +217,7 @@ private:
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 
 public:
-	HRESULT init();
+	HRESULT init(float x, float y);
 	void update();
 	void actSet();
 	void move();

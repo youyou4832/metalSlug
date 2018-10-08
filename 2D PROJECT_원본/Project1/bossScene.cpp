@@ -22,11 +22,13 @@ HRESULT bossScene::init()
 	m_bridgeX = 1000;
 	m_SubbridgeX = 1000;
 
+	m_pPlayer = new player;
+	m_pPlayer->init(WINSIZEX / 2, WINSIZEY / 2);
+
 	m_pBoss = new boss;
 	m_pBoss->init();
 
-	m_pPlayer = new player;
-	m_pPlayer->init();
+	
 
 	return S_OK;
 }
@@ -60,13 +62,13 @@ void bossScene::render(HDC hdc)
 	//맵 출력 
 	m_pimgBG->render(hdc, m_mapPoX,0 ,0 ,0, 0, m_pimgBG->getX(), m_pimgBG->getY());
 	m_pimgSubBG->render(hdc, m_mapPoX + WINSIZEX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
-
+	m_pPlayer->render(hdc);
 	//다리 출력
 	//m_pimgbridge->render(hdc, m_bridgeX, WINSIZEY - 275, 0, 0, 768, 69, 4);
 	//m_pimgSbridge->render(hdc, m_SubbridgeX + 3070, WINSIZEY-275 , 0, 0, 768, 69, 4);
 
 	m_pBoss->render(hdc);
-	m_pPlayer->render(hdc);
+	
 }
 
 bossScene::bossScene()
