@@ -149,13 +149,14 @@ void animation::setPlayFrameReverse(int start, int end, bool reverse, bool loop)
 	}
 
 	if (reverse)
-	{
+	{ 
 		for (int i = start; i < end; i++)
 		{
 			m_vecPlayList.push_back(i);
 		}
 	}
 }
+
 void animation::setPlayFrame(int start, int end, bool reverse, bool loop)
 {
 	m_isLoop = loop;
