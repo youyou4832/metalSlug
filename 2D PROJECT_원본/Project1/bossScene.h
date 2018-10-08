@@ -13,8 +13,8 @@ private:
 	image	*	m_pimgbridge;
 	image	*	m_pimgSbridge;
 	boss	*	m_pBoss;
-	player* m_pPlayer;
-	RECT	m_rc;
+	player	*	m_pPlayer;
+	RECT		m_rc;
 
 	float m_mapPoX;
 	float m_bridgeX;

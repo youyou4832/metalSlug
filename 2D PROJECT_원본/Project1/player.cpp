@@ -4,7 +4,7 @@
 #include "timer.h"
 #include "missileManager.h"
 
-HRESULT player::init()
+HRESULT player::init(float x, float y)
 {
 	// 플레이어
 	m_upper.pAni = new animation;
@@ -27,10 +27,10 @@ HRESULT player::init()
 	m_lower.pAni->stop();
 	m_lower.pAni->setFrameUpdateSec(0.1f);
 
-	m_upper.pImg->setX(WINSIZEX / 2);
-	m_upper.pImg->setY(0);
-	m_lower.pImg->setX(WINSIZEX / 2);
-	m_lower.pImg->setY(-140);
+	m_upper.pImg->setX(x);
+	m_upper.pImg->setY(y);
+	m_lower.pImg->setX(x);
+	m_lower.pImg->setY(y);
 
 	m_fSpeed = 3.0f;
 	m_fJumpSpeed = 10.0f; 
@@ -41,6 +41,7 @@ HRESULT player::init()
 	m_nDir = DIR_Right;
 	m_nDirY = DIR_Right;
 	m_isAct = false;
+	m_isAlive = true;
 
 	g_ptMouse = { WINSIZEX, WINSIZEY };
 
@@ -73,6 +74,21 @@ void player::update()
 
 void player::actSet()
 {
+	/* ### 애니메이션 프레임 지정 ###
+	등장 중일 경우 return */
+	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true) return;
+
+	// 반복모션 제외, isPlaying == false일 경우
+	else if (m_upper.pAni->getIsPlaying() == false/* && m_lower.pAni->getIsPlaying() == false*/)
+	{
+		if (m_nActUpper == UPPER_Appear)
+			m_lower.pImg->setY(WINSIZEY / 2 + 60);
+
+		m_nActUpper = UPPER_Idle;
+		m_nActLower = LOWER_Idle;
+		m_isAct = true;
+	}
+
 	// ### 캐릭터 방향 설정 ###
 	if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
 		m_nDir = DIR_Left;
@@ -80,21 +96,11 @@ void player::actSet()
 	else if (g_ptMouse.x > m_upper.pImg->getX())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
 		m_nDir = DIR_Right;
 
+	if (g_ptMouse.y <= m_upper.pImg->getY())		// 마우스 포인터가 캐릭터 위에 있을 경우
+		m_nDirY = DIR_Up;
 
-	/* ### 애니메이션 프레임 지정 ###
-	등장 중일 경우 return */
-	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true) return;
-
-	// 반복모션 제외, isPlaying == false일 경우
-	else if (m_upper.pAni->getIsPlaying() == false && m_lower.pAni->getIsPlaying() == false)
-	{
-		if (m_nActUpper == UPPER_Appear)
-			m_lower.pImg->setY(WINSIZEY / 2 + 60);
-
-		m_nActUpper = UPPER_Idle;
-		m_nActLower = LOWER_Idle; 
-		m_isAct = true;
-	}
+	else if (g_ptMouse.y > m_upper.pImg->getY())	// 마우스 포인터가 캐릭터 아래에 있을 경우
+		m_nDirY = DIR_Down;
 
 	if (m_isAct == true)
 	{
@@ -117,9 +123,8 @@ void player::actSet()
 			m_upper.pAni->init(UPPER_SitWidth, UPPER_SitHeight, UPPER_SitWidth / UPPER_SitFrame, UPPER_SitHeight, UPPER_SitY);
 
 			if (m_nDir == DIR_Left)
-			{
 				m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
-			}
+
 			else
 				m_upper.pAni->setPlayFrame(1, UPPER_SitFrame, false, false);
 
@@ -130,18 +135,54 @@ void player::actSet()
 
 			if (m_nDir == DIR_Left)
 				m_upper.pAni->setPlayFrameReverse(1, UPPER_MoveFrame, false, true);
+
 			else
 				m_upper.pAni->setPlayFrame(1, UPPER_MoveFrame, false, true);
 
 			break;
 			
-		case UPPER_Att:
-			m_upper.pAni->init(UPPER_AttWidth, UPPER_AttHeight, UPPER_AttWidth / UPPER_AttFrame, UPPER_AttHeight, UPPER_AttY);
-
+		case UPPER_Att: 
 			if (m_nDir == DIR_Left)
-				m_upper.pAni->setPlayFrameReverse(1, UPPER_AttFrame, false, false);
+			{
+				if (m_nDirY == DIR_Up)
+				{
+					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
+					m_upper.pAni->setPlayFrameReverse(1, UPPER_Att90Frame, false, false);
+				}
+
+				else if (m_nDirY == DIR_Down)
+				{
+					m_upper.pAni->init(UPPER_Att270Width, UPPER_Att270Height, UPPER_Att270Width / UPPER_Att270Frame, UPPER_Att270Height, UPPER_Att270Y);
+					m_upper.pAni->setPlayFrameReverse(1, UPPER_Att270Frame, false, false);
+				}
+
+				else
+				{
+					m_upper.pAni->init(UPPER_AttWidth, UPPER_AttHeight, UPPER_AttWidth / UPPER_AttFrame, UPPER_AttHeight, UPPER_AttY);
+					m_upper.pAni->setPlayFrameReverse(1, UPPER_AttFrame, false, false);
+				}
+			}
+
 			else
-				m_upper.pAni->setPlayFrame(1, UPPER_AttFrame, false, false);
+			{
+				if (m_nDirY == DIR_Up)
+				{
+					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
+					m_upper.pAni->setPlayFrame(1, UPPER_Att90Frame, false, false);
+				}
+
+				else if (m_nDirY == DIR_Down)
+				{
+					m_upper.pAni->init(UPPER_Att270Width, UPPER_Att270Height, UPPER_Att270Width / UPPER_Att270Frame, UPPER_Att270Height, UPPER_Att270Y);
+					m_upper.pAni->setPlayFrame(1, UPPER_Att270Frame, false, false);
+				}
+
+				else
+				{
+					m_upper.pAni->init(UPPER_AttWidth, UPPER_AttHeight, UPPER_AttWidth / UPPER_AttFrame, UPPER_AttHeight, UPPER_AttY);
+					m_upper.pAni->setPlayFrame(1, UPPER_AttFrame, false, false);
+				}
+			}
 
 			break;
 		}
@@ -233,29 +274,24 @@ void player::move()
 	// 키를 뗐을 경우 행동하지 않음으로 바꿈
 	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') || KEYMANAGER->isOnceKeyUp('S'))
 	{
-		m_nActUpper = UPPER_Idle;
+		if (m_nActUpper != UPPER_Att)
+			m_nActUpper = UPPER_Idle;
+
 		m_nActLower = LOWER_Idle;
 		m_isAct = true;
 	}
 
 	// 공격 (마우스 포인터)
-	if (KEYMANAGER->isStayKeyDown(VK_LBUTTON))
+	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
 	{
-		if (m_nActUpper != UPPER_Att)
-		{
-			m_isAct = true;
-			m_nActUpper = UPPER_Att;
-		}
+		m_isAct = true;
+		m_nActUpper = UPPER_Att;
 
-		float fireAngle = MY_UTIL::getAngle(m_upper.rc.right, m_upper.rc.top / 2, g_ptMouse.x, g_ptMouse.y);
+		float fireAngle = MY_UTIL::getAngle(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,	// 총알 발사를 위한 각도 지정
+			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
+			g_ptMouse.x, g_ptMouse.y);
 
-		//if (g_ptMouse.y <= m_upper.pImg->getY())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
-		//	m_nDirY = DIR_Up;
-
-		//else if (g_ptMouse.y > m_upper.pImg->getY())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
-		//	m_nDirY = DIR_Down;
-
-		m_pMissileMgr->fire(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,
+		m_pMissileMgr->fire(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,					// 총알 발사
 			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
 			fireAngle, 10, i_player);
 	}
@@ -295,8 +331,8 @@ void player::render(HDC hdc)
 	char szText[128];
 
 	// 플레이어
-	//Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
-	//Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);
+	Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
+	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);
 
 	if (m_nDir == DIR_Left)
 	{

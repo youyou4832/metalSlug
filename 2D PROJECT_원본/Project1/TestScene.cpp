@@ -7,7 +7,7 @@ HRESULT TestScene::init()
 	m_pBG = IMAGEMANAGER->addImage("image/testScene/background.bmp", "image/testScene/background.bmp", WINSIZEX, WINSIZEY, false, NULL);
 
 	m_pPlayer = new player;
-	m_pPlayer->init();
+	m_pPlayer->init(WINSIZEX / 2, WINSIZEY / 2);
 
 	return S_OK;
 }

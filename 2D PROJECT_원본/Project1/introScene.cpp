@@ -25,7 +25,7 @@ HRESULT introScene::init()
 	
 	// 플레이어
 	m_pPlayer = new player;
-	m_pPlayer->init();
+	m_pPlayer->init(WINSIZEX / 2, -140);
 
 
 	return S_OK;

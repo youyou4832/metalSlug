@@ -26,7 +26,7 @@ HRESULT bossScene::init()
 	m_pBoss->init();
 
 	m_pPlayer = new player;
-	m_pPlayer->init();
+	m_pPlayer->init(WINSIZEX / 2, WINSIZEY / 2);
 
 	return S_OK;
 }
@@ -40,6 +40,8 @@ void bossScene::release()
 void bossScene::update()
 {
 	m_pBoss->update();
+	m_pPlayer->update();
+
 	m_mapPoX -= 10;
 	m_bridgeX -= 10;
 
@@ -52,7 +54,7 @@ void bossScene::update()
 	{
 		m_bridgeX = 1000;
 	}
-	m_pPlayer->update();
+
 }
 
 void bossScene::render(HDC hdc)

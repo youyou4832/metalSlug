@@ -38,12 +38,14 @@ HRESULT missile::init(const char * szImageName, float speed,
 	//memset(&m_rc, 3, sizeof(m_rc));
 	ZeroMemory(&m_rc, sizeof(m_rc));
 
-	//m_pImg = IMAGEMANAGER->findImage(szImageName);
 	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon) {
 		m_pImg = IMAGEMANAGER->findImage("specialBullet");
 	}
 	else if (m_charNum == CharInfo::i_normal) {
 		m_pImg = IMAGEMANAGER->findImage("normalBullet");
+	}
+	else if (m_charNum == CharInfo::i_player) {
+		m_pImg = IMAGEMANAGER->findImage(szImageName);
 	}
 
 	return S_OK;
@@ -71,6 +73,9 @@ void missile::render(HDC hdc, int charNum)
 		}
 		else if (charNum == CharInfo::i_normal) {
 			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 24, 24, 3);
+		}
+		else if (charNum == CharInfo::i_player) {
+			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 8, 8, 3);
 		}
 	}
 }
