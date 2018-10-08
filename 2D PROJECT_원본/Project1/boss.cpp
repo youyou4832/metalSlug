@@ -30,6 +30,20 @@ HRESULT boss::init()
 	m_pChangeBoss->setPlayFrame(12, 24);
 	m_pChangeBoss->setFPS(15);
 
+	//보스 fireBall 공격 
+	m_pBossFire = new animation;
+	m_pBossFire->init(m_pimgBoss->getWidth(), m_pimgBoss->getHeight(),
+		230, 207);
+	m_pBossFire->setPlayFrame(48, 60);
+	m_pBossFire->setFPS(15);
+
+	//보스 CANNON 공격 모션
+	m_pBossCfire = new animation;
+	m_pBossCfire->init(m_pimgBoss->getWidth(), m_pimgBoss->getHeight(),
+		230, 207);
+	m_pBossCfire->setPlayFrame(36, 48);
+	m_pBossCfire->setFPS(15);
+
 	//보스 분노상태
 	m_pRageBoss = new animation;
 	m_pRageBoss->init(m_pimgBoss->getWidth(), m_pimgBoss->getHeight(),
@@ -45,7 +59,7 @@ HRESULT boss::init()
 	m_pDieAni->setFPS(15);
 
 	m_pCannon = new missileManager;
-	m_pCannon->init(10);
+	//m_pCannon->init("FireBall",200.0f,10);
 
 	m_nCurrFrameX = 0;
 	m_nCurrFrameY = 0;
@@ -67,12 +81,18 @@ HRESULT boss::init()
 
 void boss::release()
 {
-	
+	SAFE_DELETE(m_pMoveAni);
+	SAFE_DELETE(m_pChangeBoss);
+	SAFE_DELETE(m_pBossFire);
+	SAFE_DELETE(m_pBossCfire);
+	SAFE_DELETE(m_pRageBoss);
+	SAFE_DELETE(m_pDieAni);
+	SAFE_DELETE(m_pCannon);
 }
 
 void boss::update()
 {
-	change(m_isChange);
+    change(m_isChange);
 
 	if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
@@ -85,8 +105,11 @@ void boss::update()
 
 	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pDieAni->frameUpdate(TIMEMANAGER->getElapsedTime());
+	m_pBossFire->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pRageBoss->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pChangeBoss->frameUpdate(TIMEMANAGER->getElapsedTime());
+
+	m_pCannon->update();
 }
 
 void boss::render(HDC hdc)
@@ -112,7 +135,7 @@ void boss::render(HDC hdc)
 		m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pDieAni, 4.0);
 	}
 	//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-
+	m_pCannon->render(hdc,CharInfo::i_boss);
 }
 
 void boss::move()
@@ -296,14 +319,15 @@ void boss::move()
 
 void boss::change(bool ischagne)
 {
+	
 	if (ischagne == true)
 	{
-		++b_chagne.count;
-		if (b_chagne.count% 10 == 0)
+		++b_change.count;
+		if (b_change.count% 5 == 0)
 		{
-			++b_pattern.index;
+			++b_change.index;
 			
-			if (b_pattern.index == 5)
+			if (b_change.index == 5)
 			{
 				m_state = RAGE;
 				m_isChange = false;
@@ -318,6 +342,13 @@ void boss::change(bool ischagne)
 	
 }
 
+void boss::fire()
+{
+	float anlge = 200;
+	m_pCannon->fire(m_fX, m_fY, anlge, 5, CharInfo::i_boss);
+				
+}
+
 void boss::damaged(int damage)
 {
 	m_nCurrHP -= damage;
@@ -327,7 +358,7 @@ void boss::damaged(int damage)
 		m_pDieAni->start();
 	}
 
-	if (m_nCurrHP == 5)
+	if (m_nCurrHP <= 5)
 	{
 		m_state = CHANGE;
 		m_isChange = true;

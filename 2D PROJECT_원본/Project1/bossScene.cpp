@@ -15,6 +15,8 @@ HRESULT bossScene::init()
 	m_pimgSbridge = IMAGEMANAGER->addImage("bridge", "image/map/bridge.bmp",
 		768, 69, true, RGB(255, 0, 255));
 
+	IMAGEMANAGER->addImage("fireBall", "image/boss/BossEffect.bmp", 0, 0, 1056, 736, 22, 22, true, RGB(255, 0, 255));
+
 	m_pimgBG->setX(0);
 	m_pimgBG->setY(0);
 

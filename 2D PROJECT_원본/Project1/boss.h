@@ -39,18 +39,21 @@ private:
 
 	
 	image *		m_pimgBoss;
-	animation*	m_pMoveAni; // IDLE 및 기본 이동
+	animation*	m_pMoveAni;		// IDLE 및 기본 이동
+	
+	animation*	m_pBossFire;	//ILDE fire_bullet 공격
+	animation*	m_pBossCfire;	// cannon_bullet 공격
 
-	animation*	m_pChangeBoss; // 보스 변신이미지 
-	animation*  m_pRageBoss; // 보스 분노모드
-	animation*	m_pDieAni; // 보스 죽음
+	animation*	m_pChangeBoss;	 // 보스 변신이미지 
+	animation*  m_pRageBoss;	// 보스 분노모드
+	animation*	m_pDieAni;		// 보스 죽음
 
 
 	RECT		m_rc;
 
 	B_pcount	b_attack; //공격 패턴 카운터
 	B_pcount	b_pattern;	//움직이는 패턴
-	B_pcount	b_chagne; //변신 카운터
+	B_pcount	b_change; //변신 카운터
 
 	float		m_fSpeed;
 	float		m_upspeed;
@@ -87,6 +90,7 @@ public:
 	void render(HDC hdc);
 	void move();
 	void change(bool ischange);
+	void fire();
 
 	inline RECT getRect() { return m_rc; }
 	inline float getX() { return m_fX; }

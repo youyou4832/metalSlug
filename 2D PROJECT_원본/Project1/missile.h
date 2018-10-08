@@ -20,6 +20,7 @@ protected:
 	bool	m_isFire;
 
 	m_tagState special_bullet;
+	m_tagState boss_firebullet;
 	int m_charNum;
 
 	SYNTHESIZE(float, m_fSpeed, fSpeed);
@@ -42,6 +43,7 @@ public:
 	inline void setAngle(float angle) { m_fAngle = angle; }
 
 	void ani_specialBullet();
+	void ani_bossfireBuullet();
 
 	missile();
 	virtual ~missile();

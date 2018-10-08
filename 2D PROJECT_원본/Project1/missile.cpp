@@ -43,6 +43,10 @@ HRESULT missile::init(const char * szImageName, float speed,
 		m_pImg = IMAGEMANAGER->findImage("specialBullet");
 	}
 
+	if (m_charNum == CharInfo::i_boss) {
+		m_pImg = IMAGEMANAGER->findImage("fireBall");
+	}
+
 	return S_OK;
 }
 
@@ -56,6 +60,10 @@ void missile::update()
 	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon) {
 		ani_specialBullet();
 	}
+
+	if (m_charNum == CharInfo::i_boss) {
+		ani_bossfireBuullet();
+	}
 }
 
 void missile::render(HDC hdc, int charNum)
@@ -65,6 +73,10 @@ void missile::render(HDC hdc, int charNum)
 		Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 		if (charNum == CharInfo::i_sniper || charNum == CharInfo::i_cannon) {
 			m_pImg->render(hdc, m_fX, m_fY, 10 * special_bullet.index, 33, 10, 10,2);
+		}
+
+		if (charNum == CharInfo::i_boss) {
+			m_pImg->render(hdc, m_fX, m_fX, 10 * boss_firebullet.index, 33, 10, 10, 4);
 		}
 	}
 }
@@ -112,6 +124,18 @@ void missile::ani_specialBullet()
 			special_bullet.index = 0;
 		}
 		special_bullet.count = 0;
+	}
+}
+
+void missile::ani_bossfireBuullet()
+{
+		++boss_firebullet.count;
+	if (boss_firebullet.count % 5 == 0) {
+		++boss_firebullet.index;
+		if (boss_firebullet.index == 4) {
+			boss_firebullet.index = 0;
+		}
+		boss_firebullet.count = 0;
 	}
 }
 

@@ -191,10 +191,6 @@ void enemy::fire()
 		m_pMissileMgr->fire(m_fX+ (m_pImg->getFrameWidth() / 2)*3, m_fY + (m_pImg->getHeight() / 2) * 3,
 			PI, 5, m_CharNum);
 	}
-	else if (m_CharNum == CharInfo::i_cannon) {
-		m_pMissileMgr->fire(m_fX, m_fY+30,
-			PI, 5, m_CharNum);
-	}
 }
 
 void enemy::sniperAnimation()
