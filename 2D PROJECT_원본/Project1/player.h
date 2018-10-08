@@ -232,6 +232,7 @@ private:
 	float	m_fSpeed;
 	float	m_fJumpSpeed;
 	float	m_fGravity;
+	float	m_fAngle;
 
 	short	m_nActUpper;	// 상체 행동
 	short	m_nActLower;	// 하체 행동

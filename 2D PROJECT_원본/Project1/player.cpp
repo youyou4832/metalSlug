@@ -36,6 +36,7 @@ HRESULT player::init(float x, float y)
 	m_fJumpSpeed = 10.0f; 
 	m_fGravity = 0;
 	m_fReplaceY = 0;
+	m_fAngle = 0;
 	m_nActUpper = UPPER_Appear;
 	m_nActLower = LOWER_NULL;
 	m_nDir = DIR_Right;
@@ -91,16 +92,26 @@ void player::actSet()
 
 	// ### 캐릭터 방향 설정 ###
 	if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
+	{
 		m_nDir = DIR_Left;
+		m_nDirY = NULL;
+	}
 
 	else if (g_ptMouse.x > m_upper.pImg->getX())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
-		m_nDir = DIR_Right;
+	{
+		m_nDir = DIR_Right; 
+		m_nDirY = NULL;
+	}
 
-	if (g_ptMouse.y <= m_upper.pImg->getY())		// 마우스 포인터가 캐릭터 위에 있을 경우
+	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)		// 마우스 포인터가 캐릭터 위에 있을 경우
+	{
 		m_nDirY = DIR_Up;
+	}
 
-	else if (g_ptMouse.y > m_upper.pImg->getY())	// 마우스 포인터가 캐릭터 아래에 있을 경우
+	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)	// 마우스 포인터가 캐릭터 아래에 있을 경우
+	{
 		m_nDirY = DIR_Down;
+	}
 
 	if (m_isAct == true)
 	{
@@ -287,36 +298,32 @@ void player::move()
 		m_isAct = true;
 		m_nActUpper = UPPER_Att;
 
-		float fireAngle = MY_UTIL::getAngle(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,	// 총알 발사를 위한 각도 지정
+		m_fAngle = MY_UTIL::getAngle(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,	// 총알 발사를 위한 각도 지정
 			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
 			g_ptMouse.x, g_ptMouse.y);
 
 		m_pMissileMgr->fire(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,					// 총알 발사
 			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
-			fireAngle, 10, i_player);
+			m_fAngle, 10, i_player);
 	}
-	
-	// 상체 위치 업데이트
-	m_upper.rc = RectMake(m_upper.pImg->getX(), m_upper.pImg->getY(),
-		m_upper.pAni->getFrameWidth() * 3, m_upper.pAni->getFrameHeight() * 3);
 
+	// 리소스 좌표 세팅: 다리를 중심으로, 상체를 올린다. (상체는 사이즈가 변하므로)
 	// 하체 위치 업데이트
 	if (m_nDir == DIR_Left)
 	{
-		m_lower.pImg->setY(m_upper.pImg->getY());
-
-		m_lower.rc = RectMake(0, m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceY,
-			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
-
-		m_lower.rc.right = m_upper.rc.right;
-		m_lower.rc.left = m_upper.rc.right - m_lower.pAni->getFrameWidth() * 3;
-	}
-	else
-	{
-		m_lower.pImg->setY(m_upper.pImg->getY());
 		m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceY,
 			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
 	}
+	else
+	{
+		m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceY,
+			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
+	}
+
+	// 상체 위치 업데이트
+	m_upper.rc = RectMake(m_lower.rc.left, m_lower.rc.top,
+		m_upper.pAni->getFrameWidth() * 3, m_upper.pAni->getFrameHeight() * 3);
+	
 }
 
 void player::release()
@@ -355,6 +362,9 @@ void player::render(HDC hdc)
 	// 테스트
 	sprintf_s(szText, "%d, %d", g_ptMouse.x, g_ptMouse.y);
 	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
+
+	_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
+	TextOut(hdc, 100, 100, szText, strlen(szText));
 }
 player::player()
 {
