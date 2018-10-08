@@ -11,9 +11,14 @@ private:
 	image	*	m_pimgSubBG;
 	
 	image	*	m_pimgbridge;
+	image	*	m_pimgSbridge;
 	boss	*	m_pBoss;
 	
-	float m_mapSpeed;
+	RECT	m_rc;
+
+	float m_mapPoX;
+	float m_bridgeX;
+	float m_SubbridgeX;
 
 public:
 	virtual HRESULT init();
