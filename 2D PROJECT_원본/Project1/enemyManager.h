@@ -10,8 +10,9 @@ public:
 	void release();
 	void update();
 	void render(HDC hdc);
-	void setEnemy(int enemyNum, int speed, const char * textName, int charNum);
+	
 	void setSniper(const char * textName, float x, float y, int speed, int charNum);
+	void setCannon(const char * textName, float x, float y, int speed, int charNum);
 
 	inline std::vector<enemy*>	getVecEnemy() { return m_vecEnemy; }
 	inline std::vector<enemy*>::iterator getIterEnemy() { return m_iter; }

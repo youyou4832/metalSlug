@@ -56,7 +56,8 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 	if (m_CharNum == CharInfo::i_sandbag) {
 		m_currHP = m_MaxHP = 30;
 	}
-	else if(m_CharNum == CharInfo::i_sniper){
+	else{
+		s_Idle.isState = true;
 		m_currHP = m_MaxHP = 1;
 	}
 
@@ -96,6 +97,9 @@ void enemy::update()
 			if (s_Hit.isState == true) {
 				sendBagHitAnimation();
 			}
+		}
+		else if (m_CharNum == CharInfo::i_cannon) {
+			cannonAnimation();
 		}
 	}
 	//fire();
@@ -142,8 +146,20 @@ void enemy::render(HDC hdc)
 				if (secondBreak == true) {
 					m_pImg->render(hdc, m_fX - 20, m_fY - 160, 80 * s_Attack.index, 178, 80, 119, 2);
 				}
-
-				
+			}
+			else if (m_CharNum == CharInfo::i_cannon) {
+				if (m_currHP > 0) {
+					if (s_Idle.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 42 * s_Idle.index, 0, 42, 45, 3);
+					}
+					else if (s_Attack.isState == true) {
+						//m_pImg->render(hdc, m_fX, m_fY, 41 * s_Attack.index, 184, 41, 44, 3);
+						IMAGEMANAGER->findImage("cannon_Attack")->render(hdc, m_fX - 30, m_fY - 20, 58 * s_Attack.index, 0, 58, 52, 3);
+					}
+				}
+				else {
+					IMAGEMANAGER->findImage("enemy_death")->render(hdc, m_fX + 70, m_fY + 20, 44 * s_Death.index, 0, 44, 39, 3);
+				}
 			}
 		}
 
@@ -173,6 +189,10 @@ void enemy::fire()
 {
 	if (m_CharNum == CharInfo::i_sniper) {
 		m_pMissileMgr->fire(m_fX+ (m_pImg->getFrameWidth() / 2)*3, m_fY + (m_pImg->getHeight() / 2) * 3,
+			PI, 5, m_CharNum);
+	}
+	else if (m_CharNum == CharInfo::i_cannon) {
+		m_pMissileMgr->fire(m_fX, m_fY+30,
 			PI, 5, m_CharNum);
 	}
 }
@@ -255,6 +275,50 @@ void enemy::sendBagHitAnimation()
 				s_Hit.isState = false;
 			}
 			s_Hit.count = 0;
+		}
+	}
+}
+
+void enemy::cannonAnimation()
+{
+	if (m_currHP > 0) {
+		if (s_Idle.isState == true) {
+			++s_Idle.count;
+			if (s_Idle.count % 8 == 0) {
+				++s_Idle.index;
+				if (s_Idle.index == 6) {
+					s_Idle.index = 0;
+					s_Idle.isState = false;
+					s_Attack.isState = true;
+				}
+				s_Idle.count = 0;
+			}
+		}
+		else if (s_Attack.isState == true) {
+			++s_Attack.count;
+			if (s_Attack.count % 8 == 0) {
+				++s_Attack.index;
+				if (s_Attack.index == 3) {
+					fire();
+				}
+				if (s_Attack.index == 14) {
+					s_Attack.index = 0;
+					s_Attack.isState = false;
+					s_Idle.isState = true;
+				}
+				s_Attack.count = 0;
+			}
+		}
+	}
+	else {
+		++s_Death.count;
+		if (s_Death.count % 8 == 0) {
+			++s_Death.index;
+			if (s_Death.index == 6) {
+				s_Death.index = 5;
+				deathCount();
+			}
+			s_Death.count = 0;
 		}
 	}
 }

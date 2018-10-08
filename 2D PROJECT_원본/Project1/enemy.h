@@ -15,6 +15,7 @@ private:
 	E_tagState s_Attack;
 	E_tagState s_Death;
 	E_tagState s_Hit;//샌드백 히트 애니
+	E_tagState s_Idle;
 	int deathCN = 0;
 	bool firstBreak = false;
 	bool secondBreak = false;
@@ -65,6 +66,7 @@ public:
 	void sniperAnimation();
 	void sandBagAnimation();
 	void sendBagHitAnimation();
+	void cannonAnimation();
 	void deathCount();
 
 	enemy();
