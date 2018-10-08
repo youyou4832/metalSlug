@@ -3,7 +3,7 @@
 
 class boss;
 class animation;
-
+class player;
 class bossScene :public scene
 {
 private:
@@ -13,7 +13,7 @@ private:
 	image	*	m_pimgbridge;
 	image	*	m_pimgSbridge;
 	boss	*	m_pBoss;
-	
+	player* m_pPlayer;
 	RECT	m_rc;
 
 	float m_mapPoX;

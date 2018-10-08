@@ -67,7 +67,11 @@ HRESULT boss::init()
 
 void boss::release()
 {
-	
+	SAFE_DELETE(m_pMoveAni);
+	SAFE_DELETE(m_pChangeBoss);
+	SAFE_DELETE(m_pRageBoss);
+	SAFE_DELETE(m_pDieAni);
+	SAFE_DELETE(m_pCannon);
 }
 
 void boss::update()

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "bossScene.h"
 #include "boss.h"
-
+#include "player.h"
 
 HRESULT bossScene::init()
 {
@@ -25,11 +25,16 @@ HRESULT bossScene::init()
 	m_pBoss = new boss;
 	m_pBoss->init();
 
+	m_pPlayer = new player;
+	m_pPlayer->init();
+
 	return S_OK;
 }
 
 void bossScene::release()
 {
+	SAFE_DELETE(m_pBoss);
+	SAFE_DELETE(m_pPlayer);
 }
 
 void bossScene::update()
@@ -47,6 +52,7 @@ void bossScene::update()
 	{
 		m_bridgeX = 1000;
 	}
+	m_pPlayer->update();
 }
 
 void bossScene::render(HDC hdc)
@@ -60,6 +66,7 @@ void bossScene::render(HDC hdc)
 	//m_pimgSbridge->render(hdc, m_SubbridgeX + 3070, WINSIZEY-275 , 0, 0, 768, 69, 4);
 
 	m_pBoss->render(hdc);
+	m_pPlayer->render(hdc);
 }
 
 bossScene::bossScene()

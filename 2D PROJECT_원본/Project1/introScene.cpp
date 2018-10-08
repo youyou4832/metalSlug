@@ -41,6 +41,7 @@ void introScene::update()
 {
 	m_enemyMgr->update();
 	m_pPlayer->update();
+	collider();
 }
 
 void introScene::render(HDC hdc)
@@ -53,7 +54,12 @@ void introScene::render(HDC hdc)
 
 void introScene::collider()
 {
-
+	RECT upper_rc = m_pPlayer->getRectUpper();
+	RECT lower_rc = m_pPlayer->getRectLower();
+	RECT rc;
+	if (IntersectRect(&rc, &upper_rc, &gate)) {
+		SCENEMANAGER->changeScene("bossScene");
+	}
 }
 
 introScene::introScene()

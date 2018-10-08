@@ -223,6 +223,8 @@ public:
 	void move();
 	void release();
 	void render(HDC hdc);
+	inline RECT getRectUpper() { return m_upper.rc; }
+	inline RECT getRectLower() { return m_lower.rc; }
 
 	player();
 	~player();
