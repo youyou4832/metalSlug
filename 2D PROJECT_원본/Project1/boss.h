@@ -85,6 +85,7 @@ public:
 	void release();
 	void update();
 	void render(HDC hdc);
+	void fire();
 	void move();
 	void change(bool ischange);
 

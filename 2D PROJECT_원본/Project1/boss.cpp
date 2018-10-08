@@ -45,7 +45,6 @@ HRESULT boss::init()
 	m_pDieAni->setFPS(15);
 
 	m_pCannon = new missileManager;
-	m_pCannon->init(10);
 
 	m_nCurrFrameX = 0;
 	m_nCurrFrameY = 0;
@@ -72,6 +71,7 @@ void boss::release()
 	SAFE_DELETE(m_pRageBoss);
 	SAFE_DELETE(m_pDieAni);
 	SAFE_DELETE(m_pCannon);
+	SAFE_DELETE(m_pCannon);
 }
 
 void boss::update()
@@ -87,6 +87,7 @@ void boss::update()
 	
 	move();
 
+	fire();
 	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pDieAni->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pRageBoss->frameUpdate(TIMEMANAGER->getElapsedTime());
@@ -117,6 +118,10 @@ void boss::render(HDC hdc)
 	}
 	//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 
+}
+
+void boss::fire()
+{
 }
 
 void boss::move()
