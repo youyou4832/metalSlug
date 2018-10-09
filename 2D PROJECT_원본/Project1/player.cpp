@@ -4,6 +4,8 @@
 #include "timer.h"
 #include "missileManager.h"
 
+#define Jump_Height	100
+
 HRESULT player::init(float x, float y)
 {
 	// 플레이어
@@ -33,7 +35,9 @@ HRESULT player::init(float x, float y)
 	m_lower.pImg->setY(y);
 
 	m_fSpeed = 3.0f;
-	m_fJumpSpeed = 10.0f; 
+	m_fJumpSpeed = 10.0f;
+	m_fJumpHeight = 100;
+	m_fCurrHeight = 0;
 	m_fGravity = 0;
 	m_fReplaceY = 0;
 	m_fAngle = 0;
@@ -48,13 +52,14 @@ HRESULT player::init(float x, float y)
 
 	m_upper.rc = RectMake(m_upper.pImg->getX(), m_upper.pImg->getY(), m_upper.pAni->getFrameWidth() * 3, m_upper.pAni->getFrameHeight() * 3);
 	m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY(), m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
+	ZeroMemory(&m_rcAtt, NULL);
 
 	// 미사일
 	IMAGEMANAGER->addImage("playerMissile", "image/player/playerBullet.bmp", 8, 8, true, RGB(255, 0, 255));
 
 	m_pMissileMgr = new missileManager;
 	m_pMissileMgr->init("playerMissile", WINSIZEY, 10);
-	   
+	
 	return S_OK;
 }
 
@@ -90,6 +95,36 @@ void player::actSet()
 		}
 	}
 
+	// ### 캐릭터 방향 설정 ###
+	if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
+	{
+		if (m_nActUpper == UPPER_Sit)
+			m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
+
+		m_nDir = DIR_Left;
+		m_nDirY = NULL;
+	}
+
+	else if (g_ptMouse.x > m_upper.pImg->getX())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
+	{
+		if (m_nActUpper == UPPER_Sit)
+			m_upper.pAni->setPlayFrame(0, UPPER_SitFrame, false, false);
+
+		m_nDir = DIR_Right;
+		m_nDirY = NULL;
+	}
+
+	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)		// 마우스 포인터가 캐릭터 위에 있을 경우
+	{
+		m_nDirY = DIR_Up;
+	}
+
+	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)	// 마우스 포인터가 캐릭터 아래에 있을 경우
+	{
+		m_nDirY = DIR_Down;
+	}
+
+	// ### 애니메이션 설정 ###
 	if (m_isAct == true)
 	{
 		// 상체
@@ -139,6 +174,9 @@ void player::actSet()
 				{
 					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
 					m_upper.pAni->setPlayFrameReverse(1, UPPER_Att90Frame, false, false);
+					
+					m_fAttX = m_upper.pImg->getX() + 30;
+					m_fAttY = m_upper.pImg->getY() - 90;
 
 					m_fReplaceY = 10;
 				}
@@ -167,6 +205,9 @@ void player::actSet()
 					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
 					m_upper.pAni->setPlayFrame(1, UPPER_Att90Frame, false, false);
 
+					m_fAttX = m_upper.pImg->getX() + 30;
+					m_fAttY = m_upper.pImg->getY() - 90;
+
 					m_fReplaceY = 10;
 				}
 
@@ -186,6 +227,15 @@ void player::actSet()
 					m_fReplaceY = 20;
 				}
 			}
+
+			m_fAngle = MY_UTIL::getAngle(m_fAttX,	// 총알 발사를 위한 각도 지정
+				m_fAttY,
+				g_ptMouse.x, g_ptMouse.y);
+
+			m_pMissileMgr->fire(m_fAttX,			// 총알 발사
+				m_fAttY,
+				m_fAngle, 10, i_player);
+
 			break;
 
 		case UPPER_AttSit:
@@ -193,7 +243,6 @@ void player::actSet()
 			{
 				m_upper.pAni->init(UPPER_AttSitWidth, UPPER_AttSitHeight, UPPER_AttSitWidth / UPPER_AttSitFrame, UPPER_AttSitHeight, UPPER_AttSitY);
 				m_upper.pAni->setPlayFrameReverse(1, UPPER_AttSitFrame, false, false);
-
 			}
 
 			else
@@ -252,29 +301,6 @@ void player::actSet()
 
 void player::move()
 {	
-	// ### 캐릭터 방향 설정 ###
-	if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
-	{
-		m_nDir = DIR_Left;
-		m_nDirY = NULL;
-	}
-
-	else if (g_ptMouse.x > m_upper.pImg->getX())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
-	{
-		m_nDir = DIR_Right;
-		m_nDirY = NULL;
-	}
-
-	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)		// 마우스 포인터가 캐릭터 위에 있을 경우
-	{
-		m_nDirY = DIR_Up;
-	}
-
-	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)	// 마우스 포인터가 캐릭터 아래에 있을 경우
-	{
-		m_nDirY = DIR_Down;
-	}
-
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
 		if (m_nActUpper != UPPER_Sit)
@@ -283,30 +309,8 @@ void player::move()
 
 			m_nActUpper = UPPER_Sit;
 			m_nActLower = LOWER_NULL;
-
-			if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
-			{
-				m_isAct = true;
-				m_nActUpper = UPPER_AttSit;
-			}
 		}
 	}
-	
-	// 공격 (마우스 포인터)
-	else if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
-	{
-		m_isAct = true;
-		m_nActUpper = UPPER_Att;
-
-		m_fAngle = MY_UTIL::getAngle(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,	// 총알 발사를 위한 각도 지정
-			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
-			g_ptMouse.x, g_ptMouse.y);
-
-		m_pMissileMgr->fire(m_upper.pImg->getX() + m_upper.pAni->getFrameWidth() / 2,					// 총알 발사
-			m_upper.pImg->getY() + m_upper.pAni->getFrameHeight() + 30,
-			m_fAngle, 10, i_player);
-	}
-
 	else if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0)
 	{
 		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att)
@@ -336,14 +340,28 @@ void player::move()
 		m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
 	}
 
+	// 공격 (마우스 포인터)
+	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+	{
+		m_isAct = true;
+
+		if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_AttSit)
+			m_nActUpper = UPPER_AttSit;
+		else if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_AttSit)
+			m_nActUpper = UPPER_Att;
+	}
+
 	// 키를 뗐을 경우 행동하지 않음으로 바꿈
 	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') || KEYMANAGER->isOnceKeyUp('S'))
 	{
-		if (m_nActUpper != UPPER_Att)
-			m_nActUpper = UPPER_Idle;
+		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_AttSit)
+		{
+			if (m_nActUpper != UPPER_Att)
+				m_nActUpper = UPPER_Idle;
 
-		m_nActLower = LOWER_Idle;
-		m_isAct = true;
+			m_nActLower = LOWER_Idle;
+			m_isAct = true;
+		}
 	}
 
 	if (m_nActUpper != UPPER_Appear)
@@ -412,6 +430,9 @@ void player::render(HDC hdc)
 
 	_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
 	TextOut(hdc, 100, 100, szText, strlen(szText));
+
+	_stprintf_s(szText, "UPPER Act: %d", m_nActUpper);
+	TextOut(hdc, 100, 150, szText, strlen(szText));
 }
 player::player()
 {

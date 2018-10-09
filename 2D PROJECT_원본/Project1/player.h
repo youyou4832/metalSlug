@@ -227,12 +227,18 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
+	RECT	m_rcAtt;
+	float	m_fAttX;
+	float	m_fAttY;
+
 	float	m_fReplaceY;
 	float	m_fReplaceLowerY;
 	float	m_fSpeed;
 	float	m_fJumpSpeed;
 	float	m_fGravity;
 	float	m_fAngle;
+	float	m_fJumpHeight;
+	float	m_fCurrHeight;
 
 	short	m_nActUpper;	// 상체 행동
 	short	m_nActLower;	// 하체 행동
