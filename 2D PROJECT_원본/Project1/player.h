@@ -104,7 +104,6 @@ class player
 #define UPPER_SitMoveY			UPPER_SitIdleY + UPPER_SitIdleHeight
 #define UPPER_SitMoveFrame		7
 
-
 #define UPPER_AttWidth			520
 #define UPPER_AttHeight			29
 #define UPPER_AttY				UPPER_SitMoveY + UPPER_SitMoveHeight
@@ -229,6 +228,7 @@ private:
 	ACT_LOWER	m_ACT_LOWER;
 
 	float	m_fReplaceY;
+	float	m_fReplaceLowerY;
 	float	m_fSpeed;
 	float	m_fJumpSpeed;
 	float	m_fGravity;
