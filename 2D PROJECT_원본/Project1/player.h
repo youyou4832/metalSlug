@@ -228,15 +228,17 @@ private:
 	ACT_LOWER	m_ACT_LOWER;
 
 	RECT	m_rcAtt;
-	float	m_fAttX;
-	float	m_fAttY;
+	float	m_fAttX;		// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
+	float	m_fAttY;		// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 
-	float	m_fReplaceY;
-	float	m_fReplaceLowerY;
+	float	m_fReplaceY;	// 상체 Y좌표 + 리소스 출력 위치 수정
+	float	m_fReplaceLowerY;	// 하체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fSpeed;
-	float	m_fJumpSpeed;
-	float	m_fGravity;
 	float	m_fAngle;
+
+	// 점프
+	float	m_fGravity;
+	float	m_fJumpSpeed;
 	float	m_fJumpHeight;
 	float	m_fCurrHeight;
 
@@ -247,17 +249,31 @@ private:
 
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 	bool	m_isAlive;		// 생존여부
+	bool	m_isCollide;	// 충돌여부 (적과 근접)
 
 public:
 	HRESULT init(float x, float y);
 	void update();
-	void actSet();
 	void move();
 	void release();
 	void render(HDC hdc);
 
-	inline RECT getRectUpper() { return m_upper.rc; }
-	inline RECT getRectLower() { return m_lower.rc; }
+	// 캐릭터 세팅 함수
+	void actSet();		// 캐릭터 세팅 전부
+	void setUpper();	// 상체
+	void setLower();	// 하체
+	void setDir();		// 방향
+
+	void fire();		// 공격
+
+	
+	inline RECT	getRectUpper() { return m_upper.rc; }
+	inline RECT	getRectLower() { return m_lower.rc; }
+
+	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide == true (근접공격)
+
+	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
+	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
 
 	player();
 	~player();
