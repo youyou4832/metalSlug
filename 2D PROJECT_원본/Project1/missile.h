@@ -21,6 +21,7 @@ protected:
 
 	m_tagState special_bullet;
 	m_tagState fire_bullet;
+	m_tagState cannon_bullet;
 	m_tagState angle_count;
 
 
@@ -47,6 +48,7 @@ public:
 
 	void ani_specialBullet();
 	void ani_nomalBullet();
+	void ani_rageBullet();
 	void angleCount();
 	missile();
 	virtual ~missile();

@@ -46,10 +46,12 @@ HRESULT missile::init(const char * szImageName, float speed,
 		m_pImg = IMAGEMANAGER->findImage("normalBullet");
 	}
 
-	if (m_charNum == CharInfo::i_boss)
+	if (m_charNum == CharInfo::i_nomalboss || m_charNum == CharInfo::i_rageboss)
 	{
-		m_pImg = IMAGEMANAGER->findImage("firebullet");
+		m_pImg = IMAGEMANAGER->findImage("boss");
 	}
+
+	
 
 	return S_OK;
 }
@@ -65,8 +67,13 @@ void missile::update()
 		ani_specialBullet();
 	}
 
-	if (m_charNum == CharInfo::i_boss) {
+	if (m_charNum == CharInfo::i_nomalboss) {
 		ani_nomalBullet();
+	}
+
+	else if (m_charNum == CharInfo::i_rageboss)
+	{
+		ani_rageBullet();
 	}
 
 }
@@ -83,8 +90,12 @@ void missile::render(HDC hdc, int charNum)
 			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 24, 24, 3);
 		}
 
-		if (charNum == CharInfo::i_boss) {
+		if (charNum == CharInfo::i_nomalboss) {
 			m_pImg->render(hdc, m_fX, m_fY, 0 + (22 * fire_bullet.index), 714, 22, 22, 4);
+		}
+
+		else if (charNum == CharInfo::i_rageboss) {
+			m_pImg->render(hdc, m_fX, m_fY, 352 - (32 * cannon_bullet.index), 681, 32, 33, 5);
 		}
 
 	}
@@ -119,7 +130,7 @@ void missile::move()
 {
 	if (m_isFire)
 	{
-		if (m_charNum == CharInfo::i_boss)
+		if (m_charNum == CharInfo::i_nomalboss || m_charNum == CharInfo::i_rageboss)
 		{
 			
 			if (m_fAngle >= -1.45f)
@@ -134,8 +145,10 @@ void missile::move()
 			
 			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY) {
 				m_isFire = false;
+				angle_count.index = 0;
+				cannon_bullet.index = 0;
 			}
-
+			m_rc = RectMakeCenter(m_fX + 50, m_fY + 10, 20, 20);
 		}
 		
 		else
@@ -147,6 +160,7 @@ void missile::move()
 
 			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
 				m_isFire = false;
+	
 			}
 		}
 
@@ -177,6 +191,21 @@ void missile::ani_nomalBullet()
 		}
 		fire_bullet.count = 0;
 	}
+}
+
+void missile::ani_rageBullet()
+{
+	 ++cannon_bullet.count;
+	 if (cannon_bullet.count % 10 == 0) {
+		
+		 if (cannon_bullet.index != 11)
+		 {
+			 ++cannon_bullet.index;
+		 }
+		
+		 cannon_bullet.count = 0;
+	 }
+
 }
 
 void missile::angleCount()
