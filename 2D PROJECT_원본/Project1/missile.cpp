@@ -45,6 +45,9 @@ HRESULT missile::init(const char * szImageName, float speed,
 	else if (m_charNum == CharInfo::i_normal) {
 		m_pImg = IMAGEMANAGER->findImage("normalBullet");
 	}
+	else if (m_charNum == CharInfo::i_tank) {
+		m_pImg = IMAGEMANAGER->findImage("tank");
+	}
 
 	return S_OK;
 }
@@ -56,7 +59,7 @@ void missile::release()
 void missile::update()
 {
 	move();
-	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon) {
+	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon || m_charNum == CharInfo::i_tank) {
 		ani_specialBullet();
 	}
 }
@@ -71,6 +74,9 @@ void missile::render(HDC hdc, int charNum)
 		}
 		else if (charNum == CharInfo::i_normal) {
 			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 24, 24, 3);
+		}
+		else if (charNum == CharInfo::i_tank) {
+			m_pImg->render(hdc, m_fX, m_fY, 46 * special_bullet.index, 374, 46, 22, 3);
 		}
 	}
 }
@@ -101,7 +107,12 @@ void missile::move()
 	{
 		m_fX += cosf(m_fAngle) * m_fSpeed;
 		m_fY += -sinf(m_fAngle) * m_fSpeed;
-		m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
+		if (m_charNum == CharInfo::i_normal) {
+			m_rc = RectMakeCenter(m_fX + 40, m_fY + 35, 40, 10);
+		}
+		else {
+			m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
+		}
 		if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
 			m_isFire = false;
 		}

@@ -40,12 +40,12 @@ void effect::update()
 	}
 }
 
-void effect::render(HDC hdc)
+void effect::render(HDC hdc, int scalar)
 {
 	if (!m_isAlive) return;
 
 	if (m_pImg)
-		m_pImg->aniRender(hdc, m_nX, m_nY, m_pAnimation);
+		m_pImg->aniRender(hdc, m_nX, m_nY, m_pAnimation, scalar);
 }
 
 void effect::startEffect(int x, int y)

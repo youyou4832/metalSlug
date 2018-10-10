@@ -2,7 +2,7 @@
 #include "enemy.h"
 #include "missileManager.h"
 #include "progressBar.h"
-
+#include "player.h"
 HRESULT enemy::init()
 {
 	m_nCount = 0;
@@ -22,7 +22,7 @@ HRESULT enemy::init()
 	return S_OK;
 }
 
-HRESULT enemy::init(const char * szFileName, POINT position, int destX, int destY, int speed, int charNum)
+HRESULT enemy::init(const char * szFileName, POINT position, int destX, int destY, int speed, int charNum, player* player)
 {
 	m_nCount = 0;
 	m_nCurrFrameX = 0;
@@ -46,21 +46,30 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 	m_destX2 = position.x;
 	m_destY2 = position.y;
 
-	moveAngle = MY_UTIL::getAngle(
+	/*moveAngle = MY_UTIL::getAngle(
 		m_fX, m_fY,
-		m_destX, m_destY);
+		m_destX, m_destY);*/
+	moveAngle = PI;
 
+	m_player = player;
+	
 	m_fSpeed = speed;
 	isAlive = true;
 	deathCN = 0;
 	if (m_CharNum == CharInfo::i_sandbag) {
 		m_currHP = m_MaxHP = 30;
 	}
-	else{
+	else if (m_CharNum == CharInfo::i_tank) {
 		s_Idle.isState = true;
+		m_currHP = m_MaxHP = 20;
+	}
+	else{
+		//s_Idle.isState = true;
+		s_Move.isState = true;
+		MaxAttack = RANDOM->getFromIntTo(2, 5);
 		m_currHP = m_MaxHP = 1;
 	}
-
+	AttackCount = 0;
 	return S_OK;
 }
 
@@ -99,10 +108,16 @@ void enemy::update()
 			}
 		}
 		else if (m_CharNum == CharInfo::i_cannon) {
+			move();
 			cannonAnimation();
 		}
 		else if (m_CharNum == CharInfo::i_normal) {
+			move();
 			normalAnimation();
+		}
+		else if (m_CharNum == CharInfo::i_tank) {
+			move();
+			tankAnimation();
 		}
 	}
 	//fire();
@@ -158,6 +173,9 @@ void enemy::render(HDC hdc)
 					else if (s_Attack.isState == true) {
 						IMAGEMANAGER->findImage("cannon_Attack")->render(hdc, m_fX - 30, m_fY - 20, 58 * s_Attack.index, 0, 58, 52, 3);
 					}
+					else if (s_Move.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 48 * s_Move.index, 45, 48, 45, 3);
+					}
 				}
 				else {
 					IMAGEMANAGER->findImage("enemy_death")->render(hdc, m_fX + 70, m_fY + 20, 44 * s_Death.index, 0, 44, 39, 3);
@@ -176,9 +194,28 @@ void enemy::render(HDC hdc)
 							m_pImg->render(hdc, m_fX - 100, m_fY, 61 * s_Attack.index, 122, 61, 38, 3); // 사격
 						}
 					}
+					else if (s_Move.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 26 * s_Move.index, 38, 26, 40, 3);
+					}
 				}
 				else {
 					IMAGEMANAGER->findImage("enemy_death")->render(hdc, m_fX + 70, m_fY + 20, 44 * s_Death.index, 0, 44, 39, 3);
+				}
+			}
+			else if (m_CharNum == CharInfo::i_tank) {
+				if (m_currHP > 0) {
+					if (s_Idle.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 71 * s_Idle.index, 0, 71, 56, 2);// 기본
+					}
+					else if (s_Attack.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 71 * s_Attack.index, 168, 71, 60, 2);
+					}
+					else if (s_Move.isState == true) {
+						m_pImg->render(hdc, m_fX, m_fY, 71 * s_Move.index, 56, 71, 56, 2);
+					}
+				}
+				else {
+					m_pImg->render(hdc, m_fX, m_fY, 96 * s_Death.index, 228, 96, 64, 2);
 				}
 			}
 		}
@@ -193,10 +230,39 @@ void enemy::render(HDC hdc)
 
 void enemy::move()
 {
+	if (AttackCount == MaxAttack) {
+		s_Move.isState = true;
+		s_Idle.isState = false;
+		s_Attack.isState = false;
+	}
 	/*m_fX += cosf(moveAngle) * m_fSpeed;
 	m_fY += -sinf(moveAngle) * m_fSpeed;*/
 	if (m_CharNum == CharInfo::i_sniper) {
-		m_rc = RectMakeCenter(m_fX + (m_pImg->getFrameWidth() / 2) * 3 + 30, m_fY + (m_pImg->getHeight() / 2) * 3 + 30, m_pImg->getFrameWidth(), m_pImg->getHeight());
+		if (m_pImg->getFrameX() < 5) {
+			m_rc = RectMakeCenter(m_fX + (m_pImg->getFrameWidth() / 2) * 3 + 30, m_fY + (m_pImg->getHeight() / 2) * 3 + 50, m_pImg->getFrameWidth() - 20, m_pImg->getHeight()-30);
+		}
+		else {
+			m_rc = RectMakeCenter(m_fX + (m_pImg->getFrameWidth() / 2) * 3 + 30, m_fY + (m_pImg->getHeight() / 2) * 3 + 30, m_pImg->getFrameWidth() - 20, m_pImg->getHeight());
+		}
+	}
+	else if (m_CharNum == CharInfo::i_cannon) {
+		if (s_Move.isState == true) {
+			m_fX += cosf(moveAngle) * m_fSpeed;
+			m_fY += -sinf(moveAngle) * m_fSpeed;
+		}
+		if ((m_fX < m_destX || m_fX - m_player->getRectLower().left < 100) && m_fX < WINSIZEX - 50 && firstMove == true) {
+			firstMove = false;
+			s_Move.isState = false;
+			s_Idle.isState = true;
+		}
+		
+		m_rc = RectMakeCenter(m_fX + 80, m_fY + 80, 58, 80);
+	}
+	else if (m_CharNum == CharInfo::i_normal) {
+		m_rc = RectMakeCenter(m_fX + 40, m_fY + 70, 54, 85);
+	}
+	else if (m_CharNum == CharInfo::i_tank) {
+		m_rc = RectMakeCenter(m_fX + 70, m_fY + 70, 100, 100);
 	}
 
 	if (m_fX < 0) {
@@ -218,6 +284,10 @@ void enemy::fire()
 	else if (m_CharNum == CharInfo::i_normal) {
 		m_pMissileMgr->fire(m_fX - 50, m_fY,
 			PI, 8, m_CharNum);
+	}
+	else if (m_CharNum == CharInfo::i_tank) {
+		m_pMissileMgr->fire(m_fX - 60, m_fY - 15,
+			PI, 5, m_CharNum);
 	}
 }
 
@@ -329,8 +399,19 @@ void enemy::cannonAnimation()
 					s_Attack.index = 0;
 					s_Attack.isState = false;
 					s_Idle.isState = true;
+					AttackCount++;
 				}
 				s_Attack.count = 0;
+			}
+		}
+		else if (s_Move.isState == true) {
+			++s_Move.count;
+			if (s_Move.count % 8 == 0) {
+				++s_Move.index;
+				if (s_Move.index == 11) {
+					s_Move.index = 0;
+				}
+				s_Move.count = 0;
 			}
 		}
 	}
@@ -421,6 +502,16 @@ void enemy::normalAnimation()
 				s_Attack.count = 0;
 			}
 		}
+		else if (s_Move.isState == true) {
+			++s_Move.count;
+			if (s_Move.count % 8 == 0) {
+				++s_Move.index;
+				if (s_Move.index == 12) {
+					s_Move.index = 0;
+				}
+				s_Move.count = 0;
+			}
+		}
 	}
 	else {
 		++s_Death.count;
@@ -435,12 +526,64 @@ void enemy::normalAnimation()
 	}
 }
 
+void enemy::tankAnimation()
+{
+	if (m_currHP > 0) {
+		if (s_Idle.isState == true) {
+			++s_Idle.count;
+			if (s_Idle.count % 15 == 0) {
+				++s_Idle.index;
+				if (s_Idle.index == 2) {
+					s_Idle.index = 0;
+					s_Attack.isState = true;
+					s_Idle.isState = false;
+				}
+				s_Idle.count = 0;
+			}
+		}
+		else if (s_Attack.isState == true) {
+			++s_Attack.count;
+			if (s_Attack.count % 10 == 0) {
+				++s_Attack.index;
+				if (s_Attack.index == 4) {
+					EFFECTMANAGER->play("tankEffect", m_fX - 60, m_fY - 25);
+					fire();
+					s_Attack.index = 0;
+				}
+				s_Attack.count = 0;
+			}
+		}
+		else if (s_Move.isState == true) {
+			++s_Move.count;
+			if (s_Move.count % 8 == 0) {
+				++s_Move.index;
+				if (s_Move.index == 6) {
+					s_Move.index = 0;
+				}
+				s_Move.count = 0;
+			}
+		}
+	}
+	else {
+		++s_Death.count;
+		if (s_Death.count % 10 == 0) {
+			++s_Death.index;
+			if (s_Death.index == 6) {
+				s_Death.index = 5;
+				deathCount();
+			}
+			s_Idle.count = 0;
+		}
+	}
+}
+
 void enemy::deathCount()
 {
 	deathCN++;
 
 	if (deathCN == 8) {
 		isAlive = false;
+		deathCN = 0;
 	}
 }
 

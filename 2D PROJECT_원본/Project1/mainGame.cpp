@@ -96,6 +96,7 @@ void mainGame::update()
 {
 	InvalidateRect(g_hWnd, NULL, false);
 	SCENEMANAGER->update();
+	EFFECTMANAGER->update();
 }
 
 void mainGame::render()

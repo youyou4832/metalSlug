@@ -45,35 +45,28 @@ void effectManager::release()
 
 void effectManager::update()
 {
-	vector<effect*> vecE;
-	vector<effect*>::iterator iterVE;
-
-	// effect형 포인터를 원소로 갖는 vector
-	for (m_iter = m_mapEffects.begin();
-		m_iter != m_mapEffects.end(); m_iter++)
+	for (m_iter = m_mapEffects.begin(); m_iter != m_mapEffects.end(); m_iter++)
 	{
-		vecE = (m_iter->second);
-		for (iterVE = vecE.begin(); iterVE != vecE.end(); iterVE++)
+		vecEffect::iterator iter;
+		//이펙트형 포인터를 원소로 갖는 벡터
+		for (iter = m_iter->second.begin(); iter != m_iter->second.end(); iter++)
 		{
-			(*iterVE)->update();
+			(*iter)->update();
 		}
+
 	}
 }
 
-void effectManager::render(HDC hdc)
+void effectManager::render(HDC hdc , int scalar)
 {
-	vector<effect*> vecE;
-	vector<effect*>::iterator iterVE;
-
-	// effect형 포인터를 원소로 갖는 vector
-	for (m_iter = m_mapEffects.begin();
-		m_iter != m_mapEffects.end(); m_iter++)
+	for (m_iter = m_mapEffects.begin(); m_iter != m_mapEffects.end(); m_iter++)
 	{
-		vecE = (m_iter->second);
-		for (iterVE = vecE.begin(); iterVE != vecE.end(); iterVE++)
+		vecEffect::iterator iter;
+		for (iter = m_iter->second.begin(); iter != m_iter->second.end(); iter++)
 		{
-			(*iterVE)->render(hdc);
+			(*iter)->render(hdc, scalar);
 		}
+
 	}
 }
 
@@ -95,21 +88,6 @@ void effectManager::addEffect(string effectName, const char * imageName, int ima
 
 void effectManager::play(string effectName, int x, int y)
 {
-	/*vector<effect*> vecE;
-	vector<effect*>::iterator iterVE;
-
-	m_iter = m_mapEffects.find(effectName);
-
-	vecE = (m_iter->second);
-
-	for (iterVE = vecE.begin(); iterVE != vecE.end(); iterVE++)
-	{
-		if (!(*iterVE)->getIsAlive())
-		{
-			(*iterVE)->startEffect(x, y);
-			break;
-		}
-	}*/
 	m_iter = m_mapEffects.find(effectName);
 
 	if (m_iter != m_mapEffects.end())

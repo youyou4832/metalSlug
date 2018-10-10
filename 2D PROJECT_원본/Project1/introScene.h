@@ -2,6 +2,7 @@
 #include "scene.h"
 class player;
 class enemyManager;
+class enemy;
 
 class introScene : public scene
 {
@@ -9,7 +10,7 @@ private:
 	enemyManager*	m_enemyMgr;
 	player*	m_pPlayer;
 	image*	m_introMap;
-	
+
 	RECT gate;
 public:
 	virtual HRESULT init();
@@ -18,6 +19,7 @@ public:
 	virtual void render(HDC hdc);
 
 	void collider();
+	void CheckDistance();
 
 	introScene();
 	~introScene();

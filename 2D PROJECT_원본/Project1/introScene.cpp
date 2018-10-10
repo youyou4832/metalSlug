@@ -14,18 +14,25 @@ HRESULT introScene::init()
 	IMAGEMANAGER->addImage("cannon_Attack", "image/enemy/cannon_Attack.bmp", 0, 0, 812, 52, 14, 1, true, RGB(255, 0, 255));
 	IMAGEMANAGER->addImage("normalBullet", "image/enemy/normal_bullet.bmp", 24, 24, true, RGB(255, 0, 255));
 	IMAGEMANAGER->addImage("normal", "image/enemy/normal_enemy.bmp", 0, 0, 368, 199, 12, 5, true, RGB(255, 0, 255));
+	IMAGEMANAGER->addImage("tank", "image/enemy/tank.bmp", 0, 0, 576, 396, 10, 8, true, RGB(255, 0, 255));
+	EFFECTMANAGER->addEffect("tankEffect", "image/enemy/tank_effect.bmp", 800, 42, 50, 42, 20, TIMEMANAGER->getElapsedTime(), 10);
+
+	// 플레이어
+	m_pPlayer = new player;
+	m_pPlayer->init(100, -140);
 
 	m_enemyMgr = new enemyManager;
-	m_enemyMgr->setSniper("sniper", WINSIZEX / 2, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper);
-	m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 300, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon);
-	m_enemyMgr->setNormal("normal", WINSIZEX / 2 - 300, WINSIZEY / 2 + 70, 5, CharInfo::i_normal);
+	m_enemyMgr->setSniper("sniper", WINSIZEX / 2 + 300, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper, m_pPlayer);
+	m_enemyMgr->setCannon("cannon", WINSIZEX + 200, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon, m_pPlayer, 2);
+	m_enemyMgr->setNormal("normal", WINSIZEX / 2 - 300, WINSIZEY / 2 + 70, 5, CharInfo::i_normal, m_pPlayer, 1);
+	m_enemyMgr->setTank("tank", 200, WINSIZEY / 2 + 70, 5, CharInfo::i_tank, m_pPlayer, 1);
 
 	
 	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
 	
-	// 플레이어
-	m_pPlayer = new player;
-	m_pPlayer->init(WINSIZEX / 2, -140);
+	
+	
+
 
 
 	return S_OK;
@@ -49,7 +56,8 @@ void introScene::render(HDC hdc)
 	m_introMap->render(hdc, 0, 0);
 	m_enemyMgr->render(hdc);
 	m_pPlayer->render(hdc);
-	Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
+	//Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
+	EFFECTMANAGER->render(hdc,2);
 }
 
 void introScene::collider()
@@ -60,6 +68,11 @@ void introScene::collider()
 	if (IntersectRect(&rc, &upper_rc, &gate)) {
 		SCENEMANAGER->changeScene("bossScene");
 	}
+}
+
+void introScene::CheckDistance()
+{
+	
 }
 
 introScene::introScene()

@@ -1,6 +1,6 @@
 #pragma once
 class missileManager;
-
+class player;
 struct E_tagState {
 	int index = 0;
 	int count = 0;
@@ -10,12 +10,14 @@ class enemy
 {
 private:
 	image * m_pImg;
+	player * m_player;
 	RECT	m_rc;
 
 	E_tagState s_Attack;
 	E_tagState s_Death;
 	E_tagState s_Hit;//샌드백 히트 애니
 	E_tagState s_Idle;
+	E_tagState s_Move;
 	int deathCN = 0;
 	bool firstBreak = false;
 	bool secondBreak = false;
@@ -35,11 +37,16 @@ private:
 	float moveAngle;
 	bool isAlive;
 
+	bool firstMove = true;
+
+	int MaxAttack;
+	int AttackCount;
 	//노말 에너미
 	bool checkMax = false;
 	int AttackCN = 0;
 	bool isDrawGun = false;
 	bool isHaveGun = false;
+	bool checkDistance = false;
 
 	// 미사일 매니저
 	missileManager*	m_pMissileMgr;
@@ -49,11 +56,12 @@ private:
 	int m_currHP;
 	int m_MaxHP;
 	
+	//RECT playerRC;
 	//static POINT position[5];
 	//static int index;
 public:
 	HRESULT init();
-	HRESULT init(const char* szFileName, POINT position, int destX, int destY, int speed, int charNum);
+	HRESULT init(const char* szFileName, POINT position, int destX, int destY, int speed, int charNum, player * player);
 	void release();
 	void update();
 	void render(HDC hdc);
@@ -74,7 +82,11 @@ public:
 	void sendBagHitAnimation();
 	void cannonAnimation();
 	void normalAnimation();
+	void tankAnimation();
 	void deathCount();
+	
+	inline void setCheckDistance() { checkDistance = true; }
+	inline void setPlayerRect(player* player) { m_player = player; }
 
 	enemy();
 	~enemy();

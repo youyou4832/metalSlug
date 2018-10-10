@@ -14,7 +14,7 @@ public:
 	HRESULT init();
 	void release();
 	void update();
-	void render(HDC hdc);
+	void render(HDC hdc, int scalar = 1);
 
 	void addEffect(string effectName, const char* imageName,
 		int imageWidth, int imageHeight,

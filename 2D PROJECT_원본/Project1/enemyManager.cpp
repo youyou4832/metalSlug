@@ -35,35 +35,46 @@ void enemyManager::render(HDC hdc)
 }
 
 
-void enemyManager::setSniper(const char * textName, float x, float y, int speed, int charNum)
+void enemyManager::setSniper(const char * textName, float x, float y, int speed, int charNum, player* player)
 {
 	enemy* sniper;
 	enemy* sendBag;
 	sniper = new enemy;
 	sendBag = new enemy;
-	sniper->init(textName, PointMake(x, y), x, y, speed, charNum);
-	sendBag->init("sandbag", PointMake(x + 50, y + 140), x + 50, y + 140, speed, CharInfo::i_sandbag);
+	sniper->init(textName, PointMake(x, y), x, y, speed, charNum, player);
+	sendBag->init("sandbag", PointMake(x + 50, y + 140), x + 50, y + 140, speed, CharInfo::i_sandbag, player);
 	
 	m_vecEnemy.push_back(sendBag);
 	m_vecEnemy.push_back(sniper);
 }
 
-void enemyManager::setCannon(const char * textName, float x, float y, int speed, int charNum)
+void enemyManager::setCannon(const char * textName, float x, float y, int speed, int charNum, player* player, int enemyNumber)
 {
 	enemy* cannon;
-	cannon = new enemy;
-	cannon->init(textName, PointMake(x, y), x, y, speed, charNum);
-
-	m_vecEnemy.push_back(cannon);
+	for (int i = 0; i < enemyNumber; i++) {
+		cannon = new enemy;
+		cannon->init(textName, PointMake(x + 100*i, y), WINSIZEX / 2 + 100*i, y, speed, charNum, player);
+		m_vecEnemy.push_back(cannon);
+	}
+	
 }
 
-void enemyManager::setNormal(const char * textName, float x, float y, int speed, int charNum)
+void enemyManager::setNormal(const char * textName, float x, float y, int speed, int charNum, player* player, int enemyNumber)
 {
 	enemy* normal;
 	normal = new enemy;
-	normal->init(textName, PointMake(x, y), x, y, speed, charNum);
+	normal->init(textName, PointMake(x, y), x, y, speed, charNum, player);
 
 	m_vecEnemy.push_back(normal);
+}
+
+void enemyManager::setTank(const char * textName, float x, float y, int speed, int charNum, player* player, int enemyNumber)
+{
+	enemy* tank;
+	tank = new enemy;
+	tank->init(textName, PointMake(x, y), x, y, speed, charNum, player);
+
+	m_vecEnemy.push_back(tank);
 }
 
 enemyManager::enemyManager()
