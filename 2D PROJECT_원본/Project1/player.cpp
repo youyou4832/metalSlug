@@ -41,6 +41,8 @@ HRESULT player::init(float x, float y)
 	m_fGravity = 0;
 	m_fReplaceY = 0;
 	m_fAngle = 0;
+	m_fAttX = 50;
+	m_fAttY = 50;
 	m_nActUpper = UPPER_Appear;
 	m_nActLower = LOWER_NULL;
 	m_nDir = DIR_Right;
@@ -66,8 +68,8 @@ HRESULT player::init(float x, float y)
 void player::update()
 {
 	// 플레이어
-	move();
 	actSet();
+	move();
 	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 
@@ -139,7 +141,7 @@ void player::actSet()
 			}
 			else
 				m_upper.pAni->setPlayFrame(1, UPPER_IdleFrame, true, true);
-
+			
 			m_fReplaceY = 25; 
 			break;
 
@@ -175,6 +177,7 @@ void player::actSet()
 					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
 					m_upper.pAni->setPlayFrameReverse(1, UPPER_Att90Frame, false, false);
 					
+					// 상단 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
 					m_fAttX = m_upper.pImg->getX() + 30;
 					m_fAttY = m_upper.pImg->getY() - 90;
 
@@ -185,6 +188,10 @@ void player::actSet()
 				{
 					m_upper.pAni->init(UPPER_Att270Width, UPPER_Att270Height, UPPER_Att270Width / UPPER_Att270Frame, UPPER_Att270Height, UPPER_Att270Y);
 					m_upper.pAni->setPlayFrameReverse(1, UPPER_Att270Frame, false, false);
+					
+					// 왼쪽 하단 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
+					m_fAttX = m_upper.pImg->getX();
+					m_fAttY = m_upper.pImg->getY() + 40;
 
 					m_fReplaceY = 110;
 				}
@@ -193,6 +200,10 @@ void player::actSet()
 				{
 					m_upper.pAni->init(UPPER_AttWidth, UPPER_AttHeight, UPPER_AttWidth / UPPER_AttFrame, UPPER_AttHeight, UPPER_AttY);
 					m_upper.pAni->setPlayFrameReverse(1, UPPER_AttFrame, false, false);
+
+					// 좌측 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
+					m_fAttX = m_upper.pImg->getX() - 50;
+					m_fAttY = m_upper.pImg->getY() - 20;
 
 					m_fReplaceY = 20;
 				}
@@ -205,6 +216,7 @@ void player::actSet()
 					m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
 					m_upper.pAni->setPlayFrame(1, UPPER_Att90Frame, false, false);
 
+					// 상단 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
 					m_fAttX = m_upper.pImg->getX() + 30;
 					m_fAttY = m_upper.pImg->getY() - 90;
 
@@ -216,6 +228,10 @@ void player::actSet()
 					m_upper.pAni->init(UPPER_Att270Width, UPPER_Att270Height, UPPER_Att270Width / UPPER_Att270Frame, UPPER_Att270Height, UPPER_Att270Y);
 					m_upper.pAni->setPlayFrame(1, UPPER_Att270Frame, false, false);
 
+					// 오른쪽 하단 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
+					m_fAttX = m_upper.pImg->getX() + 40;
+					m_fAttY = m_upper.pImg->getY() + 50;
+
 					m_fReplaceY = 110;
 				}
 
@@ -224,17 +240,13 @@ void player::actSet()
 					m_upper.pAni->init(UPPER_AttWidth, UPPER_AttHeight, UPPER_AttWidth / UPPER_AttFrame, UPPER_AttHeight, UPPER_AttY);
 					m_upper.pAni->setPlayFrame(1, UPPER_AttFrame, false, false);
 
+					// 좌측 어택박스 (렉트충돌 + 공격: 근접공격, 원거리공격: 미사일 발사 위치)
+					m_fAttX = m_upper.pImg->getX() + 100;
+					m_fAttY = m_upper.pImg->getY() - 20;
+
 					m_fReplaceY = 20;
 				}
 			}
-
-			m_fAngle = MY_UTIL::getAngle(m_fAttX,	// 총알 발사를 위한 각도 지정
-				m_fAttY,
-				g_ptMouse.x, g_ptMouse.y);
-
-			m_pMissileMgr->fire(m_fAttX,			// 총알 발사
-				m_fAttY,
-				m_fAngle, 10, i_player);
 
 			break;
 
@@ -286,11 +298,19 @@ void player::actSet()
 				m_lower.pAni->setPlayFrame(1, LOWER_MoveFrame, false, true);
 			
 			m_fReplaceLowerY = -20;
+
 			break;
 		}
 		
 		if (m_nActLower != LOWER_Move)
 			m_fReplaceLowerY = 0;
+
+		if (m_nActUpper == UPPER_Idle)
+		{
+			// 어택박스 삭제
+			m_fAttX = NULL;
+			m_fAttY = NULL;
+		}
 
 		m_upper.pAni->start();
 		m_lower.pAni->start();
@@ -348,7 +368,17 @@ void player::move()
 		if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_AttSit)
 			m_nActUpper = UPPER_AttSit;
 		else if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_AttSit)
+		{
 			m_nActUpper = UPPER_Att;
+
+			m_fAngle = MY_UTIL::getAngle(m_fAttX,	// 총알 발사를 위한 각도 지정
+				m_fAttY,
+				g_ptMouse.x, g_ptMouse.y);
+
+			m_pMissileMgr->fire(m_fAttX,			// 총알 발사
+				m_fAttY,
+				m_fAngle, 10, i_player);
+		}
 	}
 
 	// 키를 뗐을 경우 행동하지 않음으로 바꿈
@@ -433,6 +463,8 @@ void player::render(HDC hdc)
 
 	_stprintf_s(szText, "UPPER Act: %d", m_nActUpper);
 	TextOut(hdc, 100, 150, szText, strlen(szText));
+
+	Rectangle(hdc, m_fAttX, m_fAttY, m_fAttX + 10, m_fAttY + 10);
 }
 player::player()
 {
