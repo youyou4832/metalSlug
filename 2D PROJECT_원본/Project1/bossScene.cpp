@@ -45,6 +45,8 @@ void bossScene::release()
 void bossScene::update()
 {
 	m_pBoss->update();
+	m_pPlayer->update();
+
 	m_mapPoX -= 10;
 	m_bridgeX -= 10;
 
@@ -57,7 +59,7 @@ void bossScene::update()
 	{
 		m_bridgeX = 1000;
 	}
-	m_pPlayer->update();
+
 }
 
 void bossScene::render(HDC hdc)

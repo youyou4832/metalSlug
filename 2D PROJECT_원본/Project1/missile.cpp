@@ -38,7 +38,6 @@ HRESULT missile::init(const char * szImageName, float speed,
 	//memset(&m_rc, 3, sizeof(m_rc));
 	ZeroMemory(&m_rc, sizeof(m_rc));
 
-	//m_pImg = IMAGEMANAGER->findImage(szImageName);
 	if (m_charNum == CharInfo::i_sniper || m_charNum == CharInfo::i_cannon) {
 		m_pImg = IMAGEMANAGER->findImage("specialBullet");
 	}
@@ -48,10 +47,12 @@ HRESULT missile::init(const char * szImageName, float speed,
 	else if (m_charNum == CharInfo::i_tank) {
 		m_pImg = IMAGEMANAGER->findImage("tank");
 	}
-
-	if (m_charNum == CharInfo::i_nomalboss || m_charNum == CharInfo::i_rageboss)
+	else if (m_charNum == CharInfo::i_nomalboss || m_charNum == CharInfo::i_rageboss)
 	{
 		m_pImg = IMAGEMANAGER->findImage("boss");
+	}
+	else if (m_charNum == CharInfo::i_player) {
+		m_pImg = IMAGEMANAGER->findImage(szImageName);
 	}
 
 	
@@ -102,7 +103,9 @@ void missile::render(HDC hdc, int charNum)
 		else if (charNum == CharInfo::i_rageboss) {
 			m_pImg->render(hdc, m_fX, m_fY, 352 - (32 * cannon_bullet.index), 681, 32, 33, 5);
 		}
-
+		else if (charNum == CharInfo::i_player) {
+			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 8, 8, 3);
+		}
 	}
 
 	char szText[128];

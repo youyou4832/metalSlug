@@ -59,6 +59,10 @@ class player
 			198(33)-21 6개 캐릭터 하반신 앞 점프	0-
 			*/
 
+
+	// 플레이어 상체 중심점 / 플레이어 하체 중심점을 init할 때 스캔해서 배열에 저장
+	// 이미지를 출력할 때 해당 중심점에서 n만큼 떨어진 거리를 이미지의 중심으로 잡은 후 출력
+
 // 상체
 #define UPPER_AppearWidth	186
 #define UPPER_AppearHeight	240
@@ -100,11 +104,30 @@ class player
 #define UPPER_SitMoveY			UPPER_SitIdleY + UPPER_SitIdleHeight
 #define UPPER_SitMoveFrame		7
 
-
 #define UPPER_AttWidth			520
 #define UPPER_AttHeight			29
 #define UPPER_AttY				UPPER_SitMoveY + UPPER_SitMoveHeight
 #define UPPER_AttFrame			10
+
+#define UPPER_Att90Width		290
+#define UPPER_Att90Height		66
+#define UPPER_Att90Y			UPPER_AttY + UPPER_AttHeight
+#define UPPER_Att90Frame		10
+
+#define UPPER_Att180Width		240
+#define UPPER_Att180Height		24
+#define UPPER_Att180Y			UPPER_Att90Y + UPPER_Att90Height
+#define UPPER_Att180Frame		4
+
+#define UPPER_AttSitWidth		520
+#define UPPER_AttSitHeight		29
+#define UPPER_AttSitY			UPPER_Att180Y + UPPER_Att180Height
+#define UPPER_AttSitFrame		10
+
+#define UPPER_Att270Width		138
+#define UPPER_Att270Height		54
+#define UPPER_Att270Y			UPPER_AttSitY + UPPER_AttSitHeight
+#define UPPER_Att270Frame		6
 
 	/*
 	UPPER_Att90,
@@ -175,7 +198,7 @@ class player
 		LOWER_NULL,			// 하체 출력 안 함
 		LOWER_Idle,			// 대기 84(21*16),		4FR
 		LOWER_Move,			// 이동 372(31*20),		12FR
-		LOWER_Jump,			// 점프 126(26*24),		6FR
+		LOWER_Jump,			// 점프 126(21*24),		6FR
 		LOWER_JumpMove,		// 점프 이동 198(33*21),	6FR
 	};
 	
@@ -204,27 +227,53 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
-	float	m_fReplaceY;
+	RECT	m_rcAtt;
+	float	m_fAttX;		// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
+	float	m_fAttY;		// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
+
+	float	m_fReplaceY;	// 상체 Y좌표 + 리소스 출력 위치 수정
+	float	m_fReplaceLowerY;	// 하체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fSpeed;
-	float	m_fJumpSpeed;
+	float	m_fAngle;
+
+	// 점프
 	float	m_fGravity;
+	float	m_fJumpSpeed;
+	float	m_fJumpHeight;
+	float	m_fCurrHeight;
 
 	short	m_nActUpper;	// 상체 행동
 	short	m_nActLower;	// 하체 행동
-	short	m_nDir;		// 캐릭터가 바라보는 방향
-	short	m_nDirY;	// 캐릭터가 바라보는 방향
+	short	m_nDir;			// 캐릭터가 바라보는 방향 (좌우)
+	short	m_nDirY;		// 캐릭터가 바라보는 방향 (상하)
 
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
+	bool	m_isAlive;		// 생존여부
+	bool	m_isCollide;	// 충돌여부 (적과 근접)
 
 public:
 	HRESULT init(float x, float y);
 	void update();
-	void actSet();
 	void move();
 	void release();
 	void render(HDC hdc);
-	inline RECT getRectUpper() { return m_upper.rc; }
-	inline RECT getRectLower() { return m_lower.rc; }
+
+	// 캐릭터 세팅 함수
+	void actSet();		// 캐릭터 세팅 전부
+	void setUpper();	// 상체
+	void setLower();	// 하체
+	void setDir();		// 방향
+
+	void fire();		// 공격
+
+	
+	inline RECT	getRectUpper() { return m_upper.rc; }
+	inline RECT	getRectLower() { return m_lower.rc; }
+
+	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide == true (근접공격)
+
+	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
+	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
 
 	player();
 	~player();
