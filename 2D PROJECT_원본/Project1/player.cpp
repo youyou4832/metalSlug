@@ -7,7 +7,7 @@
 #define Jump_Height	100
 
 // #######################################################################
-// 12(±Ý)±îÁö ¾É¾Æ¼­ÀÌµ¿+¾É¾Æ¼­°ø°Ý+Á¡ÇÁ+ÆøÅº°ø°Ý+±Ù°Å¸®°ø°Ý+Å»°ÍÅ»Ãâ+Á×À½ ±¸Çö
+// 12(±Ý)±îÁö Á¡ÇÁ+ÆøÅº°ø°Ý+±Ù°Å¸®°ø°Ý+Å»°ÍÅ»Ãâ+Á×À½ ±¸Çö
 // #######################################################################
 
 HRESULT player::init(float x, float y)
@@ -136,7 +136,6 @@ void player::setUpper()
 			m_fReplaceY = 25;
 		}
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_Sit:		// ¾É±â
@@ -150,7 +149,6 @@ void player::setUpper()
 
 		m_fReplaceY = 45;
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_SitMove:
@@ -163,7 +161,6 @@ void player::setUpper()
 
 		m_fReplaceY = 45;
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_Move:	// ÀÌµ¿
@@ -177,13 +174,13 @@ void player::setUpper()
 
 		m_fReplaceY = 25;
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_Att:		// °ø°ÝÀº fire() ÇÔ¼ö¿¡¼­
 		break;
 	}
 
+	m_upper.pAni->start();
 }
 
 void player::setLower()
@@ -205,7 +202,6 @@ void player::setLower()
 		else
 			m_lower.pAni->setPlayFrame(1, LOWER_IdleFrame, true, true);
 
-		m_lower.pAni->start();
 		break;
 
 	case LOWER_Move:	// ÀÌµ¿
@@ -220,12 +216,13 @@ void player::setLower()
 
 		m_fReplaceLowerY = -20;
 
-		m_lower.pAni->start();
 		break;
 	}
 
 	if (m_nActLower != LOWER_Move)
 		m_fReplaceLowerY = 0;
+
+	m_lower.pAni->start();
 }
 
 void player::setDir()
