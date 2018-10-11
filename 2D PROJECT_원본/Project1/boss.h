@@ -39,17 +39,17 @@ private:
 
 	//보스 애니메이션
 	image *		m_pimgBoss;
-	animation*	m_pMoveAni;		// IDLE 및 기본 이동
-	animation*	m_pBossFire;	// IDLE 및 기본 이동
-	animation*	m_pBossCfire;	// IDLE 및 기본 이동
+	animation*	m_pMoveAni;		// IDLE 및 기본 이동	 애니메이션
+	animation*	m_pBossFire;	// nomalboss bullet 공격 애니메이션
+	animation*	m_pBossCfire;	//  rage boss 공격 애니메이션
 
 	animation*	m_pChangeBoss;	// 보스 변신이미지 
 	animation*  m_pRageBoss;	// 보스 분노모드
 	animation*	m_pDieAni;		// 보스 죽음
 
 	//보스 이펙트 애니메이션
-	image *		 m_pimgeffect;
-	animation*	 m_pmoveEffect;
+	image *		 m_pimgeffect;	// 보스 이펙트 이미지를 담을 클래스 변수 
+	
 
 	RECT		m_rc;
 
@@ -65,57 +65,59 @@ private:
 	pattern		m_pattern;		// 보스의 무브 패턴을 받는 변수
 	bullet		m_bullet;		// 보스의 현재 총알 상태를 알려주는 변수
 
-	float		m_fSpeed;
-	float		m_upspeed;
+	float		m_fSpeed;		//보스 스피드
+	float		m_upspeed;		//보스가 등장할때 점점 빠르게 등장하기 보이기 위해서 사용
 
-	float		m_fX;
-	float		m_fY;
+	float		m_fX;			//보스 현재 X위치
+	float		m_fY;			//보스 현재 Y위치
 	float		m_fAngle;
 	
 
 	int			m_nCurrFrameX;
 	int			m_nCurrFrameY;
 
-	int		m_pattonChack; // 특정 패턴 체크
+	int		m_pattonChack;		// 특정 패턴 체크
 
-	bool m_isChange;
-	bool m_isAppear;
-	bool m_isAlive;
-	bool m_isShoot;
+	bool m_isChange;			//보스 변신 유무를 하기위한 변수
+	bool m_isAppear;			//보스 등장씬 유무를 확인하기 위한 변수
+	bool m_isAlive;				//보스가 살아있는지를 확인하기 위한 변수
+	bool m_isShoot;				//보스가 총알을 솼는지 확인하기 위한 변수
 
 	// 미사일 매니저
 	missileManager*	m_pmissileManager;
 	
-
-	int				m_nCurrHP;
-	int				m_nMaxHP;
+	int				m_nCurrHP;		//보스 현재 hp
+	int				m_nMaxHP;		//보스 max hp
 
 	
 
 	// 타겟
 	/*	플레이어클래스*	m_pTarget;*/
+
 public:
-	HRESULT init();
-	void release();
+	HRESULT init();				
+	void release();			
 	void update();
 	void render(HDC hdc);
-	void fire();
-	void shoot();
-	void move();
-	void change(bool ischange);
 
-	void ani_moveeffect();
-	void ani_smoveeffect();
-	void ani_nomalshoot();
-	void ani_rageshoot();
-	void damaged(int damage);
-	void diechack();
+	void fire();				//bullet 시레 발사하는 함수
+	void shoot();				//bullet 발사 위해 체크 하는 함수
+	void move();				//보스의 동작을 위한 함수
+	void change(bool ischange);		//보스 변신씬을 체크하는 함수
+
+	void ani_moveeffect();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수
+	void ani_smoveeffect();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수2
+	void ani_nomalshoot();		//boss nomal bullet 이펙트 에니메이션 동작을 위한 함수
+	void ani_rageshoot();		//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
+
+	void damaged(int damage);	// boss에 hp를 감소하는 함수
+	
 
 	inline RECT getRect() { return m_rc; }
 	inline float getX() { return m_fX; }
 	inline float getY() { return m_fY; }
 	inline void setY(float y) { m_fY = y; }
-	inline missileManager* getMissileMgr() { return m_pmissileManager     ; }
+	inline missileManager* getMissileMgr() { return m_pmissileManager; }
 	
 
 	//inline progressBar* getHPBar() { return m_pHPBar; }

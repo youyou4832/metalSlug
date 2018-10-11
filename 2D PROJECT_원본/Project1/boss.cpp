@@ -62,24 +62,23 @@ HRESULT boss::init()
 	m_pDieAni->setPlayFrame(72, 84);
 	m_pDieAni->setFPS(15);
 
+	//보스 이펙트
 	m_pimgeffect = IMAGEMANAGER->addImage("effect", "image/boss/BossEffect.bmp",
 		1056, 736, true, RGB(255, 0, 255));
 
-	m_pmoveEffect = new animation;
-	m_pmoveEffect->init(m_pimgeffect->getWidth(), m_pimgeffect->getHeight(), 264, 40);
-	m_pmoveEffect->setPlayFrame(0, 40, false, true);
-	m_pmoveEffect->setFPS(15);
-
+	
+	//보스 미사일 동적할당으로 생성
 	m_pmissileManager = new missileManager;
 	
 	m_nCurrFrameX = 0;
 	m_nCurrFrameY = 0;
 
-	m_fSpeed = 5.0f;
-	m_upspeed = 3.0;
+	m_fSpeed = 5.0f;	//보스 평소 스피드
+	m_upspeed = 3.0;	//보스 등장 스피드
 
-	m_fX = -20;
-	m_fY = 1035;
+	//보스 초기 위치는 등장씬을 위해 안보이는 곳에서 위치를 잡아준다.
+	m_fX = -20;			// 보스 초기 시작 X위치
+	m_fY = 1035;		// 보스 초기 시작 Y위치
 
 	m_nCurrHP = m_nMaxHP = 10;
 
@@ -94,7 +93,6 @@ HRESULT boss::init()
 
 void boss::release()
 {
-	SAFE_DELETE(m_pmoveEffect);
 	SAFE_DELETE(m_pMoveAni);
 	SAFE_DELETE(m_pChangeBoss);
 	SAFE_DELETE(m_pBossFire);
@@ -110,24 +108,18 @@ void boss::update()
 
 	if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
-		//damaged(1);
-		if (!m_isAppear)
-		{
 			fire();
-		}
-		
 	}
 
 	if (KEYMANAGER->isOnceKeyDown(VK_RETURN))
 	{
 		damaged(1);
-		
 	}
 
 	m_rc = RectMake(m_fX+100, m_fY+50, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
 	
 	
-	move();
+	move();		//보스의 움직임을 위한 함수
 	shoot();
 
 
@@ -136,8 +128,7 @@ void boss::update()
 	m_pBossFire->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pRageBoss->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pChangeBoss->frameUpdate(TIMEMANAGER->getElapsedTime());
-	m_pmoveEffect->frameUpdate(TIMEMANAGER->getElapsedTime());
-
+	
 	m_pmissileManager->update();
 
 }
@@ -208,13 +199,13 @@ void boss::move()
 	if (m_isAppear == true && m_fY >= -10) //보스 등장씬(이펙트 아직 없음) 
 	{
 		m_fY -= m_upspeed;
-		m_upspeed += 0.8;
+		m_upspeed += 0.8; 
 
 		if (m_fY <= 0)
 		{
 			m_isAppear = false; //등장후 씬이 움직이게 하기 위해
 			m_pMoveAni->start();
-			m_pmoveEffect->start();
+			
 			
 		}
 
@@ -318,7 +309,7 @@ void boss::move()
 				}
 			}
 
-			if (m_pattern == P_RUSHMOVE) // 강하게 앞으로 돌진? or 플레이어 위치로 돌진?
+			if (m_pattern == P_RUSHMOVE) // 강하게 앞으로 돌진
 			{
 
 				if (m_fX <= 500)
@@ -378,20 +369,22 @@ void boss::move()
 					if (m_bullet == NOMAL_BULLET)
 					{
 						m_pBossFire->start();
+						m_isShoot = false;
 					}
 
 					else if (m_bullet == CANNON_BULLET)
 					{
 						m_pBossCfire->start();
 					}
-					fire();
 				}
 				
+
 				if (b_pattern.count % 2 == 0)
 				{
 					++b_pattern.index;
-					if (b_pattern.index == 2)
+					if (b_pattern.index == 10)
 					{
+						fire();
 						b_pattern.count = 0;
 						b_pattern.index = 0;
 						m_pattern = S_BACKMOVE;
@@ -540,9 +533,6 @@ void boss::damaged(int damage)
 	}
 }
 
-void boss::diechack()
-{
-}
 
 boss::boss()
 {
