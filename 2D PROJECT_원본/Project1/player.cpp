@@ -90,7 +90,7 @@ void player::actSet()
 	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return;
 
 	// 반복모션 제외, isPlaying == false일 경우
-	else if (m_upper.pAni->getIsPlaying() == false/* && m_lower.pAni->getIsPlaying() == false*/)
+	else if (m_upper.pAni->getIsPlaying() == false)
 	{
 		if (m_nActUpper == UPPER_Appear)
 			m_lower.pImg->setY(WINSIZEY / 2 + 115);
@@ -135,7 +135,8 @@ void player::setUpper()
 
 			m_fReplaceY = 25;
 		}
-		
+
+		m_upper.pAni->start();
 		break;
 
 	case UPPER_Sit:		// 앉기
@@ -148,6 +149,8 @@ void player::setUpper()
 			m_upper.pAni->setPlayFrame(1, UPPER_SitFrame, false, false);
 
 		m_fReplaceY = 45;
+
+		m_upper.pAni->start();
 		break;
 
 	case UPPER_SitMove:
@@ -157,8 +160,10 @@ void player::setUpper()
 			m_upper.pAni->setPlayFrameReverse(1, UPPER_SitMove, false, true);
 		else
 			m_upper.pAni->setPlayFrame(1, UPPER_SitMoveFrame, false, true);
-		
+
 		m_fReplaceY = 45;
+
+		m_upper.pAni->start();
 		break;
 
 	case UPPER_Move:	// 이동
@@ -171,30 +176,14 @@ void player::setUpper()
 			m_upper.pAni->setPlayFrame(1, UPPER_MoveFrame, false, true);
 
 		m_fReplaceY = 25;
+
+		m_upper.pAni->start();
 		break;
 
 	case UPPER_Att:		// 공격은 fire() 함수에서
 		break;
-
-	case UPPER_AttSit:	// 앉아서 공격
-		if (m_nDir == DIR_Left)
-		{
-			m_upper.pAni->init(UPPER_AttSitWidth, UPPER_AttSitHeight, UPPER_AttSitWidth / UPPER_AttSitFrame, UPPER_AttSitHeight, UPPER_AttSitY);
-			m_upper.pAni->setPlayFrameReverse(1, UPPER_AttSitFrame, false, false);
-		}
-
-		else
-		{
-			m_upper.pAni->init(UPPER_AttSitWidth, UPPER_AttSitHeight, UPPER_AttSitWidth / UPPER_AttSitFrame, UPPER_AttSitHeight, UPPER_AttSitY);
-			m_upper.pAni->setPlayFrame(1, UPPER_AttSitFrame, false, false);
-		}
-
-		m_nActLower = NULL;
-
-		break;
 	}
 
-	m_upper.pAni->start();
 }
 
 void player::setLower()
@@ -216,6 +205,7 @@ void player::setLower()
 		else
 			m_lower.pAni->setPlayFrame(1, LOWER_IdleFrame, true, true);
 
+		m_lower.pAni->start();
 		break;
 
 	case LOWER_Move:	// 이동
@@ -230,13 +220,12 @@ void player::setLower()
 
 		m_fReplaceLowerY = -20;
 
+		m_lower.pAni->start();
 		break;
 	}
 
 	if (m_nActLower != LOWER_Move)
 		m_fReplaceLowerY = 0;
-
-	m_lower.pAni->start();
 }
 
 void player::setDir()
@@ -282,6 +271,7 @@ void player::fire()
 	int attReplaceX = 0;	// 어택박스 X, Y 좌표 수정
 	int attReplaceY = 0;
 
+	// 모션변경
 	if (m_nDir == DIR_Left)
 	{
 		if (m_nDirY == DIR_Up)
@@ -348,6 +338,7 @@ void player::fire()
 		}
 	}
 
+	// 어택박스
 	m_fAttX = m_upper.pImg->getX() + attReplaceX;
 	m_fAttY = m_upper.pImg->getY() + attReplaceY;
 
@@ -358,6 +349,8 @@ void player::fire()
 	m_pMissileMgr->fire(m_fAttX,			// 총알 발사
 		m_fAttY,
 		m_fAngle, 10, i_player);
+
+	m_upper.pAni->start();
 }
 
 void player::move()
@@ -379,9 +372,6 @@ void player::move()
 		{
 			m_isAct = true;
 			m_nActUpper = UPPER_Move;
-
-			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
-				m_nActLower = LOWER_Move;
 		}
 		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
 		{
@@ -390,6 +380,9 @@ void player::move()
 			m_nActLower = LOWER_NULL;
 			m_fSpeed = 1.0f;
 		}
+
+		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+			m_nActLower = LOWER_Move;
 
 		m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
 		m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
@@ -400,9 +393,6 @@ void player::move()
 		{
 			m_isAct = true;
 			m_nActUpper = UPPER_Move;
-
-			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
-				m_nActLower = LOWER_Move;
 		}
 		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
 		{
@@ -412,25 +402,23 @@ void player::move()
 			m_fSpeed = 1.0f;
 		}
 
+		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+			m_nActLower = LOWER_Move;
+
 		m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
 		m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
 	}
 
 	// 공격 (마우스 포인터)
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && m_nActUpper != UPPER_Sit)
 	{
-		m_isAct = true;
-
-		if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_AttSit)
-			m_nActUpper = UPPER_AttSit;
-
-		else if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_AttSit)
+		if (m_nActUpper != UPPER_Att)
 		{
-			if (m_nActUpper != UPPER_Att)
-				m_nActUpper = UPPER_Att;
-
-			fire();	// 공격
+			m_nActUpper = UPPER_Att;
+			m_isAct = true;
 		}
+
+		fire();	// 공격
 	}
 
 	// 키를 뗐을 경우 행동하지 않음으로 바꿈
@@ -439,6 +427,9 @@ void player::move()
 		if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit)
 		{
 			m_nActUpper = UPPER_Sit;
+			m_nActLower = LOWER_NULL;
+			m_isAct = true;
+
 			return;
 		}
 
@@ -451,6 +442,7 @@ void player::move()
 		
 	}
 
+	// 앉았을 때 다시 일어남
 	if (KEYMANAGER->isOnceKeyUp('S'))
 	{
 		m_nActUpper = UPPER_Idle;
@@ -459,30 +451,29 @@ void player::move()
 		m_isAct = true;
 	}
 
+	// 리소스 좌표 세팅 (리소스 사이즈와 위치가 일정하지 않기 때문에 세팅 필요)
 	if (m_nActUpper != UPPER_Appear)
 	{
-		// 리소스 좌표 세팅: 다리를 중심으로, 상체를 올린다. (상체는 사이즈가 변하므로)
+		// 리소스 좌표 세팅: 다리를 중심으로, 상체를 올린다. (상체는 사이즈와 기준점 위치가 변하므로)
 		// 상, 하체 위치 업데이트
+		m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceLowerY,
+			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
+
 		if (m_nDir == DIR_Left)
 		{
-			m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceLowerY,
-				m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
-
+			// 캐릭터가 왼쪽을 보고 있으면 하체의 오른쪽에 상체의 오른쪽을 맞춰야 함
 			m_upper.rc.right = m_lower.rc.right;
 			m_upper.rc.left = m_upper.rc.right - m_upper.pAni->getFrameWidth() * 3;
-			m_upper.rc.bottom = m_lower.rc.top + m_fReplaceY;
-			m_upper.rc.top = m_upper.rc.bottom - m_upper.pAni->getFrameHeight() * 3;
 		}
 		else
 		{
-			m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceLowerY,
-				m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
-
+			// 캐릭터가 오른쪽을 보고 있으면 하체의 왼쪽에 상체의 왼쪽을 맞춰야 함
 			m_upper.rc.left = m_lower.rc.left;
 			m_upper.rc.right = m_upper.rc.left + m_upper.pAni->getFrameWidth() * 3;
-			m_upper.rc.bottom = m_lower.rc.top + m_fReplaceY;
-			m_upper.rc.top = m_upper.rc.bottom - m_upper.pAni->getFrameHeight() * 3;
 		}
+
+		m_upper.rc.bottom = m_lower.rc.top + m_fReplaceY;
+		m_upper.rc.top = m_upper.rc.bottom - m_upper.pAni->getFrameHeight() * 3;
 	}
 
 	if (m_isAlive == false)
@@ -504,8 +495,8 @@ void player::render(HDC hdc)
 	char szText[128];
 
 	// 플레이어
-	Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
-	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);
+	/*Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
+	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);*/
 
 	if (m_nDir == DIR_Left)
 	{
@@ -525,17 +516,17 @@ void player::render(HDC hdc)
 	// 미사일
 	m_pMissileMgr->render(hdc, i_player);
 
-	// 테스트
-	sprintf_s(szText, "%d, %d", g_ptMouse.x, g_ptMouse.y);
-	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
+	//// 테스트
+	//sprintf_s(szText, "%d, %d", g_ptMouse.x, g_ptMouse.y);
+	//TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
 
-	_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
-	TextOut(hdc, 100, 100, szText, strlen(szText));
+	//_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
+	//TextOut(hdc, 100, 100, szText, strlen(szText));
 
-	_stprintf_s(szText, "UPPER Act: %d", m_nActUpper);
-	TextOut(hdc, 100, 150, szText, strlen(szText));
+	//_stprintf_s(szText, "UPPER Act: %d", m_nActUpper);
+	//TextOut(hdc, 100, 150, szText, strlen(szText));
 
-	Rectangle(hdc, m_fAttX, m_fAttY, m_fAttX + 10, m_fAttY + 10);
+	//Rectangle(hdc, m_fAttX, m_fAttY, m_fAttX + 10, m_fAttY + 10);
 }
 player::player()
 {
