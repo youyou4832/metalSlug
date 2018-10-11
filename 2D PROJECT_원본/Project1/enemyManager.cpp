@@ -62,17 +62,18 @@ void enemyManager::setCannon(const char * textName, float x, float y, int speed,
 void enemyManager::setNormal(const char * textName, float x, float y, int speed, int charNum, player* player, int enemyNumber)
 {
 	enemy* normal;
-	normal = new enemy;
-	normal->init(textName, PointMake(x, y), x, y, speed, charNum, player);
-
-	m_vecEnemy.push_back(normal);
+	for (int i = 0; i < enemyNumber; i++) {
+		normal = new enemy;
+		normal->init(textName, PointMake(x + 250+50*i, y), WINSIZEX-100*i, y, speed, charNum, player);
+		m_vecEnemy.push_back(normal);
+	}
 }
 
 void enemyManager::setTank(const char * textName, float x, float y, int speed, int charNum, player* player, int enemyNumber)
 {
 	enemy* tank;
 	tank = new enemy;
-	tank->init(textName, PointMake(x, y), x, y, speed, charNum, player);
+	tank->init(textName, PointMake(x, y), WINSIZEX - 300 , y, speed, charNum, player);
 
 	m_vecEnemy.push_back(tank);
 }

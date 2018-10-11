@@ -87,6 +87,7 @@ LRESULT mainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+
 	}
 
 	return DefWindowProc(hWnd, iMessage, wParam, lParam);

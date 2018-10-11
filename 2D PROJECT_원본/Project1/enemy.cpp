@@ -60,7 +60,8 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 		m_currHP = m_MaxHP = 30;
 	}
 	else if (m_CharNum == CharInfo::i_tank) {
-		s_Idle.isState = true;
+		MaxAttack = 1;
+		s_Move.isState = true;
 		m_currHP = m_MaxHP = 20;
 	}
 	else{
@@ -259,9 +260,27 @@ void enemy::move()
 		m_rc = RectMakeCenter(m_fX + 80, m_fY + 80, 58, 80);
 	}
 	else if (m_CharNum == CharInfo::i_normal) {
+		if (s_Move.isState == true) {
+			m_fX += cosf(moveAngle) * m_fSpeed;
+			m_fY += -sinf(moveAngle) * m_fSpeed;
+		}
+		if ((m_fX < m_destX || m_fX - m_player->getRectLower().left < 100) && m_fX < WINSIZEX - 50 && firstMove == true) {
+			firstMove = false;
+			s_Move.isState = false;
+			s_Idle.isState = true;
+		}
 		m_rc = RectMakeCenter(m_fX + 40, m_fY + 70, 54, 85);
 	}
 	else if (m_CharNum == CharInfo::i_tank) {
+		if (s_Move.isState == true) {
+			m_fX += cosf(moveAngle) * m_fSpeed;
+			m_fY += -sinf(moveAngle) * m_fSpeed;
+		}
+		if (m_fX < m_destX && firstMove == true) {
+			firstMove = false;
+			s_Move.isState = false;
+			s_Idle.isState = true;
+		}
 		m_rc = RectMakeCenter(m_fX + 70, m_fY + 70, 100, 100);
 	}
 
@@ -480,6 +499,7 @@ void enemy::normalAnimation()
 						s_Attack.isState = false;
 						s_Idle.isState = true;
 						isHaveGun = false;
+						AttackCount++;
 					}
 				}
 				else {

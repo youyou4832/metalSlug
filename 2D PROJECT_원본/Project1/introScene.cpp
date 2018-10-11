@@ -22,10 +22,11 @@ HRESULT introScene::init()
 	m_pPlayer->init(100, -140);
 
 	m_enemyMgr = new enemyManager;
+	m_enemyMgr->setTank("tank", WINSIZEX + 600, WINSIZEY / 2 + 70, 5, CharInfo::i_tank, m_pPlayer, 1);
 	m_enemyMgr->setSniper("sniper", WINSIZEX / 2 + 300, WINSIZEY / 2 - 30, 5, CharInfo::i_sniper, m_pPlayer);
 	m_enemyMgr->setCannon("cannon", WINSIZEX + 200, WINSIZEY / 2 + 50, 5, CharInfo::i_cannon, m_pPlayer, 2);
-	m_enemyMgr->setNormal("normal", WINSIZEX / 2 - 300, WINSIZEY / 2 + 70, 5, CharInfo::i_normal, m_pPlayer, 1);
-	m_enemyMgr->setTank("tank", 200, WINSIZEY / 2 + 70, 5, CharInfo::i_tank, m_pPlayer, 1);
+	m_enemyMgr->setNormal("normal", WINSIZEX +400, WINSIZEY / 2 + 70, 5, CharInfo::i_normal, m_pPlayer, 3);
+	//m_enemyMgr->setTank("tank", WINSIZEX + 600, WINSIZEY / 2 + 70, 5, CharInfo::i_tank, m_pPlayer, 1);
 
 	
 	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
