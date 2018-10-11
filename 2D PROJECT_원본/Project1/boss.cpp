@@ -15,7 +15,6 @@ HRESULT boss::init()
 	m_state = NOMAL;
 	m_pattern = MOVE;
 	m_bullet = NOMAL_BULLET;
-
 	m_pattonChack = 0;
 	//º¸½º ÀÌ¹ÌÁö »ğÀÔ(230*207 12¾¿ ÃÑ 7°³)
 	m_pimgBoss = IMAGEMANAGER->addImage("move", "image/boss/Boss.bmp",
@@ -382,7 +381,7 @@ void boss::move()
 				if (b_pattern.count % 2 == 0)
 				{
 					++b_pattern.index;
-					if (b_pattern.index == 10)
+					if (b_pattern.index == 5)
 					{
 						fire();
 						b_pattern.count = 0;
