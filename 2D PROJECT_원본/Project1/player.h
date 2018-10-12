@@ -79,12 +79,12 @@ class player
 #define UPPER_MoveY			UPPER_IdleY + UPPER_IdleHeight
 #define UPPER_MoveFrame		12
 
-#define UPPER_JumpWidth		160
+#define UPPER_JumpWidth		192
 #define UPPER_JumpHeight	35
 #define UPPER_JumpY			UPPER_MoveY + UPPER_MoveHeight
 #define UPPER_JumpFrame		6
 
-#define UPPER_JumpMoveWidth		160
+#define UPPER_JumpMoveWidth		192
 #define UPPER_JumpMoveHeight	35
 #define UPPER_JumpMoveY			UPPER_JumpY + UPPER_JumpHeight
 #define UPPER_JumpMoveFrame		6
@@ -150,7 +150,7 @@ class player
 #define LOWER_MoveY				1466
 #define LOWER_MoveFrame			12
 
-#define LOWER_JumpWidth			126
+#define LOWER_JumpWidth			138
 #define LOWER_JumpHeight		24
 #define LOWER_JumpY				1486
 #define LOWER_JumpFrame			6
@@ -159,6 +159,10 @@ class player
 #define LOWER_JumpMoveHeight	21
 #define LOWER_JumpMoveY			1510
 #define LOWER_JumpMoveFrame		6
+
+// 플레이어 충돌 렉트 사이즈
+#define PLAYER_RectWidth		60
+#define PLAYER_RectHeight		100
 
 	// 상체 (Y 시작좌표)
 	enum ACT_UPPER
@@ -212,10 +216,10 @@ class player
 
 	struct TagImg
 	{
-		image *		pImg;
-		image *		pImgReverse;
-		animation *	pAni;
-		RECT		rc;
+		image *		pImg;			// 정방향 모션
+		image *		pImgReverse;	// 역방향 모션
+		animation *	pAni;			// 애니메이션
+		RECT		rc;				// 충돌 RECT
 	};
 
 private:
@@ -227,7 +231,8 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
-	RECT	m_rcAtt;
+	RECT	m_rcHit;		// 히트 박스 (플레이어가 공격 당하는 RECT)
+	RECT	m_rcAtt;		// 어택 박스 (플레이어의 공격이 발사되는 위치의 RECT)
 	float	m_fAttX;		// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 	float	m_fAttY;		// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 
@@ -239,7 +244,6 @@ private:
 	// 점프
 	float	m_fGravity;
 	float	m_fJumpSpeed;
-	float	m_fJumpHeight;
 	float	m_fCurrHeight;
 
 	short	m_nActUpper;	// 상체 행동
@@ -250,6 +254,12 @@ private:
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 	bool	m_isAlive;		// 생존여부
 	bool	m_isCollide;	// 충돌여부 (적과 근접)
+	bool	m_isJump;		// 점프 중인가
+
+	bool	m_isGun;		// 총을 들고 있는가
+
+	bool	m_isSlugIn;		// 슬러그에 탑승 중인가
+	bool	m_isSlugEscape;	// 슬러그에서 탈출 하는가 (true이면 탈출 모션 적용)
 
 public:
 	HRESULT init(float x, float y);
@@ -264,13 +274,15 @@ public:
 	void setLower();	// 하체
 	void setDir();		// 방향
 
-	void fire();		// 공격
+	// 캐릭터 리소스 위치 수정 함수 (모션마다 사이즈와 기준점 좌표가 달라서 세팅을 별도로 해줘야 함)
+	void setResourceRect();
 
+	void fire();		// 공격
 	
 	inline RECT	getRectUpper() { return m_upper.rc; }
 	inline RECT	getRectLower() { return m_lower.rc; }
 
-	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide == true (근접공격)
+	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
 
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }

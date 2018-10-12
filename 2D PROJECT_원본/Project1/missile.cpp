@@ -86,7 +86,7 @@ void missile::render(HDC hdc, int charNum)
 {
 	if (m_isFire)
 	{
-		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+		Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 		if (charNum == CharInfo::i_sniper || charNum == CharInfo::i_cannon) {
 			m_pImg->render(hdc, m_fX, m_fY, 10 * special_bullet.index, 33, 10, 10, 2);
 		}
