@@ -269,11 +269,19 @@ public:
 	
 	inline RECT	getRectUpper() { return m_upper.rc; }
 	inline RECT	getRectLower() { return m_lower.rc; }
+	inline void setRectLower(RECT rc) { m_lower.rc = rc; }
+	// Y 좌표
+	inline float getLowerImgY() { return m_upper.pImg->getY(); }
+	inline void setLowerImgY(float y) { m_upper.pImg->setY(y); }
+	inline float getLowerImgX() { return m_upper.pImg->getX(); }
+	inline void setLowerImgX(float x) { m_upper.pImg->setX(x); }
 
 	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide == true (근접공격)
 
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
+
+	
 
 	player();
 	~player();

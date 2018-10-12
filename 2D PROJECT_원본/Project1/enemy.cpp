@@ -555,8 +555,12 @@ void enemy::tankAnimation()
 				++s_Idle.index;
 				if (s_Idle.index == 2) {
 					s_Idle.index = 0;
-					s_Attack.isState = true;
-					s_Idle.isState = false;
+					AttackCN++;
+					if (AttackCN == 3) {
+						s_Attack.isState = true;
+						s_Idle.isState = false;
+						AttackCN = 0;
+					}
 				}
 				s_Idle.count = 0;
 			}
@@ -568,6 +572,8 @@ void enemy::tankAnimation()
 				if (s_Attack.index == 4) {
 					EFFECTMANAGER->play("tankEffect", m_fX - 60, m_fY - 25);
 					fire();
+					s_Idle.isState = true;
+					s_Attack.isState = false;
 					s_Attack.index = 0;
 				}
 				s_Attack.count = 0;

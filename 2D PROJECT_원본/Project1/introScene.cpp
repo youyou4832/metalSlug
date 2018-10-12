@@ -5,18 +5,9 @@
 
 HRESULT introScene::init()
 {
+	//이미지
 	m_introMap = IMAGEMANAGER->addImage("introMap", "image/map/map_Intro.bmp", WINSIZEX, WINSIZEY, false, 0);
-	IMAGEMANAGER->addImage("sniper", "image/enemy/sniper_Attack.bmp", WINSIZEX / 2, WINSIZEY / 2, 2484, 76, 27, 1, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("specialBullet", "image/enemy/cannon_effect.bmp", 0, 0, 576, 43, 16, 2, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("sandbag", "image/sandbag/sandbag.bmp", 0, 0, 1600, 297, 20, 6, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("enemy_death", "image/enemy/enemy_death.bmp", 0, 0, 264, 39, 6, 1, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("cannon", "image/enemy/cannon.bmp", 0, 0, 726, 624, 11, 14, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("cannon_Attack", "image/enemy/cannon_Attack.bmp", 0, 0, 812, 52, 14, 1, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("normalBullet", "image/enemy/normal_bullet.bmp", 24, 24, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("normal", "image/enemy/normal_enemy.bmp", 0, 0, 368, 199, 12, 5, true, RGB(255, 0, 255));
-	IMAGEMANAGER->addImage("tank", "image/enemy/tank.bmp", 0, 0, 576, 396, 10, 8, true, RGB(255, 0, 255));
-	EFFECTMANAGER->addEffect("tankEffect", "image/enemy/tank_effect.bmp", 800, 42, 50, 42, 20, TIMEMANAGER->getElapsedTime(), 10);
-
+	
 	// 플레이어
 	m_pPlayer = new player;
 	m_pPlayer->init(100, -140);
@@ -67,13 +58,8 @@ void introScene::collider()
 	RECT lower_rc = m_pPlayer->getRectLower();
 	RECT rc;
 	if (IntersectRect(&rc, &upper_rc, &gate)) {
-		SCENEMANAGER->changeScene("bossScene");
+		SCENEMANAGER->changeScene("fightScene");
 	}
-}
-
-void introScene::CheckDistance()
-{
-	
 }
 
 introScene::introScene()

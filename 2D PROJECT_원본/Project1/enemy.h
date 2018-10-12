@@ -40,7 +40,7 @@ private:
 	bool firstMove = true;
 
 	int MaxAttack;
-	int AttackCount;
+	int AttackCount = 0;
 	//노말 에너미
 	bool checkMax = false;
 	int AttackCN = 0;

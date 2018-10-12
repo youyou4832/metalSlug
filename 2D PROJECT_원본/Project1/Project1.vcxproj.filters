@@ -186,6 +186,9 @@
     <ClInclude Include="bossScene.h">
       <Filter>2DGameFramework\scene</Filter>
     </ClInclude>
+    <ClInclude Include="fightScene.h">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -288,6 +291,9 @@
       <Filter>MainGame\boss</Filter>
     </ClCompile>
     <ClCompile Include="bossScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="fightScene.cpp">
       <Filter>2DGameFramework\scene</Filter>
     </ClCompile>
   </ItemGroup>

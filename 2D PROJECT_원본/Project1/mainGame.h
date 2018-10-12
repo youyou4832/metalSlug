@@ -1,14 +1,7 @@
 #pragma once
-class titleScene;
-class battleScene;
 class bossScene;
-class endScene;
-class selectScene;
-class gameoverScene;
-class loadingScene;
-class TestScene;
 class introScene;
-class pixelCollision;
+class fightScene;
 
 class mainGame
 {
@@ -23,16 +16,9 @@ private:
 	char m_szText[128];
 	
 	// scene list
-	titleScene*		m_pTitleScene;
-	battleScene*	m_pBattleScene;
 	bossScene*		m_pBossScene;
-	endScene*		m_pEndScene;
-	selectScene*	m_pSelectScene;
-	gameoverScene*	m_pGameoverScene;
-	loadingScene*	m_pLoadingScene;
-	TestScene*		m_pTestScene;
 	introScene*		m_pIntroScene;
-	pixelCollision*	m_pPixelCollisionScene;
+	fightScene*		m_pFightScene;
 
 public:
 	int m_nScene;

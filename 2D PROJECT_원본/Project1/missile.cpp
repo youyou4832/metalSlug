@@ -106,6 +106,7 @@ void missile::render(HDC hdc, int charNum)
 		else if (charNum == CharInfo::i_player) {
 			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 8, 8, 3);
 		}
+		Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	}
 
 	char szText[128];
@@ -161,19 +162,13 @@ void missile::move()
 
 		else
 		{
-
-			m_fX += cosf(m_fAngle) * m_fSpeed;
-			m_fY += -sinf(m_fAngle) * m_fSpeed;
-
-
-			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
-				m_isFire = false;
-
-			}
 			m_fX += cosf(m_fAngle) * m_fSpeed;
 			m_fY += -sinf(m_fAngle) * m_fSpeed;
 			if (m_charNum == CharInfo::i_normal) {
 				m_rc = RectMakeCenter(m_fX + 40, m_fY + 35, 40, 10);
+			}
+			else if (m_charNum == CharInfo::i_tank) {
+				m_rc = RectMakeCenter(m_fX + 40, m_fY + 35, 80, 10);
 			}
 			else {
 				m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
@@ -181,8 +176,6 @@ void missile::move()
 			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY || m_fY < 0) {
 				m_isFire = false;
 			}
-
-			m_rc = RectMakeCenter(m_fX + 10, m_fY + 10, 20, 20);
 
 		}
 	}
