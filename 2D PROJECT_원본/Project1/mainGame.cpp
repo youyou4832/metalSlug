@@ -27,6 +27,7 @@ HRESULT mainGame::init()
 	UIMANAGER->init();
 	SOUNDMANAGER->init();
 	
+	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
 	m_pTitleScene = new titleScene;
 	m_pTestScene = new TestScene;
 
@@ -39,7 +40,7 @@ HRESULT mainGame::init()
 	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
 	SCENEMANAGER->addScene("testScene", m_pTestScene);
 
-	SCENEMANAGER->changeScene("intro");
+	SCENEMANAGER->changeScene("bossScene");
 
 	// 필요한 리소스 미리 로드
 

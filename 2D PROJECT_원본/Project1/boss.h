@@ -111,12 +111,15 @@ public:
 	void ani_rageshoot();		//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
 
 	void damaged(int damage);	// boss에 hp를 감소하는 함수
-	
+	float getX() { return m_fX; }
+	void setX(float x) { m_fY = x; }
 
-	inline RECT getRect() { return m_rc; }
-	inline float getX() { return m_fX; }
-	inline float getY() { return m_fY; }
-	inline void setY(float y) { m_fY = y; }
+	float getY() { return m_fY; }
+	void setY(float y) { m_fY = y; }
+
+	
+	RECT getRect() { return m_rc; }
+
 	inline missileManager* getMissileMgr() { return m_pmissileManager; }
 	
 

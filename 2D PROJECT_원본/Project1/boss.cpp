@@ -106,17 +106,17 @@ void boss::update()
 {
     change(m_isChange);
 
-	if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
+	/*if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
 			fire();
-	}
+	}*/
 
 	if (KEYMANAGER->isOnceKeyDown(VK_RETURN))
 	{
 		damaged(1);
 	}
 
-	m_rc = RectMake(m_fX+100, m_fY+50, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
+	//m_rc = RectMake(m_fX, m_fY, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
 	
 	
 	move();		//보스의 움직임을 위한 함수
