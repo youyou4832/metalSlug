@@ -453,16 +453,7 @@ void player::move()
 			m_nActLower = LOWER_NULL;
 		}
 	}
-
-	// 점프
-		// 플레이어가 점프 중일 때 gravity --, 모션이 끝나면 gravity = 0 (맵에서 허공에 있을 때 모션을 UPPER_Jump로 바꿔 줌)
-		// 바닥에 닿으면 UPPER_Idle로 바꿔줌 (이렇게 되면 바닥에 닿았을 때 무한 Idle start 버그가 생김
-		// 픽셀충돌 시 m_nActUpper == UPPER_Jump 이면 UPPER_Idle로 바꿔줌
-		// 그 외의 경우에는 Y좌표만 해당 픽셀 충돌 위치에 고정시켜 줌
-
-		// 일자 맵 (픽셀충돌이 없는 맵)
-		// CurrHeight 사용
-
+	
 	// w점프
 	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
