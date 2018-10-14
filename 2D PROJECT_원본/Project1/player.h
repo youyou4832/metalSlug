@@ -167,20 +167,20 @@ class player
 #define UPPER_GunSitMoveY		UPPER_GunSitIdleY + UPPER_GunSitIdleHeight
 #define UPPER_GunSitMoveFrame	7
 
-#define UPPER_GunAttWidth		240
+#define UPPER_GunAttWidth		480
 #define UPPER_GunAttHeight		28
 #define UPPER_GunAttY			UPPER_GunSitMoveY + UPPER_GunSitMoveHeight
-#define UPPER_GunAttFrame		4
+#define UPPER_GunAttFrame		8
 
-#define UPPER_GunAtt90Width		324
+#define UPPER_GunAtt90Width		192
 #define UPPER_GunAtt90Height	72
 #define UPPER_GunAtt90Y			UPPER_GunAttY + UPPER_GunAttHeight + 27				// 무기 왼쪽 생략
-#define UPPER_GunAtt90Frame		4
+#define UPPER_GunAtt90Frame		8
 
-#define UPPER_GunAtt270Width	96
-#define UPPER_GunAtt270Height	72
+#define UPPER_GunAtt270Width	272
+#define UPPER_GunAtt270Height	64
 #define UPPER_GunAtt270Y		UPPER_GunAtt90Y + UPPER_GunAtt90Height
-#define UPPER_GunAtt270Frame	4
+#define UPPER_GunAtt270Frame	8
 
 #define UPPER_GunAttSitWidth	268
 #define UPPER_GunAttSitHeight	28
@@ -348,6 +348,7 @@ private:
 	float	m_fGravity;
 	float	m_fJumpSpeed;
 	float	m_fCurrHeight;
+	float	m_fFloorHeight;	// 바닥 높이
 	bool	m_isJump;		// 점프 중인가
 	
 	// 모션
@@ -373,8 +374,9 @@ public:
 	void release();
 	void render(HDC hdc);
 
-	// 캐릭터 정보 저장 (2018.10.14 미작성)
+	// 캐릭터 정보 입출력 (2018.10.14 미작성)
 	void dataSave();
+	void dataLoad();
 
 	// 캐릭터 세팅
 	void actSet();		// 캐릭터 모션 세팅 관리 함수
@@ -382,20 +384,22 @@ public:
 	void setLower();	// 하체
 	void setDir();		// 방향
 
-	// 캐릭터 행동
-	void fire();		// 공격
-	void fireActSet();	// 공격 모션 세팅
+	// 캐릭터 행동 (공격)
+	void fire();			// 공격 총괄 관리 함수
+	void fireActSet();		// 공격 모션 세팅
+	void fireActSetLeft();	// 공격 모션 세팅 : 왼쪽
+	void fireActSetRight();	// 공격 모션 세팅 : 오른쪽
 
 	// 캐릭터 리소스 위치 수정 함수 (모션마다 사이즈와 기준점 좌표가 달라서 세팅을 별도로 해줘야 함)
 	void setResourceRect();
 
 	// update 초반에 return하는 실행문을 관리하는 함수
-	void returnUpdate();	// (등장하는 도중에 / 죽었을 때 / 슬러그에 탑승중일 때 / 슬러그에서 탈출할 때)
+	bool isReturnUpdate();	// (등장하는 도중에 / 죽었을 때 / 슬러그에 탑승중일 때 / 슬러그에서 탈출할 때)
 	
 	// Getter & Setter
 	inline RECT	getRectUpper() { return m_upper.rc; }
 	inline RECT	getRectLower() { return m_lower.rc; }
-	inline RECT getRectAttBox() { return m_rcAtt; }	// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
+	inline RECT getRectAttBox() { return m_rcAtt; }		// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
 	
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
