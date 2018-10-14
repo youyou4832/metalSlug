@@ -7,7 +7,8 @@
 #define Jump_Height	100
 
 // #######################################################################
-// 13(토)까지 점프근거리공격(+AttBox충돌)+탈것탈출(슬러그에서 내릴 때 bool함수 변경)+죽음 구현
+// 13(토)까지 근거리공격(+AttBox충돌) + 탈것 탈출(슬러그에서 내릴 때 bool변수 변경, bool변수에 따라 모션 재생)
+//			  죽음: update() 함수에 GameOver 씬으로 변경 실행문 추가 해야 함, 죽음 모션 추가 필요
 // 14(일)까지 아이템 먹었을 때 헤비머신건
 // 15(월)까지 폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령
 //		 폭탄을 사용했을 때(갯수 > 0) 폭탄 던지는 모션 + 폭탄(미사일클래스)
@@ -16,6 +17,9 @@
 
 HRESULT player::init(float x, float y)
 {
+	// 슬러그에 탑승 중이면 플레이어 update 처리 안 함 (슬러그 class에서 처리)
+	if (m_isSlugIn == true)	return;
+
 	// 플레이어
 	m_upper.pAni = new animation;
 	m_lower.pAni = new animation;
@@ -29,13 +33,13 @@ HRESULT player::init(float x, float y)
 	m_upper.pAni->setFPS(FPS);
 	m_upper.pAni->setPlayFrame(1, UPPER_AppearFrame);
 	m_upper.pAni->start();
-	m_upper.pAni->setFrameUpdateSec(0.1f);
+	m_upper.pAni->setFrameUpdateSec(0.08f);
 
 	m_lower.pAni->init(1, 1, 1, 1);
 	m_lower.pAni->setFPS(FPS);
 	m_lower.pAni->setPlayFrame(0, 0);
 	m_lower.pAni->stop();
-	m_lower.pAni->setFrameUpdateSec(0.1f);
+	m_lower.pAni->setFrameUpdateSec(0.08f);
 
 	m_upper.pImg->setX(x);
 	m_upper.pImg->setY(y);
@@ -77,12 +81,27 @@ HRESULT player::init(float x, float y)
 
 void player::update()
 {
+	// 슬러그에 탑승 중이면 플레이어 update 처리 안 함 (슬러그 class에서 처리)
+	if (m_isSlugIn == true)	return;
+
 	// 애니메이션
 	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 
 	// 등장 중일 경우 return
 	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return;
+
+	// 죽었을 경우 죽음 모션 세팅 후, 애니메이션이 끝나면 GameOver 씬으로 변경
+	if (m_isAlive == false)
+	{
+		m_nActUpper = UPPER_Death;
+		m_nActLower = LOWER_NULL;
+
+		if (m_upper.pAni->getIsPlaying() == false)
+			//SCENEMANAGER->changeScene();
+
+		return;
+	}
 
 	// 플레이어
 	setDir();
@@ -104,13 +123,18 @@ void player::actSet()
 			m_lower.pImg->setY(WINSIZEY / 2 + 115);
 
 		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && 
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)
+			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove &&
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 		{
 			m_nActUpper = UPPER_Idle;
 			m_nActLower = LOWER_Idle;
 			m_isAct = true;
 		}
 	}
+
+	// 탈것 탈출
+
+	// 죽음
 
 	m_fAttX = m_upper.pImg->getX();
 	m_fAttY = m_upper.pImg->getY();
@@ -189,10 +213,10 @@ void player::setUpper()
 		m_upper.pAni->init(UPPER_JumpWidth, UPPER_JumpHeight, UPPER_JumpWidth / UPPER_JumpFrame, UPPER_JumpHeight, UPPER_JumpY);
 
 		if (m_nDir == DIR_Left)
-			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpFrame, false, false);
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpFrame, true, false);
 
 		else
-			m_upper.pAni->setPlayFrame(1, UPPER_JumpFrame, false, false);
+			m_upper.pAni->setPlayFrame(1, UPPER_JumpFrame, true, false);
 
 		m_fReplaceY = 45;
 
@@ -202,13 +226,21 @@ void player::setUpper()
 		m_upper.pAni->init(UPPER_JumpMoveWidth, UPPER_JumpMoveHeight, UPPER_JumpMoveWidth / UPPER_JumpMoveFrame, UPPER_JumpMoveHeight, UPPER_JumpMoveY);
 
 		if (m_nDir == DIR_Left)
-			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpMoveFrame, false, false);
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpMoveFrame, true, false);
 
 		else
-			m_upper.pAni->setPlayFrame(1, UPPER_JumpMoveFrame, false, false);
+			m_upper.pAni->setPlayFrame(1, UPPER_JumpMoveFrame, true, false);
 
 		m_fReplaceY = 45;
 
+		break;
+
+	case UPPER_Death:
+		m_upper.pAni->init(UPPER_DeathWidth, UPPER_DeathHeight, UPPER_DeathWidth / UPPER_DeathFrame, UPPER_DeathHeight, UPPER_DeathY);
+
+		m_upper.pAni->setPlayFrame(1, UPPER__DeathFrame, false , false);
+
+		m_fReplaceY = 0;
 		break;
 
 	case UPPER_Att:		// 공격은 fire() 함수에서
@@ -254,20 +286,34 @@ void player::setLower()
 		break;
 		
 	case LOWER_Jump:	// 점프
-		m_lower.pAni->init(LOWER_JumpWidth, LOWER_JumpHeight, LOWER_JumpWidth / LOWER_JumpFrame, LOWER_MoveHeight, LOWER_JumpY);
+		m_lower.pAni->init(LOWER_JumpWidth, LOWER_JumpHeight, LOWER_JumpWidth / LOWER_JumpFrame, LOWER_JumpHeight, LOWER_JumpY);
 
 		if (m_nDir == DIR_Left)
 		{
-			m_lower.pAni->setPlayFrameReverse(1, LOWER_JumpFrame, false, false);
+			m_lower.pAni->setPlayFrameReverse(1, LOWER_JumpFrame, true, false);
 		}
 		else
-			m_lower.pAni->setPlayFrame(1, LOWER_JumpFrame, false, false);
+			m_lower.pAni->setPlayFrame(1, LOWER_JumpFrame, true, false);
+
+		m_fReplaceLowerY = -50;
+
+		break;
+
+	case LOWER_JumpMove:	// 점프 이동
+		m_lower.pAni->init(LOWER_JumpMoveWidth, LOWER_JumpMoveHeight, LOWER_JumpMoveWidth / LOWER_JumpMoveFrame, LOWER_JumpMoveHeight, LOWER_JumpMoveY);
+
+		if (m_nDir == DIR_Left)
+		{
+			m_lower.pAni->setPlayFrameReverse(1, LOWER_JumpMoveFrame, true, false);
+		}
+		else
+			m_lower.pAni->setPlayFrame(1, LOWER_JumpMoveFrame, true, false);
 
 		m_fReplaceLowerY = -50;
 
 		break;
 	}
-
+ 
 	if (m_nActLower != LOWER_Move)
 		m_fReplaceLowerY = 0;
 
@@ -445,7 +491,8 @@ void player::move()
 	// 앉기
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
-		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && 
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 		{
 			m_isAct = true;
 
@@ -454,30 +501,27 @@ void player::move()
 		}
 	}
 	
-	// w점프
-	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
-	{
-		if (m_nActLower != LOWER_Jump)	// 제자리 jump 모션
+	// 점프
+	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE) && m_nActLower != LOWER_Jump)
+	{	
+		m_isAct = true;
+		m_isJump = true;
+
+		m_fCurrHeight = m_lower.pImg->getY();
+
+		// 이동하던 도중 jump할 경우 jumpMove모션으로 변경  
+		if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
+			m_nActLower == LOWER_Move)
 		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_Jump;
-			m_nActLower = LOWER_Jump;
-		}
-		else if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
-			m_nActLower == LOWER_Move)	// // 이동하던 도중에 점프할 경우
-		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
 			m_nActUpper = UPPER_JumpMove;
 			m_nActLower = LOWER_JumpMove;
+
+			return;
 		}
+
+		// 제자리 jump 모션
+		m_nActUpper = UPPER_Jump;
+		m_nActLower = LOWER_Jump;
 	}
 	
 	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == true)
@@ -487,22 +531,24 @@ void player::move()
 			m_fGravity -= m_fJumpSpeed; 
 			m_lower.pImg->setY(m_lower.pImg->getY() - m_fGravity);
 		}
-		else
+		else 
 		{
 			m_isJump = false;
 			m_fGravity = 0;
 		}
 	}
-	else if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == false)
+	
+	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == false)
 	{
 		if (m_fGravity <= 10.0f)
 		{
 			m_fGravity += m_fJumpSpeed;
 			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
 		}
-		else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우
+		else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우 (땅에 닿았을 경우)
 		{
 			m_lower.pImg->setY(m_fCurrHeight);
+			m_fCurrHeight = 0;
 			m_isJump = false;
 			m_nActUpper = UPPER_Idle;
 			m_nActLower = LOWER_Idle;
@@ -513,9 +559,9 @@ void player::move()
 	// 이동
 	if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0)			// 왼쪽 이동
 	{																		//	
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&		// 걷기, 공격	 아닐 때
+		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&		// 걷기, 공격		 아닐 때
 			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&		// 앉기, 앉아걷기	 아닐 때
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)		// 점프, 점프걷기	 아닐 때
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)		// 점프, 점프걷기	 아닐 때
 		{																	//
 			m_isAct = true;													//
 			m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
@@ -527,19 +573,14 @@ void player::move()
 			m_nActLower = LOWER_NULL;
 			m_fSpeed = 1.0f;
 		}
-		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
 		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
 			m_nActUpper = UPPER_JumpMove;
 			m_nActLower = LOWER_JumpMove;
-
 		}
 
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL && 
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 			m_nActLower = LOWER_Move;
 
 		m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
@@ -547,9 +588,9 @@ void player::move()
 	}
 	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX)	// 오른쪽 이동
 	{																			//
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격	 아닐 때
+		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격		 아닐 때
 			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기	 아닐 때
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)			// 점프, 점프걷기	 아닐 때
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)			// 점프, 점프걷기	 아닐 때
 		{																		//
 			m_isAct = true;														//
 			m_nActUpper = UPPER_Move;											// 걷기 모션으로 변경한다.
@@ -561,18 +602,14 @@ void player::move()
 			m_nActLower = LOWER_NULL;
 			m_fSpeed = 1.0f;
 		}
-		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
 		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
 			m_nActUpper = UPPER_JumpMove;
 			m_nActLower = LOWER_JumpMove;
 		}
 
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL && 
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 			m_nActLower = LOWER_Move;
 
 		m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
@@ -590,7 +627,7 @@ void player::move()
 
 		fire();	// 공격
 	}
-
+	
 	// 키를 뗐을 경우 행동하지 않음으로 바꿈
 	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D'))
 	{
@@ -598,7 +635,7 @@ void player::move()
 		{
 			m_nActUpper = UPPER_Sit;
 			m_nActLower = LOWER_NULL;
-			m_isAct = true;
+			m_isAct = true; 
 
 			return;
 		}
@@ -606,14 +643,15 @@ void player::move()
 		else if (m_nActUpper != UPPER_Att)
 			m_nActUpper = UPPER_Idle;
 
-		m_nActLower = LOWER_Idle;
-		m_isAct = true;
-
-		
+		if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
+		{
+			m_nActLower = LOWER_Idle;
+			m_isAct = true;
+		}
 	}
 
 	// 앉았을 때 다시 일어남
-	if (KEYMANAGER->isOnceKeyUp('S'))
+	if (KEYMANAGER->isOnceKeyUp('S') && (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove))
 	{
 		m_nActUpper = UPPER_Idle;
 		m_nActLower = LOWER_Idle;
@@ -641,6 +679,9 @@ void player::release()
 
 void player::render(HDC hdc)
 {
+	// 슬러그에 탑승 중이면 플레이어 render 처리 안 함 (슬러그 class에서 처리)
+	if (m_isSlugIn == true)	return;
+
 	char szText[128];
 
 	// 플레이어
@@ -673,11 +714,17 @@ void player::render(HDC hdc)
 	//_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
 	//TextOut(hdc, 100, 100, szText, strlen(szText));
 
-	//_stprintf_s(szText, "UPPER Act: %d", m_nActUpper);
-	//TextOut(hdc, 100, 150, szText, strlen(szText));
+	_stprintf_s(szText, "m_fCurrHeight: %f", m_fCurrHeight);
+	TextOut(hdc, 100, 150, szText, strlen(szText));
 
 	//Rectangle(hdc, m_fAttX, m_fAttY, m_fAttX + 10, m_fAttY + 10);
 }
+
+void player::dataSave()
+{
+}
+
+
 player::player()
 {
 }

@@ -59,9 +59,12 @@ class player
 			198(33)-21 6개 캐릭터 하반신 앞 점프	0-
 			*/
 
-
-	// 플레이어 상체 중심점 / 플레이어 하체 중심점을 init할 때 스캔해서 배열에 저장
-	// 이미지를 출력할 때 해당 중심점에서 n만큼 떨어진 거리를 이미지의 중심으로 잡은 후 출력
+	/*
+	플레이어 상체 중심점 / 플레이어 하체 중심점을 init할 때 픽셀 스캔해서 배열에 저장
+	이미지를 출력할 때 해당 중심점을 기준으로 출력
+		=> 리소스 문제로 시간이 많이 걸려 불가능
+		   모션마다 중심점(배꼽) 위치가 전부 달라서 픽셀 스캔을 위해 리소스 작업을 다시 하려면 시간이 너무 오래걸림
+	*/ 
 
 // 상체
 #define UPPER_AppearWidth	186
@@ -129,15 +132,100 @@ class player
 #define UPPER_Att270Y			UPPER_AttSitY + UPPER_AttSitHeight
 #define UPPER_Att270Frame		6
 
-	/*
-	UPPER_Att90,
-	UPPER_Att180,
-	UPPER_AttSit,
-	UPPER_Att270,
-	UPPER_Knife,
-	UPPER_KnifeSit
-	*/
+#define UPPER_KnifeWidth		264
+#define UPPER_KnifeHeight		48
+#define UPPER_KnifeY			
+#define UPPER_KnifeFrame		6
 
+#define UPPER_KnifeSitWidth		
+#define UPPER_KnifeSitHeight		
+#define UPPER_KnifeSitY			
+#define UPPER_KnifeSitFrame		4
+
+#define UPPER_GunIdleWidth		
+#define UPPER_GunIdleHeight		
+#define UPPER_GunIdleY			
+#define UPPER_GunIdleFrame		4
+
+#define UPPER_GunMoveWidth		
+#define UPPER_GunMoveHeight		
+#define UPPER_GunMoveY			
+#define UPPER_GunMoveFrame		12
+
+#define UPPER_GunSitWidth		
+#define UPPER_GunSitHeight		
+#define UPPER_GunSitY			
+#define UPPER_GunSitFrame		4
+
+#define UPPER_GunSitIdleWidth		
+#define UPPER_GunSitIdleHeight		
+#define UPPER_GunSitIdleY			
+#define UPPER_GunSitIdleFrame		4
+
+#define UPPER_GunSitMoveWidth		
+#define UPPER_GunSitMoveHeight		
+#define UPPER_GunSitMoveY			
+#define UPPER_GunSitMoveFrame		7
+
+#define UPPER_GunAttWidth		
+#define UPPER_GunAttHeight		
+#define UPPER_GunAttY			
+#define UPPER_GunAttFrame		4
+
+#define UPPER_GunAtt270Width		
+#define UPPER_GunAtt270Height		
+#define UPPER_GunAtt270Y			
+#define UPPER_GunAtt270Frame		4
+
+#define UPPER_GunAtt90Width		
+#define UPPER_GunAtt90Height		
+#define UPPER_GunAtt90Y			
+#define UPPER_GunAtt90Frame		4
+
+#define UPPER_GunAttSitWidth		
+#define UPPER_GunAttSitHeight		
+#define UPPER_GunAttSitY			
+#define UPPER_GunAttSitFrame		4
+
+#define UPPER_BombWidth		
+#define UPPER_BombHeight		
+#define UPPER_BombY			
+#define UPPER_BombFrame		
+
+#define UPPER_BombSitWidth		
+#define UPPER_BombSitHeight		
+#define UPPER_BombSitY			
+#define UPPER_BombSitFrame		
+
+#define UPPER_BombGunWidth		
+#define UPPER_BombGunHeight		
+#define UPPER_BombGunY			
+#define UPPER_BombGunFrame		
+
+#define UPPER_BombGunSitWidth		
+#define UPPER_BombGunSitHeight		
+#define UPPER_BombGunSitY			
+#define UPPER_BombGunSitFrame		
+
+#define UPPER_KnifeGunWidth		
+#define UPPER_KnifeGunHeight		
+#define UPPER_KnifeGunY			
+#define UPPER_KnifeGunFrame		
+
+#define UPPER_KnifeGunSitWidth		
+#define UPPER_KnifeGunSitHeight		
+#define UPPER_KnifeGunSitY			
+#define UPPER_KnifeGunSitFrame		
+
+#define UPPER_SlugEscapeWidth		
+#define UPPER_SlugEscapeHeight		
+#define UPPER_SlugEscapeY			
+#define UPPER_SlugEscapeFrame		
+
+#define UPPER_DeathWidth		
+#define UPPER_DeathHeight		
+#define UPPER_DeathY			
+#define UPPER_DeathFrame		
 
 // 하체
 #define LOWER_IdleWidth			84
@@ -153,7 +241,7 @@ class player
 #define LOWER_JumpWidth			138
 #define LOWER_JumpHeight		24
 #define LOWER_JumpY				1486
-#define LOWER_JumpFrame			6
+#define LOWER_JumpFrame			6 
 
 #define LOWER_JumpMoveWidth		198
 #define LOWER_JumpMoveHeight	21
@@ -168,22 +256,22 @@ class player
 	enum ACT_UPPER
 	{
 		UPPER_Appear,		// 등장 186(31*240),		6FR
-		UPPER_Idle,			// 대기 124(31*29),		4FR
-		UPPER_Move,			// 이동 384(32*28),		12FR
-		UPPER_Jump,			// 점프 160(32*35),		6FR
+		UPPER_Idle,			// 대기 124(31*29),			4FR
+		UPPER_Move,			// 이동 384(32*28),			12FR
+		UPPER_Jump,			// 점프 160(32*35),			6FR
 		UPPER_JumpMove,		// 점프 이동 160(32*35),	6FR
 
-		UPPER_Sit,			// 앉기 116(29*41),		4FR
+		UPPER_Sit,			// 앉기 116(29*41),			4FR
 		UPPER_SitIdle,		// 앉아 대기 124(31*27),	4FR
 		UPPER_SitMove,		// 앉아 이동 245(35*24),	7FR
 		
 		UPPER_Att,			// 공격 520(52*29),			10FR
-		UPPER_Att90,		// 공격 90도 290(29*66),		10FR
+		UPPER_Att90,		// 공격 90도 290(29*66),	10FR
 		UPPER_Att180,		// 공격 180도 240(60*24),	4FR
-		UPPER_AttSit,		// 앉아 공격 520(52*29),		10FR
+		UPPER_AttSit,		// 앉아 공격 520(52*29),	10FR
 		UPPER_Att270,		// 공격 270도 138(23*54),	6FR
 		UPPER_Knife,		// 칼질 264(44*48),			6FR
-		UPPER_KnifeSit,		// 앉아 칼질 168(42*35),		4FR
+		UPPER_KnifeSit,		// 앉아 칼질 168(42*35),	4FR
 
 		UPPER_GunIdle,		// 무기 대기 152(38*29),		4FR
 		UPPER_GunMove,		// 무기 이동 516(43*31),		12FR
@@ -191,18 +279,31 @@ class player
 		UPPER_GunSitIdle,	// 무기 앉아 대기 164(41*24),	4FR
 		UPPER_GunSitMove,	// 무기 앉아 이동 287(41*24),	7FR
 
-		UPPER_GunAtt,		// 무기 공격 240(60*28),			4FR
+		UPPER_GunAtt,		// 무기 공격 240(60*28),		4FR
 		UPPER_GunAtt270,	// 무기 공격 270도 324(81*27),	4FR
-		// 무기 공격 (중간에서 위) 이후 작성 필요
+		// 중간에서 위, 위에서 아래, 중간에서 아래, 아래에서 위, 왼쪽공격 생략
+		UPPER_GunAtt90,		// 무기 공격 90도 96(24*72),	4FR
+		UPPER_GunAttSit,	// 무기 앉아 공격 268(67*28),	4FR
+
+		UPPER_Bomb,			// 폭탄 공격 198(33*29),		6FR
+		UPPER_BombSit,		// 앉아 폭탄 246(41*28),		6FR
+		UPPER_BombGun,		// 무기 폭탄 240(40*29),		6FR
+		UPPER_BombGunSit,	// 무기 앉아 폭탄 264(44*36),	6FR
+
+		UPPER_KnifeGun,		// 무기 칼질 330(55*42),		6FR
+		UPPER_KnifeGunSit,	// 무기 앉아 칼질 360(60*33),	6FR
+		
+		UPPER_SlugEscape,	// 슬러그 탈출 384(32*34),		12FR
+		UPPER_Death,		// 죽음 931(49*44),				19FR
 	};
 
 	// 하체
 	enum ACT_LOWER
 	{
 		LOWER_NULL,			// 하체 출력 안 함
-		LOWER_Idle,			// 대기 84(21*16),		4FR
-		LOWER_Move,			// 이동 372(31*20),		12FR
-		LOWER_Jump,			// 점프 126(21*24),		6FR
+		LOWER_Idle,			// 대기 84(21*16),			4FR
+		LOWER_Move,			// 이동 372(31*20),			12FR
+		LOWER_Jump,			// 점프 126(21*24),			6FR
 		LOWER_JumpMove,		// 점프 이동 198(33*21),	6FR
 	};
 	
@@ -231,12 +332,12 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
-	RECT	m_rcHit;		// 히트 박스 (플레이어가 공격 당하는 RECT)
-	RECT	m_rcAtt;		// 어택 박스 (플레이어의 공격이 발사되는 위치의 RECT)
-	float	m_fAttX;		// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
-	float	m_fAttY;		// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
+	RECT	m_rcHit;			// 히트 박스 (플레이어가 공격 당하는 RECT)
+	RECT	m_rcAtt;			// 어택 박스 (플레이어의 공격이 발사되는 위치의 RECT)
+	float	m_fAttX;			// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
+	float	m_fAttY;			// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 
-	float	m_fReplaceY;	// 상체 Y좌표 + 리소스 출력 위치 수정
+	float	m_fReplaceY;		// 상체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fReplaceLowerY;	// 하체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fSpeed;
 	float	m_fAngle;
@@ -245,19 +346,21 @@ private:
 	float	m_fGravity;
 	float	m_fJumpSpeed;
 	float	m_fCurrHeight;
-
+	bool	m_isJump;		// 점프 중인가
+	
+	// 모션
 	short	m_nActUpper;	// 상체 행동
 	short	m_nActLower;	// 하체 행동
 	short	m_nDir;			// 캐릭터가 바라보는 방향 (좌우)
 	short	m_nDirY;		// 캐릭터가 바라보는 방향 (상하)
-
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
-	bool	m_isAlive;		// 생존여부
-	bool	m_isCollide;	// 충돌여부 (적과 근접)
-	bool	m_isJump;		// 점프 중인가
-
 	bool	m_isGun;		// 총을 들고 있는가
 
+	// enemy 또는 map 충돌에서 받아와야 하는 정보
+	bool	m_isAlive;		// 생존여부
+	bool	m_isCollide;	// 충돌여부 (적과 근접)
+
+	// 슬러그
 	bool	m_isSlugIn;		// 슬러그에 탑승 중인가
 	bool	m_isSlugEscape;	// 슬러그에서 탈출 하는가 (true이면 탈출 모션 적용)
 
@@ -267,6 +370,9 @@ public:
 	void move();
 	void release();
 	void render(HDC hdc);
+
+	// 캐릭터 정보 저장 (2018.10.14 미작성)
+	void dataSave();
 
 	// 캐릭터 세팅 함수
 	void actSet();		// 캐릭터 세팅 전부
