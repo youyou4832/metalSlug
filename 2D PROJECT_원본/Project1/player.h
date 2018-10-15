@@ -401,7 +401,8 @@ public:
 	inline RECT	getRectUpper() { return m_upper.rc; }
 	inline RECT	getRectLower() { return m_lower.rc; }
 	inline RECT getRectAttBox() { return m_rcAtt; }		// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
-	
+	inline bool getIsAttack() { return m_isAttack; }	// 플레이어가 공격중인지 체크
+
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
 

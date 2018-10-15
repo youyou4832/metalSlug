@@ -4,11 +4,14 @@
 #include "timer.h"
 #include "missileManager.h"
 
-#define Jump_Height	100
+#define Jump_Speed		0.3f
+#define Move_Speed		3.0f
+#define Sit_Speed		1.0f
 
 // #######################################################################
 // 근거리공격(+AttBox충돌) 작성해야 함
-// 아이템 먹었을 때 헤비머신건 진행중
+// 
+// 아이템 먹었을 때 헤비머신건 진행중 (하체 reverse 앞으로 점프 리소스 수정
 // 15(월)까지 dataSave() 함수 작성해야 함 (맵 이동 시 init 대신 dataLoad 이용)
 //			  + 폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령, 폭탄은 missileManager에서 발사)
 //		 폭탄을 사용했을 때(갯수 > 0) 폭탄 던지는 모션 + 폭탄(미사일클래스)
@@ -45,8 +48,8 @@ HRESULT player::init(float x, float y)
 	m_lower.pImg->setX(x);
 	m_lower.pImg->setY(y);
 
-	m_fSpeed = 3.0f;
-	m_fJumpSpeed = 0.3f;
+	m_fSpeed = Move_Speed;
+	m_fJumpSpeed = Jump_Speed;
 	m_fCurrHeight = 0;
 	m_fFloorHeight = 0;
 	m_fGravity = 10.0f;
@@ -166,8 +169,12 @@ void player::actSet()
 	}
 
 	// 공격할 때가 아니면 AttBox는 플레이어 위치를 따라다님
-	m_fAttX = m_upper.pImg->getX();
-	m_fAttY = m_upper.pImg->getY();
+	if (m_isAttack == false)
+	{
+		m_fAttX = m_upper.pImg->getX();
+		m_fAttY = m_upper.pImg->getY();
+		m_rcAtt = RectMake(m_fAttX, m_fAttY, 20, 20);
+	}
 
 	// ### 애니메이션 설정 ###
 	if (m_isAct == true)
@@ -453,6 +460,9 @@ void player::setDir()
 			if (m_nActUpper == UPPER_Sit)
 				m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
 
+			else if (m_nActUpper == UPPER_GunSit)
+				m_upper.pAni->setPlayFrameReverse(0, UPPER_GunSitFrame, false, false);
+
 			m_nDir = DIR_Left;
 			m_nDirY = NULL;
 		}
@@ -462,21 +472,12 @@ void player::setDir()
 			if (m_nActUpper == UPPER_Sit)
 				m_upper.pAni->setPlayFrame(0, UPPER_SitFrame, false, false);
 
+			else if (m_nActUpper == UPPER_GunSit)
+				m_upper.pAni->setPlayFrame(0, UPPER_GunSitFrame, false, false);
+
 			m_nDir = DIR_Right;
 			m_nDirY = NULL;
 		}
-	}
-
-	// 마우스 포인터가 캐릭터 위에 있을 경우
-	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)
-	{
-		m_nDirY = DIR_Up;
-	}
-
-	// 마우스 포인터가 캐릭터 아래에 있을 경우
-	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)
-	{
-		m_nDirY = DIR_Down;
 	}
 }
 
@@ -537,6 +538,11 @@ bool player::isReturnUpdate()
 		return true;
 	}
 
+	else if (m_isCollide == true && (m_nActUpper == UPPER_Knife || m_nActUpper == UPPER_KnifeGun))
+	{
+		return false;
+	}
+
 	// 죽었을 경우 죽음 모션 세팅 후, 애니메이션이 끝나면 GameOver 씬으로 변경
 	else if (m_isAlive == false)
 	{
@@ -586,14 +592,18 @@ void player::fire()
 	// 어택박스 세팅
 	m_fAttX = m_upper.pImg->getX() + m_fAttReplaceX;
 	m_fAttY = m_upper.pImg->getY() + m_fAttReplaceY;
+	m_rcAtt = RectMake(m_fAttX, m_fAttY, 20, 20);
 
 	m_fAngle = MY_UTIL::getAngle(m_fAttX,	// 총알 발사를 위한 각도 지정
 		m_fAttY,
 		g_ptMouse.x, g_ptMouse.y);
 
-	m_pMissileMgr->fire(m_fAttX,			// 총알 발사
-		m_fAttY,
-		m_fAngle, 10, i_player);
+	if (m_isAttack == false)
+	{
+		m_pMissileMgr->fire(m_fAttX,			// 총알 발사
+			m_fAttY,
+			m_fAngle, 10, i_player);
+	}
 
 	// 공격 할 때마다 프레임 초기화 (연속공격 모션)
 	m_upper.pAni->start();
@@ -601,13 +611,27 @@ void player::fire()
 
 void player::fireActSet()
 {
-	// 모션변경 : 왼쪽
+	// 상, 하 모션 세팅
+	// 마우스 포인터가 캐릭터 위에 있을 경우
+	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)
+		m_nDirY = DIR_Up;
+
+	// 마우스 포인터가 캐릭터 아래에 있을 경우
+	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)
+		m_nDirY = DIR_Down;
+
+
+	// 좌, 우 모션 세팅
+	// 모션 변경 : 왼쪽
 	if (m_nDir == DIR_Left)
 		fireActSetLeft();
 
 	// 모션 변경 : 오른쪽
 	else
 		fireActSetRight();
+
+	if (m_isCollide == true)
+		m_isCollide = false;
 }
 
 void player::fireActSetLeft()
@@ -615,7 +639,18 @@ void player::fireActSetLeft()
 	// 총을 든, 마우스 왼쪽 모션
 	if (m_isGun == true)
 	{
-		if (m_nDirY == DIR_Up)
+		// 근접공격 (총 들고 왼쪽)
+		if (m_isCollide == true)
+		{
+			m_upper.pAni->init(UPPER_KnifeGunWidth, UPPER_KnifeGunHeight, UPPER_KnifeGunWidth / UPPER_KnifeGunFrame, UPPER_KnifeGunHeight, UPPER_KnifeGunY);
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_KnifeGunFrame, false, false);
+
+			m_fAttReplaceX = 30;
+			m_fAttReplaceY = -90;
+			m_fReplaceY = 10;
+		}
+
+		else if (m_nDirY == DIR_Up)
 		{
 			// UPPER_GunAtt90
 			m_upper.pAni->init(UPPER_GunAtt90Width, UPPER_GunAtt90Height, UPPER_GunAtt90Width / UPPER_GunAtt90Frame, UPPER_GunAtt90Height, UPPER_GunAtt90Y);
@@ -652,7 +687,18 @@ void player::fireActSetLeft()
 	// 총을 들지 않은, 마우스 왼쪽 모션
 	else
 	{
-		if (m_nDirY == DIR_Up)
+		// 근접공격 (총 X, 왼쪽)
+		if (m_isCollide == true)
+		{
+			m_upper.pAni->init(UPPER_KnifeWidth, UPPER_KnifeHeight, UPPER_KnifeWidth / UPPER_KnifeFrame, UPPER_KnifeHeight, UPPER_KnifeY);
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_KnifeFrame, false, false);
+
+			m_fAttReplaceX = 30;
+			m_fAttReplaceY = -90;
+			m_fReplaceY = 10;
+		}
+
+		else if (m_nDirY == DIR_Up)
 		{
 			// UPPER_Att90
 			m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
@@ -692,7 +738,18 @@ void player::fireActSetRight()
 	// 총을 든, 마우스 오른쪽 모션
 	if (m_isGun == true)
 	{
-		if (m_nDirY == DIR_Up)
+		// 근접공격 (총 들고 오른쪽)
+		if (m_isCollide == true)
+		{
+			m_upper.pAni->init(UPPER_KnifeGunWidth, UPPER_KnifeGunHeight, UPPER_KnifeGunWidth / UPPER_KnifeGunFrame, UPPER_KnifeGunHeight, UPPER_KnifeGunY);
+			m_upper.pAni->setPlayFrame(1, UPPER_KnifeGunFrame, false, false);
+
+			m_fAttReplaceX = 30;
+			m_fAttReplaceY = -90;
+			m_fReplaceY = 10;
+		}
+
+		else if (m_nDirY == DIR_Up)
 		{
 			// UPPER_GunAtt90
 			m_upper.pAni->init(UPPER_GunAtt90Width, UPPER_GunAtt90Height, UPPER_GunAtt90Width / UPPER_GunAtt90Frame, UPPER_GunAtt90Height, UPPER_GunAtt90Y);
@@ -729,7 +786,18 @@ void player::fireActSetRight()
 	// 총을 들지 않은, 마우스 오른쪽 모션
 	else
 	{
-		if (m_nDirY == DIR_Up)
+		// 근접공격 (총 X, 왼쪽)
+		if (m_isCollide == true)
+		{
+			m_upper.pAni->init(UPPER_KnifeWidth, UPPER_KnifeHeight, UPPER_KnifeWidth / UPPER_KnifeFrame, UPPER_KnifeHeight, UPPER_KnifeY);
+			m_upper.pAni->setPlayFrame(1, UPPER_KnifeFrame, false, false);
+
+			m_fAttReplaceX = 30;
+			m_fAttReplaceY = -90;
+			m_fReplaceY = 10;
+		}
+
+		else if (m_nDirY == DIR_Up)
 		{
 			// UPPER_Att90
 			m_upper.pAni->init(UPPER_Att90Width, UPPER_Att90Height, UPPER_Att90Width / UPPER_Att90Frame, UPPER_Att90Height, UPPER_Att90Y);
@@ -776,9 +844,8 @@ void player::move()
 	// 앉기
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
-		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
-			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove)
+		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) ||
+			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove))
 		{
 			if (m_isGun == true)
 				m_nActUpper = UPPER_GunSit;
@@ -898,7 +965,7 @@ void player::move()
 
 			m_isAct = true;
 			m_nActLower = LOWER_NULL;
-			m_fSpeed = 1.0f;
+			m_fSpeed = Sit_Speed;
 		}
 
 		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
@@ -953,7 +1020,7 @@ void player::move()
 
 			m_isAct = true;
 			m_nActLower = LOWER_NULL;
-			m_fSpeed = 1.0f;
+			m_fSpeed = Sit_Speed;
 		}
 
 		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
@@ -1015,10 +1082,10 @@ void player::move()
 		}
 
 		// 서있었을 경우 'Idle'로 변경
-		else if (m_nActUpper != UPPER_Att && m_isGun == true)
+		else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove && m_isGun == true)
 			m_nActUpper = UPPER_GunIdle;
 
-		else if (m_nActUpper != UPPER_Att && m_isGun == false)
+		else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && m_isGun == false)
 			m_nActUpper = UPPER_Idle;
 
 		if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove && m_isJump == false)
@@ -1027,7 +1094,7 @@ void player::move()
 			m_isAct = true;
 		}
 	}
-
+	
 	// 키를 뗄 경우 앉았을 때 다시 일어남
 	if (KEYMANAGER->isOnceKeyUp('S') &&
 		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove) ||
@@ -1039,7 +1106,7 @@ void player::move()
 			m_nActUpper = UPPER_Idle;
 
 		m_nActLower = LOWER_Idle;
-		m_fSpeed = 3.0f;
+		m_fSpeed = Move_Speed;
 		m_isAct = true;
 	}
 
@@ -1087,13 +1154,13 @@ void player::render(HDC hdc)
 
 
 	// 테스트
-	//Rectangle(hdc, m_fAttX, m_fAttY, m_fAttX + 10, m_fAttY + 10);
-	//sprintf_s(szText, "%d, %d", g_ptMouse.x, g_ptMouse.y);
-	//TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
-	//_stprintf_s(szText, "Missile Angle: %f", m_fAngle);
-	//TextOut(hdc, 100, 100, szText, strlen(szText));
-	//_stprintf_s(szText, "m_lower.pImg->getY(): %f", m_lower.pImg->getY());
-	//TextOut(hdc, 100, 150, szText, strlen(szText));
+	Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
+	sprintf_s(szText, "isAttack: %d, m_isGun: %d", m_isAttack, m_isGun);
+	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
+	_stprintf_s(szText, "m_nActUpper: %d", m_nActUpper);
+	TextOut(hdc, 100, 100, szText, strlen(szText));
+	_stprintf_s(szText, "m_nActLower: %d", m_nActLower);
+	TextOut(hdc, 100, 150, szText, strlen(szText));
 }
 
 void player::dataSave()

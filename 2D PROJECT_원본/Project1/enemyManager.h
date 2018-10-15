@@ -7,6 +7,8 @@ private:
 	std::vector<enemy*>	m_vecEnemy;
 	std::vector<enemy*>::iterator	m_iter;
 	
+	RECT m_rcPlayer;
+	
 public:
 	HRESULT init();
 	void release();
