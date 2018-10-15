@@ -68,6 +68,7 @@ HRESULT player::init(float x, float y)
 	m_isJump = false;
 	m_isSlugEscape = false;
 	m_isSlugIn = false;
+	m_isAttack = false;
 
 	g_ptMouse = { WINSIZEX, WINSIZEY };
 
@@ -88,6 +89,19 @@ HRESULT player::init(float x, float y)
 
 void player::update()
 {
+	// ######### 테스트 ##########
+	if (KEYMANAGER->isOnceKeyDown(VK_DELETE))	// 죽음
+		m_isAlive = false;
+	if (KEYMANAGER->isOnceKeyDown(VK_END))		// 슬러그 탈출
+		m_isSlugEscape = true;
+	if (KEYMANAGER->isOnceKeyDown(VK_INSERT))	// 총 착용
+		m_isGun = true;
+	if (KEYMANAGER->isOnceKeyDown(VK_HOME))		// 총 해제
+		m_isGun = false;
+	// ######### 테스트 ##########
+
+
+
 	// update 초반에 return 하는 실행문을 관리하는 함수
 	if (isReturnUpdate() == false)	return;
 
@@ -137,6 +151,9 @@ void player::actSet()
 			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
 			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove)
 		{
+			if (m_isAttack == true)
+				m_isAttack = false;
+
 			if (m_isGun == true)
 				m_nActUpper = UPPER_GunIdle;
 
@@ -428,23 +445,26 @@ void player::setDir()
 		return;
 	}
 
-	// 마우스 포인터 위치에 따라 방향 세팅
-	else if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우 
+	// 마우스 포인터 위치에 따라 방향 세팅 (슬러그 탈출, 죽음 모션 중에는 방향이 변경되지 않음)
+	if (m_nActUpper != UPPER_Death && m_nActUpper != UPPER_SlugEscape)
 	{
-		if (m_nActUpper == UPPER_Sit)
-			m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
+		if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우
+		{
+			if (m_nActUpper == UPPER_Sit)
+				m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
 
-		m_nDir = DIR_Left;
-		m_nDirY = NULL;
-	}
+			m_nDir = DIR_Left;
+			m_nDirY = NULL;
+		}
 
-	else if (g_ptMouse.x > m_upper.pImg->getX())	// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
-	{
-		if (m_nActUpper == UPPER_Sit)
-			m_upper.pAni->setPlayFrame(0, UPPER_SitFrame, false, false);
+		else if (g_ptMouse.x > m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
+		{
+			if (m_nActUpper == UPPER_Sit)
+				m_upper.pAni->setPlayFrame(0, UPPER_SitFrame, false, false);
 
-		m_nDir = DIR_Right;
-		m_nDirY = NULL;
+			m_nDir = DIR_Right;
+			m_nDirY = NULL;
+		}
 	}
 
 	// 마우스 포인터가 캐릭터 위에 있을 경우
@@ -746,20 +766,6 @@ void player::fireActSetRight()
 
 void player::move()
 {
-	// ######### 테스트 ##########
-	if (KEYMANAGER->isOnceKeyDown(VK_DELETE))	// 죽음
-		m_isAlive = false;
-	if (KEYMANAGER->isOnceKeyDown(VK_END))		// 슬러그 탈출
-		m_isSlugEscape = true;
-	if (KEYMANAGER->isOnceKeyDown(VK_INSERT))	// 총 착용
-		m_isGun = true;
-	if (KEYMANAGER->isOnceKeyDown(VK_HOME))		// 총 해제
-		m_isGun = false;
-	// ######### 테스트 ##########
-
-
-
-
 	// (플레이어 <- 적 총알) 충돌 RECT UPDATE
 	m_rcHit.bottom = m_lower.rc.bottom;
 	m_rcHit.left = m_upper.pImg->getX();
@@ -871,7 +877,8 @@ void player::move()
 			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
 			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
 			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
-			m_nActUpper != UPPER_GunMove)										// 총 무브				
+			m_nActUpper != UPPER_GunMove &&
+			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때				
 		{																		//
 			if (m_isGun == true)												// 총 착용시
 				m_nActUpper = UPPER_GunMove;
@@ -925,7 +932,8 @@ void player::move()
 			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
 			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
 			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
-			m_nActUpper != UPPER_GunMove)										// 총 무브				
+			m_nActUpper != UPPER_GunMove &&
+			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때
 		{																		//
 			if (m_isGun == true)												// 총 착용시
 				m_nActUpper = UPPER_GunMove;
@@ -938,7 +946,6 @@ void player::move()
 		else if ((m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove) ||	// 앉아 있으면서 앉아걷기 모션이 아닐 때
 			(m_nActUpper == UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
 		{
-
 			if (m_isGun == true)
 				m_nActUpper = UPPER_GunSitMove;									// 총 착용시
 			else
@@ -981,6 +988,7 @@ void player::move()
 		{
 			m_nActUpper = UPPER_Att;
 			m_isAct = true;
+			m_isAttack = true;
 		}
 
 		fire();	// 공격

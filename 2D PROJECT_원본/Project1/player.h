@@ -358,6 +358,7 @@ private:
 	short	m_nDirY;		// 캐릭터가 바라보는 방향 (상하)
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 	bool	m_isGun;		// 총을 들고 있는가
+	bool	m_isAttack;		// 공격중인가
 
 	// enemy 또는 map 충돌에서 받아와야 하는 정보
 	bool	m_isAlive;		// 생존여부
