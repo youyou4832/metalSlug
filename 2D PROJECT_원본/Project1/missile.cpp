@@ -71,7 +71,7 @@ void missile::update()
 		ani_specialBullet();
 	}
 
-	if (m_charNum == CharInfo::i_nomalboss) {
+	else if (m_charNum == CharInfo::i_nomalboss) {
 		ani_nomalBullet();
 	}
 
@@ -154,7 +154,6 @@ void missile::move()
 			if (m_fX < 0 || m_fX > WINSIZEX || m_fY > WINSIZEY) {
 				m_isFire = false;
 				angle_count.index = 0;
-				cannon_bullet.index = 0;
 			}
 			m_rc = RectMakeCenter(m_fX + 50, m_fY + 10, 20, 20);
 		}
@@ -220,6 +219,11 @@ void missile::ani_rageBullet()
 		 if (cannon_bullet.index != 11)
 		 {
 			 ++cannon_bullet.index;
+		 }
+
+		 if (m_fY >= WINSIZEY)
+		 {
+			 cannon_bullet.index = 0;;
 		 }
 		
 		 cannon_bullet.count = 0;
