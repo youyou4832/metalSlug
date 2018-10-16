@@ -215,18 +215,18 @@ void boss::move()
 	{
 		if (m_state == NOMAL || m_state == RAGE)
 		{
-			++b_pattern.count;
+			++m_MovePattern.count;
 			if (m_pattern == MOVE) // 등장이 끝난후 잠깐 제자리 걸음(사실상 정지)
 			{
 				//m_fX += m_fSpeed;
 				
-				if (b_pattern.count%5 == 0)
+				if (m_MovePattern.count%5 == 0)
 				{
-					++b_pattern.index;
-					if (b_pattern.index == 10)
+					++m_MovePattern.index;
+					if (m_MovePattern.index == 10)
 					{
-						b_pattern.count = 0;
-						b_pattern.index = 0;
+						m_MovePattern.count = 0;
+						m_MovePattern.index = 0;
 						m_pattern = S_BACKMOVE;
 					}
 				}
@@ -243,13 +243,13 @@ void boss::move()
 
 					else
 					{
-						if (b_pattern.count % 5 == 0)
+						if (m_MovePattern.count % 5 == 0)
 						{
-							++b_pattern.index;
-							if (b_pattern.index == 15)
+							++m_MovePattern.index;
+							if (m_MovePattern.index == 15)
 							{
-								b_pattern.count = 0;
-								b_pattern.index = 0;
+								m_MovePattern.count = 0;
+								m_MovePattern.index = 0;
 								m_pattern = S_RUSHMOVE;
 
 							}
@@ -266,13 +266,13 @@ void boss::move()
 
 					else
 					{
-						if (b_pattern.count % 5 == 0)
+						if (m_MovePattern.count % 5 == 0)
 						{
-							++b_pattern.index;
-							if (b_pattern.index == 25)
+							++m_MovePattern.index;
+							if (m_MovePattern.index == 25)
 							{
-								b_pattern.count = 0;
-								b_pattern.index = 0;
+								m_MovePattern.count = 0;
+								m_MovePattern.index = 0;
 								m_pattern = P_RUSHMOVE;
 
 							}
@@ -295,13 +295,13 @@ void boss::move()
 
 				else
 				{
-					if (b_pattern.count % 5 == 0)
+					if (m_MovePattern.count % 5 == 0)
 					{
-						++b_pattern.index;
-						if (b_pattern.index == 15)
+						++m_MovePattern.index;
+						if (m_MovePattern.index == 15)
 						{
-							b_pattern.count = 0;
-							b_pattern.index = 0;
+							m_MovePattern.count = 0;
+							m_MovePattern.index = 0;
 							m_pattonChack = 1;
 							m_pattern = IDLEMOVE;
 						}
@@ -325,13 +325,13 @@ void boss::move()
 
 				else
 				{
-					if (b_pattern.count % 5 == 0)
+					if (m_MovePattern.count % 5 == 0)
 					{
-						++b_pattern.index;
-						if (b_pattern.index == 15)
+						++m_MovePattern.index;
+						if (m_MovePattern.index == 15)
 						{
-							b_pattern.count = 0;
-							b_pattern.index = 0;
+							m_MovePattern.count = 0;
+							m_MovePattern.index = 0;
 							m_pattonChack = 0;
 							m_pattern = IDLEMOVE;
 						}
@@ -345,13 +345,13 @@ void boss::move()
 					m_fX -= m_fSpeed;
 				else
 				{
-					if (b_pattern.count % 5 == 0)
+					if (m_MovePattern.count % 5 == 0)
 					{
-						++b_pattern.index;
-						if (b_pattern.index == 5)
+						++m_MovePattern.index;
+						if (m_MovePattern.index == 5)
 						{
-							b_pattern.count = 0;
-							b_pattern.index = 0;
+							m_MovePattern.count = 0;
+							m_MovePattern.index = 0;
 							m_pattern = BULLET_SHOOT;
 						}
 					}
@@ -379,14 +379,14 @@ void boss::move()
 				}
 				
 
-				if (b_pattern.count % 2 == 0)
+				if (m_MovePattern.count % 2 == 0)
 				{
-					++b_pattern.index;
-					if (b_pattern.index == 10)
+					++m_MovePattern.index;
+					if (m_MovePattern.index == 10)
 					{
 						fire();
-						b_pattern.count = 0;
-						b_pattern.index = 0;
+						m_MovePattern.count = 0;
+						m_MovePattern.index = 0;
 						m_pattern = S_BACKMOVE;
 					}
 				}
@@ -412,12 +412,12 @@ void boss::change(bool ischagne)
 	
 	if (ischagne == true)
 	{
-		++b_change.count;
-		if (b_change.count% 5 == 0)
+		++m_ChangeDelay.count;
+		if (m_ChangeDelay.count% 5 == 0)
 		{
-			++b_change.index;
+			++m_ChangeDelay.index;
 			
-			if (b_change.index == 4)
+			if (m_ChangeDelay.index == 4)
 			{
 				m_state = RAGE;
 				m_isChange = false;

@@ -25,7 +25,7 @@ enum bullet {
 	CANNON_BULLET	// 대포 총알
 };
 
-struct B_pcount {
+struct PatternDelay {
 	int index = 0;
 	int count = 0;
 };
@@ -50,16 +50,15 @@ private:
 	//보스 이펙트 애니메이션
 	image *		 m_pimgeffect;	// 보스 이펙트 이미지를 담을 클래스 변수 
 	
-
 	RECT		m_rc;
 
-	B_pcount	b_attack;		//공격 패턴 카운터
-	B_pcount	b_pattern;		//움직이는 패턴
-	B_pcount	b_change;		//변신 카운터
-	B_pcount	b_moveeffect;	// 이동 이펙트 카운터
-	B_pcount	b_smoveeffect;	// 이동 이펙트 카운터2
-	B_pcount	b_nomaleffect;	// 노말 bullet 카운터
-	B_pcount	b_rageefect;	// 분노 bullet 카운터
+	PatternDelay	b_attack;		//공격 패턴 카운터
+	PatternDelay	m_MovePattern;		//움직이는 패턴
+	PatternDelay	m_ChangeDelay;		//변신 카운터
+	PatternDelay	b_moveeffect;	// 이동 이펙트 카운터
+	PatternDelay	b_smoveeffect;	// 이동 이펙트 카운터2
+	PatternDelay	b_nomaleffect;	// 노말 bullet 카운터
+	PatternDelay	b_rageefect;	// 분노 bullet 카운터
 
 	state		m_state;		// 보스의 상태를 위한 변수
 	pattern		m_pattern;		// 보스의 무브 패턴을 받는 변수

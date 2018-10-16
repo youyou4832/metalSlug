@@ -105,7 +105,7 @@ void bossScene::render(HDC hdc)
 	//m_pBridge->render(hdc);
 	
 	//보스 출력
-	//m_pBoss->render(hdc);
+	m_pBoss->render(hdc);
 
 	Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	Rectangle(hdc, m_rc2.left, m_rc2.top, m_rc2.right, m_rc2.bottom);
