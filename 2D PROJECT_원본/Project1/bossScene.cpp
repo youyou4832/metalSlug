@@ -54,36 +54,37 @@ void bossScene::update()
 	m_pPlayer->update();
 	m_pBridge->update();
 	
+	if (m_pBoss->getisAlive())
+	{
+		m_mapPosX -= 10;
+		m_mapPosX2 -= 10;
 
-	m_mapPosX -= 10;
-	m_mapPosX2 -= 10;
-	
-	m_bridgePosX -= 10;
-	m_bridgePosX2 -= 10;
-	m_bridgePosX3 -= 10;
+		m_bridgePosX -= 10;
+		m_bridgePosX2 -= 10;
+		m_bridgePosX3 -= 10;
 
-	if (m_mapPosX <= -WINSIZEX)
-	{
-		m_mapPosX = WINSIZEX;
-	}
-	if (m_mapPosX2 <= -WINSIZEX)
-	{
-		m_mapPosX2 = WINSIZEX;
-	}
+		if (m_mapPosX <= -WINSIZEX)
+		{
+			m_mapPosX = WINSIZEX;
+		}
+		if (m_mapPosX2 <= -WINSIZEX)
+		{
+			m_mapPosX2 = WINSIZEX;
+		}
 
-	if(m_bridgePosX <= -WINSIZEX)
-	{
-		m_bridgePosX = 800;
+		if (m_bridgePosX <= -WINSIZEX)
+		{
+			m_bridgePosX = 800;
+		}
+		if (m_bridgePosX2 <= -WINSIZEX)
+		{
+			m_bridgePosX2 = WINSIZEX * 2;
+		}
+		if (m_bridgePosX3 <= -WINSIZEX)
+		{
+			m_bridgePosX3 = WINSIZEX * 2;
+		}
 	}
-	if (m_bridgePosX2 <= -WINSIZEX)
-	{
-		m_bridgePosX2 = WINSIZEX*2;
-	}
-	if (m_bridgePosX3 <= -WINSIZEX)
-	{
-		m_bridgePosX3 = WINSIZEX*2;
-	}
-	
 	//pixelCollide();
 	m_rc = RectMake(m_pBoss->getX()+700, m_pixelCurrY, 50 ,50);
 	m_rc2 = RectMake(m_pBoss->getX() + 700, m_pixelCurrY-150, 50, 50);

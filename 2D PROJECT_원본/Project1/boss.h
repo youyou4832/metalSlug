@@ -50,38 +50,42 @@ private:
 	
 	RECT		m_rc;
 
-	PatternDelay	m_NextMoveDelay;	//움직이는 패턴
-	PatternDelay	m_ChangeDelay;		//변신 카운터
-	PatternDelay	m_EffectAniCount;	// 이동 이펙트 카운터
-	PatternDelay	m_EffectAniCount2;	// 이동 이펙트 카운터2
-	PatternDelay	m_NomalEffectDelay;	// 노말 bullet 카운터
-	PatternDelay	m_RageFireAinCount;	// 분노 bullet 카운터
+	PatternDelay	m_NextPatternDelay;	//패턴 변환 딜레이
+	PatternDelay	m_ChangeDelay;		//변신 딜레이 
+	
+	PatternDelay	m_AppearEffectAniCount;	// 등장 이펙트 카운터
+	PatternDelay	m_AppearEffectAniCount2;	// 등장 이펙트 카운터
+
+	PatternDelay	m_MoveEffectAniCount;	// 이동 이펙트 카운터
+	PatternDelay	m_MoveEffectAniCount2;	// 이동 이펙트 카운터2
+	
+
+	PatternDelay	m_NomalEffectDelay;	// 노말상태 보스 bullet 
+	PatternDelay	m_RageFireAinDelay;	// 분노상태 보스 bullet 
 
 	BOSS_STATE		m_BossState;	// 보스의 상태를 위한 변수
 	PATTERN_STATE	m_PatternState;		// 보스의 무브 패턴을 받는 변수
 	BULLET_STATE	m_BulletState;		// 보스의 현재 총알 상태를 알려주는 변수
 
-	float		m_Speed;		//보스 스피드
-	float		m_AppearSpeed;		//보스가 등장할때 점점 빠르게 등장하기 보이기 위해서 사용
+	int				m_nCurrHP;		//보스 현재 hp
+	int				m_nMaxHP;		//보스 max hp
+	int				m_pattonChack;		// 특정 패턴 체크
 
-	float		m_fX;			//보스 현재 X위치
-	float		m_fY;			//보스 현재 Y위치
-	float		m_fAngle;
 	
-	int		m_pattonChack;		// 특정 패턴 체크
+	float			m_Speed;		//보스 스피드
+	float			m_AppearSpeed;	//보스 등장 스피드
 
-	bool m_isChange;			//보스 변신 유무를 하기위한 변수
-	bool m_isAppear;			//보스 등장씬 유무를 확인하기 위한 변수
-	bool m_isAlive;				//보스가 살아있는지를 확인하기 위한 변수
-	bool m_isShoot;				//보스가 총알을 솼는지 확인하기 위한 변수
+	float			m_fX;			//보스 현재 X위치
+	float			m_fY;			//보스 현재 Y위치
+	float			m_fAngle;
+	
+	bool			m_iSstandBy;
+	bool			m_isChange;			//보스 변신 유무를 하기위한 변수
+	bool			m_isAppear;			//보스 등장씬 유무를 확인하기 위한 변수
+	bool			m_isAlive;				//보스가 살아있는지를 확인하기 위한 변수
 
 	// 미사일 매니저
 	missileManager*	m_pmissileManager;
-	
-	int				m_nCurrHP;		//보스 현재 hp
-	int				m_nMaxHP;		//보스 max hp
-
-	float getTimeCount;
 
 	// 타겟
 	/*	플레이어클래스*	m_pTarget;*/
@@ -93,15 +97,18 @@ public:
 	void render(HDC hdc);
 
 	void fire();				//bullet 시레 발사하는 함수
-	void shoot();				//bullet 발사 위해 체크 하는 함수
 	void move();				//보스의 동작을 위한 함수
-	void change(bool ischange);		//보스 변신씬을 체크하는 함수
+	void change(bool ischange);	//보스 변신씬을 체크하는 함수
 	void damaged(int damage);	// boss에 hp를 감소하는 함수
+	void AppearAndDie();
 	
-	void Boss_MoveEffectAniCount();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수
-	void Boss_MoveEffectAniCount2();	//boss 움직이는 이펙트 에니메이션 동작을 위한 함수2
-	void Boss_FireEffectAniCount();		//boss nomal bullet 이펙트 에니메이션 동작을 위한 함수
-	void Boss_FireEffectAniCount2();	//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
+	void AppearEffectAniCount();	//boss 등장 씬 이펙트 애니메이션을 동작을 휘한 함수
+	
+	void MoveEffectAniCount();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수
+	void MoveEffectAniCount2();	//boss 움직이는 이펙트 에니메이션 동작을 위한 함수2
+	
+	void FireEffectAniCount();		//boss nomal bullet 이펙트 에니메이션 동작을 위한 함수
+	void FireEffectAniCount2();	//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
 
 	//get & set 함수
 	float getX() { return m_fX; }

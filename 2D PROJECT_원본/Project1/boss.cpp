@@ -10,13 +10,31 @@ HRESULT boss::init()
 	m_isAppear = true;
 	m_isAlive = true;
 	m_isChange = false;
-	m_isShoot = false;
+	m_iSstandBy = true;
 
 	m_BossState = NOMAL;
 	m_PatternState = MOVE;
 	m_BulletState = NOMAL_BULLET;
 
-	m_pattonChack = 0;
+	//boss HP
+	m_nCurrHP = m_nMaxHP = 10;
+
+	// 보스 패턴관련 변수
+	m_pattonChack = 0;		// 보스 돌진 패턴	
+	
+
+	//boss 속도 
+	m_Speed = 5.0f;			//보스 평소 스피드
+	m_AppearSpeed = 3.0;	//보스 등장 스피드
+
+	//보스 초기 위치는 등장씬을 위해 안보이는 곳에서 위치를 잡아준다.
+	m_fX = -20;			// 보스 초기 시작 X위치
+	m_fY = 1035;		// 보스 초기 시작 Y위치
+
+	
+
+	m_fAngle = (PI * 45) / 180;
+
 	//보스 이미지 삽입(230*207 12씩 총 7개)
 	m_pimgBoss = IMAGEMANAGER->addImage("move", "image/boss/Boss.bmp",
 		2760, 1449, true, RGB(255, 0, 255));
@@ -71,18 +89,9 @@ HRESULT boss::init()
 	m_pmissileManager = new missileManager;
 	
 	
-	m_Speed = 5.0f;	//보스 평소 스피드
-	m_AppearSpeed = 3.0;	//보스 등장 스피드
+	
 
-	//보스 초기 위치는 등장씬을 위해 안보이는 곳에서 위치를 잡아준다.
-	m_fX = -20;			// 보스 초기 시작 X위치
-	m_fY = 1035;		// 보스 초기 시작 Y위치
 
-	m_nCurrHP = m_nMaxHP = 10;
-
-	m_fAngle = (PI * 45) / 180;
-
-	getTimeCount = 0.0f;
 	//m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth(), m_pimgBoss->getHeight());
 	
 	//m_rc = RectMake(m_fX + 100, m_fY + 50, (m_pimgBoss->getWidth() + 400) / 4, m_pimgBoss->getHeight());
@@ -116,11 +125,10 @@ void boss::update()
 		damaged(1);
 	}
 
-	//m_rc = RectMake(m_fX, m_fY, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
+	m_rc = RectMake(m_fX, m_fY, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
 	
 	
 	move();		//보스의 움직임을 위한 함수
-	shoot();
 
 
 	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
@@ -138,41 +146,57 @@ void boss::render(HDC hdc)
 {
 	if (m_isAlive)
 	{
-	
+
 		if (m_BossState == NOMAL && m_PatternState != BULLET_SHOOT)
 		{
 			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni, 4.0);
+
 		}
 
 		else if (m_BossState == NOMAL && m_PatternState == BULLET_SHOOT)
 		{
 			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pNomalFireAni, 4.0);
 
-			m_pimgeffect->render(hdc, m_fX + 470, m_fY + 40, 0+(40*m_NomalEffectDelay.index), 648, 40, 33, 5);
-			m_pimgeffect->render(hdc, m_fX + 200, m_fY-10, 0 + (40 * m_NomalEffectDelay.index), 648, 40, 33, 5);
-			
+			m_pimgeffect->render(hdc, m_fX + 470, m_fY + 40, 0 + (40 * m_NomalEffectDelay.index), 648, 40, 33, 5);
+			m_pimgeffect->render(hdc, m_fX + 200, m_fY - 10, 0 + (40 * m_NomalEffectDelay.index), 648, 40, 33, 5);
+
 		}
 
 		else if (m_BossState == CHANGE)
 		{
 			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pChangeBossAni, 4.0);
-		
+
 		}
 
 		else if (m_BossState == RAGE && m_PatternState != BULLET_SHOOT)
 		{
-			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pRageBossAni, 4.0);
+			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pRageBossAni, 4.0f);
+
+		}
+
+		else if (m_BossState == RAGE && m_PatternState == BULLET_SHOOT)
+		{
+			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pRageFireAni, 4.0f);
+			m_pimgeffect->render(hdc, m_fX + 530, m_fY + 60, 0 + (81 * m_RageFireAinDelay.index), 0, 81, 89, 5);
+		}
+
+		if (m_AppearEffectAniCount2.index  < 2)
+		{
+			m_pimgeffect->render(hdc, m_fX, m_fY + 100,
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX+150, m_fY + 100,
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 300, m_fY + 100,
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 450, m_fY + 100,
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 600, m_fY + 100,
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+		}
 		
-		}
+		m_pimgeffect->render(hdc, m_fX - 100, m_fY + 680, 0 + (264 * m_MoveEffectAniCount.index),
+			492 + (52 * m_MoveEffectAniCount2.index), 264, 52, 4);
 
-		else if(m_BossState == RAGE && m_PatternState == BULLET_SHOOT)
-		{ 
-			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pRageFireAni, 4.0);
-			m_pimgeffect->render(hdc, m_fX + 530, m_fY +60, 0 + (81 * m_RageFireAinCount.index), 0, 81, 89, 5);
-		}
-
-		m_pimgeffect->render(hdc, m_fX - 100, m_fY + 680, 0 + (264 * m_EffectAniCount.index),
-			492 + (52 * m_EffectAniCount2.index), 264, 52, 4);
 
 		if (m_BulletState == NOMAL_BULLET)
 			m_pmissileManager->render(hdc, CharInfo::i_nomalboss);
@@ -181,53 +205,66 @@ void boss::render(HDC hdc)
 			m_pmissileManager->render(hdc, CharInfo::i_rageboss);
 	}
 
+		else
+		{
+			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pDieAni, 4.0);
+			m_pimgeffect->render(hdc, m_fX, WINSIZEY-(157*5),
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 150, WINSIZEY - (157 * 5),
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 300, WINSIZEY - (157 * 5),
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 450, WINSIZEY - (157 * 5),
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+			m_pimgeffect->render(hdc, m_fX + 600, WINSIZEY - (157 * 5),
+				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
+		}
+		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 
-	else
-	{
-		m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pDieAni, 4.0);
 	}
-	//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-	
-	
-
-	
-}
 
 void boss::move()
 {
-	Boss_MoveEffectAniCount();
-	Boss_MoveEffectAniCount2();
+	MoveEffectAniCount();
+	MoveEffectAniCount2();
+	
+	
 	if (m_isAppear == true && m_fY >= -10) //보스 등장씬(이펙트 아직 없음) 
 	{
 		m_fY -= m_AppearSpeed;
 		m_AppearSpeed += 0.8;
 
+		
+
 		if (m_fY <= 0)
 		{
 			m_isAppear = false; //등장후 씬이 움직이게 하기 위해
+			
 			m_pMoveAni->start();
-			
-			
+
 		}
 
 	}
 
+	AppearAndDie();
+	
+	
 	if (m_isAlive && !m_isAppear)
 	{
 		if (m_BossState == NOMAL || m_BossState == RAGE)
 		{
-			++m_NextMoveDelay.count;
+			++m_NextPatternDelay.count;
 			if (m_PatternState == MOVE) // 등장이 끝난후 잠깐 제자리 걸음(사실상 정지)
 			{
 				//m_fX += m_Speed;
 				
-				if (m_NextMoveDelay.count%5 == 0)
+				if (m_NextPatternDelay.count%5 == 0)
 				{
-					++m_NextMoveDelay.index;
-					if (m_NextMoveDelay.index == 10)
+					++m_NextPatternDelay.index;
+					if (m_NextPatternDelay.index == 10)
 					{
-						m_NextMoveDelay.count = 0;
-						m_NextMoveDelay.index = 0;
+						m_NextPatternDelay.count = 0;
+						m_NextPatternDelay.index = 0;
 						m_PatternState = S_BACKMOVE;
 					}
 				}
@@ -244,13 +281,13 @@ void boss::move()
 
 					else
 					{
-						if (m_NextMoveDelay.count % 5 == 0)
+						if (m_NextPatternDelay.count % 5 == 0)
 						{
-							++m_NextMoveDelay.index;
-							if (m_NextMoveDelay.index == 15)
+							++m_NextPatternDelay.index;
+							if (m_NextPatternDelay.index == 15)
 							{
-								m_NextMoveDelay.count = 0;
-								m_NextMoveDelay.index = 0;
+								m_NextPatternDelay.count = 0;
+								m_NextPatternDelay.index = 0;
 								m_PatternState = S_RUSHMOVE;
 
 							}
@@ -267,13 +304,13 @@ void boss::move()
 
 					else
 					{
-						if (m_NextMoveDelay.count % 5 == 0)
+						if (m_NextPatternDelay.count % 5 == 0)
 						{
-							++m_NextMoveDelay.index;
-							if (m_NextMoveDelay.index == 25)
+							++m_NextPatternDelay.index;
+							if (m_NextPatternDelay.index == 25)
 							{
-								m_NextMoveDelay.count = 0;
-								m_NextMoveDelay.index = 0;
+								m_NextPatternDelay.count = 0;
+								m_NextPatternDelay.index = 0;
 								m_PatternState = P_RUSHMOVE;
 
 							}
@@ -296,13 +333,13 @@ void boss::move()
 
 				else
 				{
-					if (m_NextMoveDelay.count % 5 == 0)
+					if (m_NextPatternDelay.count % 5 == 0)
 					{
-						++m_NextMoveDelay.index;
-						if (m_NextMoveDelay.index == 15)
+						++m_NextPatternDelay.index;
+						if (m_NextPatternDelay.index == 15)
 						{
-							m_NextMoveDelay.count = 0;
-							m_NextMoveDelay.index = 0;
+							m_NextPatternDelay.count = 0;
+							m_NextPatternDelay.index = 0;
 							m_pattonChack = 1;
 							m_PatternState = IDLEMOVE;
 						}
@@ -326,13 +363,13 @@ void boss::move()
 
 				else
 				{
-					if (m_NextMoveDelay.count % 5 == 0)
+					if (m_NextPatternDelay.count % 5 == 0)
 					{
-						++m_NextMoveDelay.index;
-						if (m_NextMoveDelay.index == 15)
+						++m_NextPatternDelay.index;
+						if (m_NextPatternDelay.index == 15)
 						{
-							m_NextMoveDelay.count = 0;
-							m_NextMoveDelay.index = 0;
+							m_NextPatternDelay.count = 0;
+							m_NextPatternDelay.index = 0;
 							m_pattonChack = 0;
 							m_PatternState = IDLEMOVE;
 						}
@@ -346,13 +383,13 @@ void boss::move()
 					m_fX -= m_Speed;
 				else
 				{
-					if (m_NextMoveDelay.count % 5 == 0)
+					if (m_NextPatternDelay.count % 5 == 0)
 					{
-						++m_NextMoveDelay.index;
-						if (m_NextMoveDelay.index == 5)
+						++m_NextPatternDelay.index;
+						if (m_NextPatternDelay.index == 5)
 						{
-							m_NextMoveDelay.count = 0;
-							m_NextMoveDelay.index = 0;
+							m_NextPatternDelay.count = 0;
+							m_NextPatternDelay.index = 0;
 							m_PatternState = BULLET_SHOOT;
 						}
 					}
@@ -364,12 +401,11 @@ void boss::move()
 			if (m_PatternState == BULLET_SHOOT) // 총알 슛
 			{
 				
-				if (m_NextMoveDelay.count == 0)
+				if (m_NextPatternDelay.count == 0)
 				{
 					if (m_BulletState == NOMAL_BULLET)
 					{
 						m_pNomalFireAni->start();
-						//m_isShoot = false;
 					}
 
 					else if (m_BulletState == RAGE_BULLET)
@@ -380,32 +416,32 @@ void boss::move()
 
 				if (m_BulletState == NOMAL_BULLET)
 				{
-					Boss_FireEffectAniCount();
+					FireEffectAniCount();
 				}
 
 				else if (m_BulletState == RAGE_BULLET)
 				{
-					Boss_FireEffectAniCount2();
+					FireEffectAniCount2();
 				}
 				
 
-				if (m_NextMoveDelay.count % 2 == 0)
+				if (m_NextPatternDelay.count % 2 == 0)
 				{
-					++m_NextMoveDelay.index;
-					if (m_NextMoveDelay.index == 4 && m_BulletState == NOMAL_BULLET)
+					++m_NextPatternDelay.index;
+					if (m_NextPatternDelay.index == 10 && m_BulletState == NOMAL_BULLET)
 					{
 						fire();
-						m_NextMoveDelay.count = 0;
-						m_NextMoveDelay.index = 0;
+						m_NextPatternDelay.count = 0;
+						m_NextPatternDelay.index = 0;
 						m_pNomalFireAni->stop();
 						m_PatternState = S_BACKMOVE;
 					}
 
-					if (m_NextMoveDelay.index == 5 && m_BulletState == RAGE_BULLET)
+					if (m_NextPatternDelay.index == 5 && m_BulletState == RAGE_BULLET)
 					{
 						fire();
-						m_NextMoveDelay.count = 0;
-						m_NextMoveDelay.index = 0;
+						m_NextPatternDelay.count = 0;
+						m_NextPatternDelay.index = 0;
 						m_pRageFireAni->stop();
 						m_PatternState = S_BACKMOVE;
 					}
@@ -419,8 +455,8 @@ void boss::move()
 	else if(!m_isAlive)
 	{
 		if (!m_isAppear && (m_fX >= -1200 && m_fY <= 2000)) {
-
-			m_fX -= m_Speed;
+			
+			AppearAndDie();
 			m_fY += m_Speed;
 		}
 	}
@@ -449,31 +485,33 @@ void boss::change(bool ischagne)
 	
 }
 
-void boss::Boss_MoveEffectAniCount()
+void boss::MoveEffectAniCount()
 {
-	++m_EffectAniCount.count;
-	if (m_EffectAniCount.count % 5 == 0) {
-		++m_EffectAniCount.index;
-		if (m_EffectAniCount.index == 4) {
-			m_EffectAniCount.index = 0;
+	++m_MoveEffectAniCount.count;
+	if (m_MoveEffectAniCount.count % 5 == 0) {
+		++m_MoveEffectAniCount.index;
+		if (m_MoveEffectAniCount.index == 4) {
+			m_MoveEffectAniCount.index = 0;
 		}
-		m_EffectAniCount.count = 0;
+		m_MoveEffectAniCount.count = 0;
 	}
 }
 
-void boss::Boss_MoveEffectAniCount2()
+void boss::MoveEffectAniCount2()
 {
-	++m_EffectAniCount2.count;
-	if (m_EffectAniCount2.count % 5 == 0) {
-		++m_EffectAniCount2.index;
-		if (m_EffectAniCount2.index == 2) {
-			m_EffectAniCount2.index = 0;
+	++m_MoveEffectAniCount2.count;
+	if (m_MoveEffectAniCount2.count % 5 == 0) {
+		++m_MoveEffectAniCount2.index;
+		if (m_MoveEffectAniCount2.index == 3) {
+			m_MoveEffectAniCount2.index = 0;
 		}
-		m_EffectAniCount2.count = 0;
+		m_MoveEffectAniCount2.count = 0;
 	}
 }
 
-void boss::Boss_FireEffectAniCount()
+
+
+void boss::FireEffectAniCount()
 {
 	++m_NomalEffectDelay.count;
 	if (m_NomalEffectDelay.count % 1 == 0) {
@@ -485,15 +523,15 @@ void boss::Boss_FireEffectAniCount()
 	}
 }
 
-void boss::Boss_FireEffectAniCount2()
+void boss::FireEffectAniCount2()
 {
-	++m_RageFireAinCount.count;
-	if (m_RageFireAinCount.count % 1 == 0) {
-		++m_RageFireAinCount.index;
-		if (m_RageFireAinCount.index == 10) {
-			m_RageFireAinCount.index = 0;
+	++m_RageFireAinDelay.count;
+	if (m_RageFireAinDelay.count % 1 == 0) {
+		++m_RageFireAinDelay.index;
+		if (m_RageFireAinDelay.index == 10) {
+			m_RageFireAinDelay.index = 0;
 		}
-		m_RageFireAinCount.count = 0;
+		m_RageFireAinDelay.count = 0;
 	}
 }
 
@@ -512,28 +550,7 @@ void boss::fire()
 			
 }
 
-void boss::shoot()
-{
-	if (m_PatternState == BULLET_SHOOT)
-	{
-		m_isShoot = true;
-	}
 
-	else
-	{
-		m_isShoot = false;
-		//m_pNomalFireAni->stop();
-		if (m_BulletState == NOMAL_BULLET)
-		{
-			m_pNomalFireAni->stop();
-		}
-
-		else if (m_BulletState == RAGE_BULLET)
-		{
-			m_pRageFireAni->stop();
-		}
-	}
-}
 
 void boss::damaged(int damage)
 {
@@ -541,6 +558,7 @@ void boss::damaged(int damage)
 	if (m_nCurrHP <= 0)
 	{
 		m_isAlive = false;
+		m_AppearEffectAniCount2.index = 0;
 		m_pDieAni->start();
 	}
 
@@ -552,6 +570,38 @@ void boss::damaged(int damage)
 		m_pChangeBossAni->start();
 	}
 }
+
+void boss::AppearAndDie()
+{
+	if (m_fY <= WINSIZEY / 2)
+	{
+		if (m_AppearEffectAniCount2.index < 2)
+		{
+			AppearEffectAniCount();
+		}
+	}
+}
+
+
+
+void boss::AppearEffectAniCount()
+{
+	if (m_AppearEffectAniCount2.index < 2)
+	{
+		++m_AppearEffectAniCount.count;
+		if (m_AppearEffectAniCount.count % 5 == 0) {
+
+			++m_AppearEffectAniCount.index;
+			if (m_AppearEffectAniCount.index == 13) {
+				m_AppearEffectAniCount.index = 0;
+				++m_AppearEffectAniCount2.index;
+			}
+			m_AppearEffectAniCount.count = 0;
+		}
+	}
+}
+
+
 
 
 boss::boss()
