@@ -13,10 +13,14 @@ class bridge
 private:
 
 	bridgeInfo m_bridge[BRUDEGE_NUM];
+	image* m_maxBridge;
+	image* m_maxBridge2;
 	
 	/*image * m_pimgBridege[BRUDEGE_NUM];
 	image * m_pimgSubBridege;*/
 	image * m_pimgPixels;
+	RECT rc;
+	RECT rc2;
 
 	float m_bridgeDestX[BRUDEGE_NUM];
 	float m_bridgeDestY;
@@ -42,7 +46,7 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
-	virtual image * getImgPixels() { return m_pimgPixels; }
+	virtual image * getImgPixels(int i) { return m_bridge[i].m_pimgPixels; }
 
 	bridge();
 	~bridge();

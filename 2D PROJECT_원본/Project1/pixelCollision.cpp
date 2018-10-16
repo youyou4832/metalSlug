@@ -37,7 +37,7 @@ void pixelCollision::update()
 
 	m_currY = m_position.y + m_pImg->getHeight() / 2;
 
-	for (int i = m_currY - 50; i < m_currY + 50; ++i)
+	for (int i = 4; i < 50; ++i)
 	{
 		COLORREF color = GetPixel(m_pImg->getMemDC(), m_position.x, i);
 

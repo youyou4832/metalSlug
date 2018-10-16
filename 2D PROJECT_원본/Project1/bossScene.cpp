@@ -9,9 +9,8 @@ HRESULT bossScene::init()
 {
 	m_pimgBG = IMAGEMANAGER->addImage("map", "image/map/testBG.bmp",
 		WINSIZEX, WINSIZEY, false, 0);
-	m_pimgSubBG = IMAGEMANAGER->addImage("submap", "image/map/testBG.bmp",
-		WINSIZEX, WINSIZEY, false, 0);
-	
+	m_pimgSubBG = IMAGEMANAGER->findImage("map");
+
 	m_tempBG = new image;
 	m_tempBG->init("magenta", WINSIZEX, WINSIZEY, false, 0);
 	m_pimgeffect = IMAGEMANAGER->addImage("boss", "image/boss/BossEffect.bmp",
@@ -20,9 +19,13 @@ HRESULT bossScene::init()
 	m_pimgBG->setX(0);
 	m_pimgBG->setY(0);
 
-	m_mapPoX = 0;
+	m_mapPosX = 0;
+	m_mapPosX2 = WINSIZEX;
 
-
+	m_bridgePosX = 0;
+	m_bridgePosX2 = WINSIZEX;
+	m_bridgePosX3 = WINSIZEX*2 + 800;
+	
 	m_pPlayer = new player;
 	m_pPlayer->init(WINSIZEX / 2, WINSIZEY / 2);
 
@@ -31,7 +34,9 @@ HRESULT bossScene::init()
 	
 	m_pBridge = new bridge;
 	m_pBridge->init();
-
+	m_bridge = IMAGEMANAGER->findImage("maxBridge");
+	m_bridge2 = IMAGEMANAGER->findImage("maxBridge2");
+	m_bridge3 = IMAGEMANAGER->findImage("maxBridge2");
 	
 	return S_OK;
 }
@@ -50,12 +55,33 @@ void bossScene::update()
 	m_pBridge->update();
 	
 
-	m_mapPoX -= 10;
+	m_mapPosX -= 10;
+	m_mapPosX2 -= 10;
+	
+	m_bridgePosX -= 10;
+	m_bridgePosX2 -= 10;
+	m_bridgePosX3 -= 10;
 
-
-	if(m_mapPoX <= -WINSIZEX)
+	if (m_mapPosX <= -WINSIZEX)
 	{
-		m_mapPoX = 0;
+		m_mapPosX = WINSIZEX;
+	}
+	if (m_mapPosX2 <= -WINSIZEX)
+	{
+		m_mapPosX2 = WINSIZEX;
+	}
+
+	if(m_bridgePosX <= -WINSIZEX)
+	{
+		m_bridgePosX = 800;
+	}
+	if (m_bridgePosX2 <= -WINSIZEX)
+	{
+		m_bridgePosX2 = WINSIZEX*2;
+	}
+	if (m_bridgePosX3 <= -WINSIZEX)
+	{
+		m_bridgePosX3 = WINSIZEX*2;
 	}
 	
 	//pixelCollide();
@@ -66,14 +92,20 @@ void bossScene::update()
 void bossScene::render(HDC hdc)
 { 
 	//맵 출력 
-	m_pimgBG->render(hdc, m_mapPoX,0 ,0 ,0, 0, m_pimgBG->getX(), m_pimgBG->getY());
-	m_pimgSubBG->render(hdc, m_mapPoX + WINSIZEX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
+	/*m_bridge->render(hdc, m_mapPoX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
+	m_bridge2->render(hdc, m_mapPoX + WINSIZEX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());*/
+	m_pimgBG->render(hdc, m_mapPosX, 0);
+	m_pimgSubBG->render(hdc, m_mapPosX2, 0);
+	
+	m_bridge->render(hdc, m_bridgePosX, 0);
+	m_bridge2->render(hdc, m_bridgePosX2, 0);
+	m_bridge3->render(hdc, m_bridgePosX3, 0);
 	m_pPlayer->render(hdc);
 	//다리 출력
-	m_pBridge->render(hdc);
+	//m_pBridge->render(hdc);
 	
 	//보스 출력
-	m_pBoss->render(hdc);
+	//m_pBoss->render(hdc);
 
 	Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	Rectangle(hdc, m_rc2.left, m_rc2.top, m_rc2.right, m_rc2.bottom);
@@ -86,10 +118,13 @@ void bossScene::pixelCollide()
 	m_pixelPosY = m_pBoss->getY();
 
 	m_pixelCurrY = m_pixelPosY + 750;
-
-	for (int i = m_pixelCurrY - 100; i < m_pixelCurrY + 60; ++i)
+	/*m_front++;
+	if (m_front == 19) {
+		m_front = 0;
+	}*/
+	for (int i = m_pixelCurrY - 150; i < m_pixelCurrY + 50; ++i)
 	{
-		COLORREF color = GetPixel(m_pBridge->getImgPixels()->getMemDC(),m_pBoss->getX()+700, i);
+		COLORREF color = GetPixel(m_pBridge->getImgPixels(m_front)->getMemDC(),m_pBoss->getX(), i);
 
 		int r = GetRValue(color);
 		int g = GetGValue(color);
@@ -102,7 +137,7 @@ void bossScene::pixelCollide()
 
 		if (!(r == 255 && g == 0 && b == 255))
 		{
-			m_pixelPosY = i - m_pBridge->getImgPixels()->getHeight();
+			//Sleep(1000);
 			break;
 		}
 	}
