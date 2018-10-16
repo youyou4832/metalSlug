@@ -392,8 +392,6 @@ public:
 	// 캐릭터 행동 (공격)
 	void fire();			// 공격 총괄 관리 함수
 	void fireActSet();		// 공격 모션 세팅
-	void fireActSetLeft();	// 공격 모션 세팅 : 왼쪽
-	void fireActSetRight();	// 공격 모션 세팅 : 오른쪽
 
 	// 캐릭터 리소스 위치 수정 함수 (모션마다 사이즈와 기준점 좌표가 달라서 세팅을 별도로 해줘야 함)
 	void setResourceRect();

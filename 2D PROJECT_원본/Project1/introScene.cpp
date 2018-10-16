@@ -48,9 +48,9 @@ void introScene::release()
 void introScene::update()
 {
 	collisionRect();
-
 	//m_enemyMgr->update();
 	m_pPlayer->update();
+
 	collider();
 }
 
