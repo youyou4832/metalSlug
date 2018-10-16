@@ -78,6 +78,7 @@ void introScene::collisionRect()
 			if ((*enemyIter)->getIsAlive() == true)
 			{
 				m_pPlayer->setCollide(true);
+				m_pPlayer->setIsAttack(false);
 				(*enemyIter)->setIsAlive(false);
 			}
 

@@ -60,6 +60,7 @@ HRESULT player::init(float x, float y)
 	m_fAngle = 0;
 	m_fAttX = 50;
 	m_fAttY = 50;
+	m_nBombNum = 0;
 
 	m_nActUpper = UPPER_Appear;
 	m_nActLower = LOWER_NULL;
@@ -108,15 +109,11 @@ void player::update()
 	// update 초반에 return 하는 실행문을 관리하는 함수
 	if (isReturnUpdate() == false)	return;
 
-	// 애니메이션 프레임 업데이트
-	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
-	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
-
 	// 플레이어
 	setDir();
 	move();
 	actSet();
-
+	
 	// 미사일
 	m_pMissileMgr->update();
 }
@@ -145,7 +142,10 @@ void player::actSet()
 	}
 
 	// isPlaying == false일 경우 Idle 상태로 변경 (반복모션 제외)
-	if (m_upper.pAni->getIsPlaying() == false && 
+	if (m_nActUpper == UPPER_Att90 || m_nActUpper == UPPER_Att270)
+		m_fReplaceY = 100;
+
+	else if (m_upper.pAni->getIsPlaying() == false && 
 		m_nActUpper != UPPER_Death && m_nActUpper != UPPER_SlugEscape &&
 		m_nActUpper != UPPER_Appear)
 	{
@@ -184,6 +184,10 @@ void player::actSet()
 
 		m_isAct = false;
 	}
+	
+	// 애니메이션 프레임 업데이트
+	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
+	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 }
 
 void player::setUpper()
@@ -193,7 +197,7 @@ void player::setUpper()
 	{
 
 	// ### 아이템 먹지 않았을 때 모션 ###
-
+		 
 	case UPPER_Idle:		// 대기
 		m_upper.pAni->init(UPPER_IdleWidth, UPPER_IdleHeight, UPPER_IdleWidth / UPPER_IdleFrame, UPPER_IdleHeight, UPPER_IdleY);
 
@@ -202,8 +206,9 @@ void player::setUpper()
 
 		else
 			m_upper.pAni->setPlayFrame(1, UPPER_IdleFrame, true, true);
-
-		m_fReplaceY = 25;
+			
+		if (m_nActUpper != UPPER_Att90 && m_nActUpper != UPPER_Att270)
+			m_fReplaceY = 25;
 
 		break;
 
@@ -445,6 +450,10 @@ void player::setDir()
 {
 	// ### 캐릭터 방향 설정 ###
 
+	m_fAngle = MY_UTIL::getAngle(m_upper.pImg->getX(),
+		m_upper.pImg->getY(),
+		g_ptMouse.x, g_ptMouse.y);
+
 	// 등장 중일 경우 무조건 오른쪽
 	if (m_nActUpper == UPPER_Appear)
 	{
@@ -455,7 +464,7 @@ void player::setDir()
 	// 마우스 포인터 위치에 따라 방향 세팅 (슬러그 탈출, 죽음 모션 중에는 방향이 변경되지 않음)
 	if (m_nActUpper != UPPER_Death && m_nActUpper != UPPER_SlugEscape)
 	{
-		if (g_ptMouse.x <= m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 왼쪽에 있을 경우
+		if (g_ptMouse.x <= m_upper.pImg->getX())			// 마우스 포인터가 캐릭터 왼쪽에 있을 경우
 		{
 			if (m_nActUpper == UPPER_Sit)
 				m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
@@ -464,7 +473,7 @@ void player::setDir()
 				m_upper.pAni->setPlayFrameReverse(0, UPPER_GunSitFrame, false, false);
 
 			m_nDir = DIR_Left;
-			m_nDirY = NULL;
+			m_nDirY = DIR_NULL;
 		}
 
 		else if (g_ptMouse.x > m_upper.pImg->getX())		// 마우스 포인터가 캐릭터 오른쪽에 있을 경우
@@ -476,7 +485,20 @@ void player::setDir()
 				m_upper.pAni->setPlayFrame(0, UPPER_GunSitFrame, false, false);
 
 			m_nDir = DIR_Right;
-			m_nDirY = NULL;
+			m_nDirY = DIR_NULL;
+		}
+
+		// 상, 하 모션 세팅
+		// 마우스 포인터가 캐릭터 위에 있을 경우
+		if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)
+			m_nDirY = DIR_Up;
+
+		// 마우스 포인터가 캐릭터 아래에 있을 경우
+		else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)
+			m_nDirY = DIR_Down;
+		else
+		{
+			int a = 0;
 		}
 	}
 }
@@ -598,7 +620,7 @@ void player::fire()
 		m_fAttY,
 		g_ptMouse.x, g_ptMouse.y);
 
-	if (m_isAttack == false)
+	if (m_isAttack == true)
 	{
 		m_pMissileMgr->fire(m_fAttX,			// 총알 발사
 			m_fAttY,
@@ -611,16 +633,6 @@ void player::fire()
 
 void player::fireActSet()
 {
-	// 상, 하 모션 세팅
-	// 마우스 포인터가 캐릭터 위에 있을 경우
-	if (g_ptMouse.y <= m_upper.pImg->getY() && m_fAngle > 0.7f && m_fAngle < 2.4f)
-		m_nDirY = DIR_Up;
-
-	// 마우스 포인터가 캐릭터 아래에 있을 경우
-	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)
-		m_nDirY = DIR_Down;
-
-
 	// 좌, 우 모션 세팅
 	// 모션 변경 : 왼쪽
 	if (m_nDir == DIR_Left)
@@ -642,6 +654,7 @@ void player::fireActSetLeft()
 		// 근접공격 (총 들고 왼쪽)
 		if (m_isCollide == true)
 		{
+			m_nActUpper = UPPER_KnifeGun;
 			m_upper.pAni->init(UPPER_KnifeGunWidth, UPPER_KnifeGunHeight, UPPER_KnifeGunWidth / UPPER_KnifeGunFrame, UPPER_KnifeGunHeight, UPPER_KnifeGunY);
 			m_upper.pAni->setPlayFrameReverse(1, UPPER_KnifeGunFrame, false, false);
 
@@ -652,6 +665,7 @@ void player::fireActSetLeft()
 
 		else if (m_nDirY == DIR_Up)
 		{
+			m_nActUpper = UPPER_GunAtt90;
 			// UPPER_GunAtt90
 			m_upper.pAni->init(UPPER_GunAtt90Width, UPPER_GunAtt90Height, UPPER_GunAtt90Width / UPPER_GunAtt90Frame, UPPER_GunAtt90Height, UPPER_GunAtt90Y);
 			m_upper.pAni->setPlayFrameReverse(1, UPPER_GunAtt90Frame, false, false);
@@ -663,6 +677,7 @@ void player::fireActSetLeft()
 
 		else if (m_nDirY == DIR_Down)
 		{
+			m_nActUpper = UPPER_GunAtt270;
 			// UPPER_GunAtt270
 			m_upper.pAni->init(UPPER_GunAtt270Width, UPPER_GunAtt270Height, UPPER_GunAtt270Width / UPPER_GunAtt270Frame, UPPER_GunAtt270Height, UPPER_GunAtt270Y);
 			m_upper.pAni->setPlayFrameReverse(1, UPPER_GunAtt270Frame, false, false);
@@ -674,6 +689,7 @@ void player::fireActSetLeft()
 
 		else
 		{
+			m_nActUpper = UPPER_GunAtt;
 			// UPPER_GunAtt
 			m_upper.pAni->init(UPPER_GunAttWidth, UPPER_GunAttHeight, UPPER_GunAttWidth / UPPER_GunAttFrame, UPPER_GunAttHeight, UPPER_GunAttY);
 			m_upper.pAni->setPlayFrameReverse(1, UPPER_GunAttFrame, false, false);
@@ -1129,9 +1145,9 @@ void player::render(HDC hdc)
 	char szText[128];
 
 	// 플레이어
-	/*Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
-	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);*/
-	/*Rectangle(hdc, m_rcHit.left, m_rcHit.top, m_rcHit.right, m_rcHit.bottom);*/
+	Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
+	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);
+	Rectangle(hdc, m_rcHit.left, m_rcHit.top, m_rcHit.right, m_rcHit.bottom);
 
 	if (m_nDir == DIR_Left)
 	{
@@ -1165,10 +1181,14 @@ void player::render(HDC hdc)
 
 void player::dataSave()
 {
+	vector<string> vSaveData;
+
+	TXTDATA->txtSave("data/playerData.txt", vSaveData);
 }
 
 void player::dataLoad()
 {
+	TXTDATA->txtLoadInt("data/playerData.txt");
 }
 
 
