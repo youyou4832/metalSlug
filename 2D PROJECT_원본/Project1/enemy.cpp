@@ -91,16 +91,10 @@ void enemy::release()
 
 void enemy::update()
 {
-	if (KEYMANAGER->isStayKeyDown(VK_RETURN)) {
-		m_currHP--;
-		s_Hit.isState = true;
-		if (m_currHP == 15) {
-			firstBreak = true;
-		}
-		if (m_currHP == 0) {
-			secondBreak = true;
-		}
-	}
+
+	//m_currHP--;
+	
+
 
 	if (isAlive) {
 		if (m_CharNum == CharInfo::i_sniper) {
@@ -333,6 +327,7 @@ void enemy::sniperAnimation()
 		}
 	}
 	else {
+		s_Death.isState = true;
 		++s_Death.count;
 		if (s_Death.count % 8 == 0) {
 			++s_Death.index;
@@ -359,6 +354,7 @@ void enemy::sandBagAnimation()
 		}
 	}
 	else if (secondBreak == true) {
+		s_Death.isState = true;
 		++s_Attack.count;
 		if (s_Attack.count % 5 == 0) {
 			++s_Attack.index;
@@ -441,6 +437,7 @@ void enemy::cannonAnimation()
 		}
 	}
 	else {
+		s_Death.isState = true;
 		++s_Death.count;
 		if (s_Death.count % 8 == 0) {
 			++s_Death.index;
@@ -540,6 +537,7 @@ void enemy::normalAnimation()
 		}
 	}
 	else {
+		s_Death.isState = true;
 		++s_Death.count;
 		if (s_Death.count % 8 == 0) {
 			++s_Death.index;
@@ -597,6 +595,7 @@ void enemy::tankAnimation()
 		}
 	}
 	else {
+		s_Death.isState = true;
 		++s_Death.count;
 		if (s_Death.count % 10 == 0) {
 			++s_Death.index;
@@ -616,6 +615,17 @@ void enemy::deathCount()
 	if (deathCN == 8) {
 		isAlive = false;
 		deathCN = 0;
+	}
+}
+
+void enemy::hit()
+{
+	s_Hit.isState = true;
+	if (m_currHP == 15) {
+		firstBreak = true;
+	}
+	if (m_currHP == 0) {
+		secondBreak = true;
 	}
 }
 

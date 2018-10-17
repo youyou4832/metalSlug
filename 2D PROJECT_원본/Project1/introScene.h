@@ -17,7 +17,9 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
-	virtual void collisionRect();
+	void knifeCollideToEnemy();
+	void BulletCollideToEnemy();
+	void BulletCollideToPlayer();
 
 	void collider();
 

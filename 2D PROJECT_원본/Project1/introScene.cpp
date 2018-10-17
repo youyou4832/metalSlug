@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "introScene.h"
 #include "enemyManager.h"
+#include "missileManager.h"
 #include "player.h"
 
 HRESULT introScene::init()
@@ -38,11 +39,13 @@ void introScene::release()
 
 void introScene::update()
 {
-	collisionRect();
+	knifeCollideToEnemy();
 
 	m_enemyMgr->update();
 	m_pPlayer->update();
+	BulletCollideToEnemy();
 	collider();
+	
 }
 
 void introScene::render(HDC hdc)
@@ -54,7 +57,7 @@ void introScene::render(HDC hdc)
 	EFFECTMANAGER->render(hdc,2);
 }
 
-void introScene::collisionRect()
+void introScene::knifeCollideToEnemy()
 {
 	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
 	vector<enemy *>::iterator enemyIter = vEnemy.begin();
@@ -77,6 +80,34 @@ void introScene::collisionRect()
 			break;
 		}
 	}
+}
+
+void introScene::BulletCollideToEnemy()
+{
+	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
+	vector<enemy *>::iterator enemyIter;
+
+	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter) {
+		//에너미 총알
+		vector<missile*> e_vMissile = (*enemyIter)->getMissileMgr()->getVecMissile();
+		vector<missile*>::iterator e_missileIter;
+		//플레이어 총알
+		vector<missile*> p_vMissile = m_pPlayer->getMissileMgr()->getVecMissile();
+		vector<missile*>::iterator p_missileIter;
+		for (p_missileIter = p_vMissile.begin(); p_missileIter != p_vMissile.end(); ++p_missileIter) {
+			RECT rc;
+			//플레이어 총알과 에네미 충돌
+			if ((*p_missileIter)->getIsFire() && (*enemyIter)->getIsAlive() && IntersectRect(&rc, &(*enemyIter)->getRect(), &(*p_missileIter)->getRect()) && (*enemyIter)->getDeathState() == false) {
+				(*enemyIter)->setCurrHP((*enemyIter)->getCurrHP() - 1);
+				(*enemyIter)->hit();
+				(*p_missileIter)->setIsFire(false);
+			}
+		}
+	}
+}
+
+void introScene::BulletCollideToPlayer()
+{
 }
 
 void introScene::collider()

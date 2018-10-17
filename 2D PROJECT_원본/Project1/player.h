@@ -424,6 +424,11 @@ public:
 	inline void setIsGun(bool isGun) { m_isGun = isGun; }
 	inline void setActUpper(short nActUpper) { m_nActUpper = nActUpper; }
 
+	inline missileManager* getMissileMgr()
+	{
+		return m_pMissileMgr;
+	}
+
 	player();
 	~player();
 };

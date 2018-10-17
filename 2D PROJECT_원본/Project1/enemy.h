@@ -53,9 +53,8 @@ private:
 	int				m_nFireCount;
 	int				m_nRandFireCount;
 	
-	int m_currHP;
 	int m_MaxHP;
-	
+	SYNTHESIZE(int, m_currHP, CurrHP);
 	SYNTHESIZE(float, m_bulletSpeed, BulletSpeed);
 	//RECT playerRC;
 	//static POINT position[5];
@@ -85,9 +84,11 @@ public:
 	void normalAnimation();
 	void tankAnimation();
 	void deathCount();
+	void hit();
 	
 	inline void setCheckDistance() { checkDistance = true; }
 	inline void setPlayerRect(player* player) { m_player = player; }
+	inline bool getDeathState() { return s_Death.isState; }
 
 	enemy();
 	~enemy();
