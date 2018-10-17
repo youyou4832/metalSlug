@@ -133,7 +133,7 @@ void enemy::render(HDC hdc)
 	if (isAlive) {
 		if (m_pImg)
 		{
-			Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+			//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 			if (m_CharNum == CharInfo::i_sniper) {
 				if (m_currHP > 0) {
 					m_pImg->render(hdc, m_fX, m_fY, m_pImg->getFrameX()*m_pImg->getFrameWidth(), m_pImg->getFrameY(), m_pImg->getFrameWidth(), m_pImg->getHeight(), 3);

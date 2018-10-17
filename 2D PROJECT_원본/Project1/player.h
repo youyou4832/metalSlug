@@ -338,6 +338,7 @@ private:
 	float	m_fAttX;			// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 	float	m_fAttY;			// 어택 박스 Y좌표 (적과 근접 충돌 확인, 총알 발사 위치)
 
+	float	m_fReplaceX;		// 상체 X좌표 + 리소스 출력 위치 수정
 	float	m_fReplaceY;		// 상체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fReplaceLowerY;	// 하체 Y좌표 + 리소스 출력 위치 수정
 	float	m_fAttReplaceX;		// 어택박스 X, Y 좌표 수정
@@ -392,6 +393,8 @@ public:
 	// 캐릭터 행동 (공격)
 	void fire();			// 공격 총괄 관리 함수
 	void fireActSet();		// 공격 모션 세팅
+	void fireActSetLeft();
+	void fireActSetRight();
 	void fireAttBoxSet();	// 어택박스 세팅
 
 	// 캐릭터 리소스 위치 수정 함수 (모션마다 사이즈와 기준점 좌표가 달라서 세팅을 별도로 해줘야 함)
@@ -405,11 +408,13 @@ public:
 	inline RECT	getRectLower() { return m_lower.rc; }
 	inline RECT getRectAttBox() { return m_rcAtt; }		// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
 	inline bool getIsAttack() { return m_isAttack; }	// 플레이어가 공격중인지 체크
+	inline bool getIsGun() { return m_isGun; }
 
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
 	inline void setIsAttack(bool isAttack) { m_isAttack = isAttack; }
-
+	inline void setIsGun(bool isGun) { m_isGun = isGun; }
+	inline void setActUpper(short nActUpper) { m_nActUpper = nActUpper; }
 
 	player();
 	~player();

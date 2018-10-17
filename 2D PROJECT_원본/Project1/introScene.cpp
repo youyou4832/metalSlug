@@ -49,7 +49,7 @@ void introScene::update()
 {
 	collisionRect();
 
-	//m_enemyMgr->update();
+	m_enemyMgr->update();
 	m_pPlayer->update();
 	collider();
 }
@@ -79,6 +79,7 @@ void introScene::collisionRect()
 			{
 				m_pPlayer->setCollide(true);
 				m_pPlayer->setIsAttack(false);
+				m_pPlayer->fire();
 				(*enemyIter)->setIsAlive(false);
 			}
 
