@@ -101,7 +101,7 @@ void bossScene::update()
 
 void bossScene::render(HDC hdc)
 { 
-	m_pInGameUi->render(hdc);
+	
 	//맵 출력 
 	/*m_bridge->render(hdc, m_mapPoX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());
 	m_bridge2->render(hdc, m_mapPoX + WINSIZEX, 0, 0, 0, 0, m_pimgBG->getX(), m_pimgBG->getY());*/
@@ -117,7 +117,7 @@ void bossScene::render(HDC hdc)
 	
 	//보스 출력
 	m_pBoss->render(hdc);
-
+	m_pInGameUi->render(hdc);
 
 	Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	Rectangle(hdc, m_rc2.left, m_rc2.top, m_rc2.right, m_rc2.bottom);

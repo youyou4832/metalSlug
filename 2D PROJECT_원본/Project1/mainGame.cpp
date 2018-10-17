@@ -67,8 +67,7 @@ HRESULT mainGame::init()
 	m_pGameOverScene = new gameoverScene;
 	SCENEMANAGER->addScene("gameoveScene", m_pGameOverScene);
 
-
-	SCENEMANAGER->changeScene("bossScene");
+	SCENEMANAGER->changeScene("intro");
 	
 	// 필요한 리소스 미리 로드
 
