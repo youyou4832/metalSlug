@@ -10,8 +10,10 @@
 
 // #######################################################################
 // dataSave() 함수 작성해야 함 (맵 이동 시 init 대신 dataLoad 이용)
-//	폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령, 폭탄은 missileManager에서 발사)
-//		 폭탄을 사용했을 때(갯수 > 0) 폭탄 던지는 모션 + 폭탄(미사일클래스)
+//
+// 1. [완료] 아이템 획득 시 총알의 모양이 바뀜
+// 2. [죽음 모션을 2번 반복] m_isAlive == false가 되면 캐릭터를 초기화 하고 새로 태어남 (isReturnUpdae() 함수에 추가 => 기본 3개, 죽을 때마다 --Life)
+// 3. [ㅠㅠ] 새로 태어나면 2초간 무적 시간 (isReturnUpdae() 함수에 추가 => 무적 시간 동안 캐릭터가 깜빡임, alphaRender 사용해서 깜빡임을 표현)
 // #######################################################################
 
 HRESULT player::init(float x, float y)
@@ -28,6 +30,9 @@ HRESULT player::init(float x, float y)
 	m_upper.pImgReverse = IMAGEMANAGER->addImage("image/player/player2.bmp", "image/player/player2.bmp", 931, 1531, true, RGB(255, 0, 255));
 	m_lower.pImgReverse = IMAGEMANAGER->addImage("image/player/player2.bmp", "image/player/player2.bmp", 931, 1531, true, RGB(255, 0, 255));
 
+	m_fStartX = x;
+	m_fStartY = y;
+
 	m_upper.pAni->init(UPPER_AppearWidth, UPPER_AppearHeight, UPPER_AppearWidth / UPPER_AppearFrame, UPPER_AppearHeight, UPPER_AppearY);
 	m_upper.pAni->setFPS(FPS);
 	m_upper.pAni->setPlayFrame(1, UPPER_AppearFrame);
@@ -40,10 +45,10 @@ HRESULT player::init(float x, float y)
 	m_lower.pAni->stop();
 	m_lower.pAni->setFrameUpdateSec(0.15f);
 
-	m_upper.pImg->setX(x);
-	m_upper.pImg->setY(y);
-	m_lower.pImg->setX(x);
-	m_lower.pImg->setY(y);
+	m_upper.pImg->setX(m_fStartX);
+	m_upper.pImg->setY(m_fStartY);
+	m_lower.pImg->setX(m_fStartX);
+	m_lower.pImg->setY(m_fStartY);
 
 	m_fSpeed = Move_Speed;
 	m_fJumpSpeed = Jump_Speed;
@@ -58,7 +63,7 @@ HRESULT player::init(float x, float y)
 	m_fAngle = 0;
 	m_fAttX = 50;
 	m_fAttY = 50;
-	m_nBombNum = 0;
+	m_nLife = 3;
 
 	m_nActUpper = UPPER_Appear;
 	m_nActLower = LOWER_NULL;
@@ -71,6 +76,10 @@ HRESULT player::init(float x, float y)
 	m_isSlugEscape = false;
 	m_isSlugIn = false;
 	m_isAttack = false;
+	m_isInvincible = true;
+	m_isGun = false;
+
+	m_fElapsedTimeStart = TIMEMANAGER->getTimer()->getWorldTime();
 
 	g_ptMouse = { WINSIZEX, WINSIZEY };
 
@@ -82,6 +91,7 @@ HRESULT player::init(float x, float y)
 
 	// 미사일
 	IMAGEMANAGER->addImage("playerMissile", "image/player/playerBullet.bmp", 8, 8, true, RGB(255, 0, 255));
+	IMAGEMANAGER->addImage("playerGunMissile", "image/player/playerGunBullet.bmp", 30, 5, true, RGB(255, 0, 255));
 
 	m_pMissileMgr = new missileManager;
 	m_pMissileMgr->init("playerMissile", WINSIZEY, 10);
@@ -90,6 +100,57 @@ HRESULT player::init(float x, float y)
 
 	return S_OK;
 }
+
+HRESULT player::initRevive(float x, float y)
+{
+	m_nActUpper = UPPER_Appear;
+	m_nActLower = LOWER_NULL;
+	m_nDir = DIR_Right;
+	m_nDirY = DIR_Right;
+
+	m_upper.pImg->setX(x);
+	m_upper.pImg->setY(y);
+	m_lower.pImg->setX(x);
+	m_lower.pImg->setY(y);
+
+	m_upper.pAni->start();
+	m_lower.pAni->stop();
+
+	m_fSpeed = Move_Speed;
+	m_fJumpSpeed = Jump_Speed;
+	m_fCurrHeight = 0;
+	m_fFloorHeight = 0;
+	m_fGravity = 10.0f;
+
+	m_fReplaceX = 0;
+	m_fReplaceY = 0;
+	m_fAttReplaceX = 0;
+	m_fAttReplaceY = 0;
+	m_fAngle = 0;
+	m_fAttX = 50;
+	m_fAttY = 50;
+
+	m_isAct = false;
+	m_isAlive = true;
+	m_isJump = false;
+	m_isSlugEscape = false;
+	m_isSlugIn = false;
+	m_isAttack = false;
+	m_isInvincible = true;
+	m_isGun = false;
+
+	m_fElapsedTimeStart = TIMEMANAGER->getTimer()->getWorldTime();
+
+	return S_OK;
+}
+
+//HRESULT player::initMoveMap()
+//{
+//	m_isGun = g_saveData.isGun;
+//	m_nLife = g_saveData.nLife;
+//
+//	return S_OK;
+//}
 
 void player::update()
 {
@@ -102,8 +163,16 @@ void player::update()
 		m_isGun = true;
 	if (KEYMANAGER->isOnceKeyDown(VK_HOME))		// 총 해제
 		m_isGun = false;
+	if (KEYMANAGER->isOnceKeyDown(VK_F1))		// 저장
+		dataSave();
+	if (KEYMANAGER->isOnceKeyDown(VK_F2))		// 불러오기
+		dataLoad();
+
 	// ######### 테스트 ##########
 
+	// 아이템
+	if (m_isGun == true && m_pMissileMgr->getImageName() != "playerGunMissile")
+		m_pMissileMgr->setImageName("playerGunMissile");
 
 
 	// update 초반에 return 하는 실행문을 관리하는 함수
@@ -122,76 +191,6 @@ void player::update()
 
 void player::actSet()
 {
-	/*// ### 모션 지정 총 관리 함수 ###
-
-	// 슬러그(탈것) 탈출 중일 경우 모션 변경
-	if (m_isSlugEscape == true)
-	{
-		if (m_nActUpper != UPPER_SlugEscape)
-		{
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_SlugEscape;
-			m_nActLower = LOWER_NULL;
-			m_isJump = true;
-			m_isAct = true;
-		}
-		else if (m_upper.pAni->getIsPlaying() == false)
-		{
-			m_isSlugEscape = false;
-			m_isAct = true;
-		}
-	}
-
-	// isPlaying == false일 경우 Idle 상태로 변경 (반복모션 제외)
-	if (m_nActUpper == UPPER_Att90 || m_nActUpper == UPPER_Att270)
-		m_fReplaceY = 100;
-
-	else if (m_upper.pAni->getIsPlaying() == false &&
-		m_nActUpper != UPPER_Death && m_nActUpper != UPPER_SlugEscape &&
-		m_nActUpper != UPPER_Appear)
-	{
-		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove &&
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
-			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove)
-		{
-			if (m_isAttack == true)
-				m_isAttack = false;
-
-			if (m_isGun == true)
-				m_nActUpper = UPPER_GunIdle;
-
-			else
-				m_nActUpper = UPPER_Idle;
-
-			m_nActLower = LOWER_Idle;
-			m_isAct = true;
-		}
-	}
-
-	// 공격할 때가 아니면 AttBox는 플레이어 위치를 따라다님
-	if (m_isAttack == false)
-	{
-		m_fAttX = m_upper.pImg->getX();
-		m_fAttY = m_upper.pImg->getY();
-		m_rcAtt = RectMake(m_fAttX, m_fAttY, 20, 20);
-	}
-
-	// ### 애니메이션 설정 ###
-	if (m_isAct == true)
-	{
-		setUpper();
-		setLower();
-
-		m_isAct = false;
-	}
-
-	// 애니메이션 프레임 업데이트
-	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
-	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());*/
-
-
 	// ### 모션 지정 총 관리 함수 ###
 
 	// 애니메이션 프레임 업데이트
@@ -709,6 +708,11 @@ void player::setResourceRect()
 
 bool player::isReturnUpdate()
 {
+	m_fElapsedTimeEnd = TIMEMANAGER->getTimer()->getWorldTime();
+
+	float timer = m_fElapsedTimeEnd - m_fElapsedTimeStart;
+
+
 	// ### update 초반에 return 하는 실행문들을 관리하는 함수 ###
 
 	// 슬러그에 탑승 중이면 플레이어 update 처리 안 함 (슬러그 class에서 처리)
@@ -717,6 +721,51 @@ bool player::isReturnUpdate()
 	// 애니메이션 프레임 업데이트
 	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
+
+	// 죽었을 경우 죽음 모션 세팅 후, 애니메이션이 끝나면 GameOver 씬으로 변경
+	if (m_isAlive == false)
+	{
+		// 죽음 모션이 끝났다면 새로 태어남
+		if (m_nActUpper == UPPER_Death && m_upper.pAni->getIsPlaying() == false)
+		{
+			if (m_nLife > 0)
+			{
+				--m_nLife;
+				initRevive(m_fStartX, m_fStartY);
+				return true;
+			}
+			else
+			{
+				//SCENEMANAGER->changeScene();
+				return false;
+			}
+		}
+
+		else if (m_nActUpper != UPPER_Death)
+		{
+			m_nActUpper = UPPER_Death;
+			m_nActLower = LOWER_NULL;
+			m_isAct = true;
+			m_fGravity = 0;
+
+			return true;
+		}
+
+		else if (m_upper.pAni->getIsPlaying() == true &&
+			m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() < m_fFloorHeight)	// 플레이어가 바닥과 떨어져 있을 때
+		{
+			m_fGravity += 0.2f;
+			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
+
+			if (m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() >= m_fFloorHeight + 30)
+			{
+				m_lower.pImg->setY(m_fFloorHeight + m_lower.pAni->getFrameHeight() + 60);
+				m_isJump = false;
+			}
+
+			return true;
+		}
+	}
 
 	// 등장 중일 경우 return
 	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return false;
@@ -740,43 +789,12 @@ bool player::isReturnUpdate()
 		return false;
 	}
 
-	// 죽었을 경우 죽음 모션 세팅 후, 애니메이션이 끝나면 GameOver 씬으로 변경
-	else if (m_isAlive == false)
+	// 수정중
+	if (m_isInvincible == true && timer >= 5.0f)
 	{
-		if (m_nActUpper != UPPER_Death)
-		{
-			m_nActUpper = UPPER_Death;
-			m_nActLower = LOWER_NULL;
-			m_isAct = true;
-			m_fGravity = 0;
-		}
+		m_isInvincible = false;
 
-		else if (m_upper.pAni->getIsPlaying() == true &&
-			m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() < m_fFloorHeight)	// 플레이어가 바닥과 떨어져 있을 때
-		{
-			m_fGravity += 0.2f;
-			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
-
-			if (m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() >= m_fFloorHeight + 30)
-			{
-				m_lower.pImg->setY(m_fFloorHeight + m_lower.pAni->getFrameHeight() + 60);
-				m_isJump = false;
-			}
-		}
-
-		// 테스트
-		else if (m_upper.pAni->getIsPlaying() == false)
-		{
-			//SCENEMANAGER->changeScene();
-			return true;
-		}
-
-		/*//원본
-		else if (m_upper.pAni->getIsPlaying() == false)
-		{
-			SCENEMANAGER->changeScene("GameOverScene");
-			return;
-		}	*/
+		return true;
 	}
 }
 
@@ -812,91 +830,7 @@ void player::fire()
 	if (m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)
 		m_upper.pAni->start();
 
-	/*// 총알 발사
-	if (m_isCollide == false)
-	{
-		m_pMissileMgr->fire(m_fAttX,
-			m_fAttY,
-			m_fAngle, 10, i_player);
-	}
-
-	// 공격 모션 세팅
-	fireActSet();
-
-	// 어택박스 세팅
-	if (m_nActUpper == UPPER_Att || m_nActUpper == UPPER_Att90 || m_nActUpper == UPPER_Att270 ||
-		m_nActUpper == UPPER_GunAtt || m_nActUpper == UPPER_GunAtt90 || m_nActUpper == UPPER_GunAtt270)
-	{
-		if (m_nDir == DIR_Left)
-		{
-			if (m_nActUpper == UPPER_Att90 || m_nActUpper == UPPER_GunAtt90 ||
-				m_nActUpper == UPPER_KnifeGun || m_nActUpper == UPPER_Knife)
-			{
-				m_fAttReplaceX = 30;
-				m_fAttReplaceY = -90;
-				m_fReplaceY = 10;
-			}
-
-			else if (m_nActUpper == UPPER_Att270 || m_nActUpper == UPPER_GunAtt270)
-			{
-				m_fAttReplaceX = 0;
-				m_fAttReplaceY = 40;
-
-				if (m_nActUpper == UPPER_Att270)
-					m_fReplaceY = 110;
-
-				else if (m_nActUpper == UPPER_GunAtt270)
-					m_fReplaceY = 140;
-			}
-
-			else if (m_nActUpper == UPPER_Att || m_nActUpper == UPPER_GunAtt)
-			{
-				m_fAttReplaceX = -50;
-				m_fAttReplaceY = -20;
-				m_fReplaceY = 20;
-			}
-		}
-
-		else if (m_nDir == DIR_Right)
-		{
-			if (m_nActUpper == UPPER_Att90 || m_nActUpper == UPPER_GunAtt90 ||
-				m_nActUpper == UPPER_KnifeGun || m_nActUpper == UPPER_Knife)
-			{
-				m_fAttReplaceX = 30;
-				m_fAttReplaceY = -90;
-				m_fReplaceY = 10;
-			}
-			else if (m_nActUpper == UPPER_Att270 || m_nActUpper == UPPER_GunAtt270)
-			{
-				m_fAttReplaceX = 40;
-				m_fAttReplaceY = 50;
-
-				if (m_nActUpper == UPPER_Att270)
-					m_fReplaceY = 110;
-
-				else if (m_nActUpper == UPPER_GunAtt270)
-					m_fReplaceY = 140;
-			}
-			else if (m_nActUpper == UPPER_Att || m_nActUpper == UPPER_GunAtt)
-			{
-				m_fAttReplaceX = 100;
-				m_fAttReplaceY = -20;
-				m_fReplaceY = 20;
-			}
-		}
-
-		m_fAttX = m_upper.pImg->getX() + m_fAttReplaceX;
-		m_fAttY = m_upper.pImg->getY() + m_fAttReplaceY;
-		m_rcAtt = RectMake(m_fAttX, m_fAttY, 20, 20);
-
-		m_fAngle = MY_UTIL::getAngle(m_fAttX,	// 총알 발사를 위한 각도 지정
-			m_fAttY,
-			g_ptMouse.x, g_ptMouse.y);
-	}
-
-	// 공격 할 때마다 프레임 초기화 (연속공격 모션)
-	if (m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)
-		m_upper.pAni->start();*/
+	
 }
 
 void player::fireActSet()
@@ -1121,7 +1055,7 @@ void player::fireActSetRight()
 			m_fAttReplaceY = -20;
 			m_fReplaceX = 0;
 			m_fReplaceY = 20;
-		}
+		} 
 	}
 
 	// 총을 들지 않은, 마우스 오른쪽 모션
@@ -1499,22 +1433,50 @@ void player::render(HDC hdc)
 	/*Rectangle(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.rc.right, m_upper.rc.bottom);
 	Rectangle(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.rc.right, m_lower.rc.bottom);
 	Rectangle(hdc, m_rcHit.left, m_rcHit.top, m_rcHit.right, m_rcHit.bottom);*/
-	Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
+	//Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
 
-	if (m_nDir == DIR_Left)
+	// 무적 상태가 아닐 때
+	if (m_isInvincible == false)
 	{
-		if (m_nActLower != LOWER_NULL)
-			m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
+		if (m_nDir == DIR_Left)
+		{
+			if (m_nActLower != LOWER_NULL)
+				m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
 
-		m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
+			m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
+		}
+
+		else if (m_nDir == DIR_Right)
+		{
+			if (m_nActLower != LOWER_NULL)
+				m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
+
+			m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
+		}
 	}
-
-	else if (m_nDir == DIR_Right)
+	
+	// 무적 상태라면 깜빡인다.
+	else if (m_isInvincible == true)
 	{
-		if (m_nActLower != LOWER_NULL)
-			m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
-		
-		m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
+		if (m_nDir == DIR_Left)
+		{
+			if (m_nActLower != LOWER_NULL)
+				m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3, false, 200);
+				//m_lower.pImgReverse->alphaRender(hdc, m_lower.rc.left, m_lower.rc.top, 200);
+
+			m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3, false, 200);
+			//m_upper.pImgReverse->alphaRender(hdc, m_upper.rc.left, m_upper.rc.top, 200);
+		}
+
+		else if (m_nDir == DIR_Right)
+		{
+			if (m_nActLower != LOWER_NULL)
+				m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3, false, 200);
+				//m_lower.pImgReverse->alphaRender(hdc, m_lower.rc.left, m_lower.rc.top, 200);
+
+			m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3, false, 200);
+			//m_upper.pImgReverse->alphaRender(hdc, m_upper.rc.left, m_upper.rc.top, 200);
+		}
 	}
 
 	// 미사일
@@ -1522,25 +1484,33 @@ void player::render(HDC hdc)
 
 
 	// 테스트
-	/*Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
-	sprintf_s(szText, "isAttack: %d, m_isGun: %d", m_isAttack, m_isGun);
-	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));*/
-	_stprintf_s(szText, "m_nActUpper: %d", m_nActUpper);
-	TextOut(hdc, 100, 100, szText, strlen(szText));
-	_stprintf_s(szText, "m_nActLower: %d", m_nActLower);
-	TextOut(hdc, 100, 150, szText, strlen(szText));
+	/*Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);*/
+	sprintf_s(szText, "invincible : %d", m_isInvincible);
+	TextOut(hdc, 400, 50, szText, strlen(szText));
+	sprintf_s(szText, "worldTime : %f", TIMEMANAGER->getTimer()->getWorldTime());
+	TextOut(hdc, 400, 100, szText, strlen(szText));
+	_stprintf_s(szText, "isAlive: %d", m_isAlive);
+	TextOut(hdc, 400, 150, szText, strlen(szText));
+	_stprintf_s(szText, "nLife: %d", m_nLife);
+	TextOut(hdc, 400, 200, szText, strlen(szText));
 }
 
 void player::dataSave()
 {
-	vector<string> vSaveData;
+	vector<int> vSaveData;
 
-	TXTDATA->txtSave("data/playerData.txt", vSaveData);
+	vSaveData.push_back(m_isGun);
+	vSaveData.push_back(m_nLife);
+
+	TXTDATA->txtSaveInt("data/playerData.txt", vSaveData);
 }
 
 void player::dataLoad()
 {
-	TXTDATA->txtLoadInt("data/playerData.txt");
+	vector<int> vLoadData = TXTDATA->txtLoadInt("data/playerData.txt");
+
+	m_isGun = vLoadData[0];
+	m_nLife = vLoadData[1];
 }
 
 

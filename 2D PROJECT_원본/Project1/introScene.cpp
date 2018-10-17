@@ -42,7 +42,7 @@ void introScene::update()
 {
 	knifeCollideToEnemy();
 
-	m_enemyMgr->update();
+	//m_enemyMgr->update();
 	m_pPlayer->update();
 	m_pInGameUi->update();
 	BulletCollideToEnemy();
@@ -108,7 +108,7 @@ void introScene::BulletCollideToEnemy()
 		}
 		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
 			RECT rc;
-			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect())) {
+			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect()) && m_pPlayer->getIsInvincible() == false) {
 				m_pPlayer->setIsAlive(false);
 				(*e_missileIter)->setIsFire(false);
 			}

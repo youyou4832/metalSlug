@@ -104,15 +104,15 @@ void missile::render(HDC hdc, int charNum)
 			m_pImg->render(hdc, m_fX, m_fY, 352 - (32 * cannon_bullet.index), 681, 32, 33, 5);
 		}
 		else if (charNum == CharInfo::i_player) {
-			m_pImg->render(hdc, m_fX, m_fY, 0, 0, 8, 8, 3);
+			m_pImg->render(hdc, m_fX, m_fY, 0, 0, m_pImg->getWidth(), m_pImg->getHeight(), 3);
 		}
 		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	}
 
-	char szText[128];
-	_stprintf_s(szText, "%f", m_fAngle);
+	//char szText[128];
+	//_stprintf_s(szText, "%f", m_fAngle);
 
-	TextOut(hdc, 100, 200, szText, strlen(szText));
+	//TextOut(hdc, 100, 200, szText, strlen(szText));
 }
 
 void missile::fire(float x, float y)
