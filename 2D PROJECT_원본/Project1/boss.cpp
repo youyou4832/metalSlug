@@ -10,7 +10,6 @@ HRESULT boss::init()
 	m_isAppear = true;
 	m_isAlive = true;
 	m_isChange = false;
-	m_iSstandBy = true;
 
 	m_BossState = NOMAL;
 	m_PatternState = MOVE;
@@ -30,8 +29,6 @@ HRESULT boss::init()
 	//보스 초기 위치는 등장씬을 위해 안보이는 곳에서 위치를 잡아준다.
 	m_fX = -20;			// 보스 초기 시작 X위치
 	m_fY = 1035;		// 보스 초기 시작 Y위치
-
-	
 
 	m_fAngle = (PI * 45) / 180;
 
@@ -87,15 +84,9 @@ HRESULT boss::init()
 	
 	//보스 미사일 동적할당으로 생성
 	m_pmissileManager = new missileManager;
-	
-	
-	
-
 
 	//m_rc = RectMakeCenter(m_fX, m_fY, m_pimgBoss->getWidth(), m_pimgBoss->getHeight());
-	
 	//m_rc = RectMake(m_fX + 100, m_fY + 50, (m_pimgBoss->getWidth() + 400) / 4, m_pimgBoss->getHeight());
-
 
 	return S_OK;
 }
@@ -115,11 +106,6 @@ void boss::update()
 {
     change(m_isChange);
 
-	/*if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
-	{
-			fire();
-	}*/
-
 	if (KEYMANAGER->isOnceKeyDown(VK_RETURN))
 	{
 		damaged(1);
@@ -127,9 +113,7 @@ void boss::update()
 
 	m_rc = RectMake(m_fX, m_fY, (m_pimgBoss->getWidth()+400)/4, m_pimgBoss->getHeight());
 	
-	
 	move();		//보스의 움직임을 위한 함수
-
 
 	m_pMoveAni->frameUpdate(TIMEMANAGER->getElapsedTime());
 	m_pDieAni->frameUpdate(TIMEMANAGER->getElapsedTime());
@@ -146,7 +130,6 @@ void boss::render(HDC hdc)
 {
 	if (m_isAlive)
 	{
-
 		if (m_BossState == NOMAL && m_PatternState != BULLET_SHOOT)
 		{
 			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pMoveAni, 4.0);
@@ -225,7 +208,6 @@ void boss::render(HDC hdc)
 		}
 	}
 	//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-
 }
 
 void boss::move()
@@ -243,11 +225,9 @@ void boss::move()
 			m_isAppear = false; //등장후 씬이 움직이게 하기 위해
 			m_pMoveAni->start();
 		}
-
 	}
 
 	AppearAndDie();
-	
 	
 	if (m_isAlive && !m_isAppear)
 	{
@@ -256,8 +236,6 @@ void boss::move()
 			++m_NextPatternDelay.count;
 			if (m_PatternState == MOVE) // 등장이 끝난후 잠깐 제자리 걸음(사실상 정지)
 			{
-				//m_fX += m_Speed;
-				
 				if (m_NextPatternDelay.count%5 == 0)
 				{
 					++m_NextPatternDelay.index;
@@ -398,7 +376,6 @@ void boss::move()
 
 			if (m_PatternState == BULLET_SHOOT) // 총알 슛
 			{
-				
 				if (m_NextPatternDelay.count == 0)
 				{
 					if (m_BulletState == NOMAL_BULLET)
@@ -422,7 +399,6 @@ void boss::move()
 					FireEffectAniCount2();
 				}
 				
-
 				if (m_NextPatternDelay.count % 2 == 0)
 				{
 					++m_NextPatternDelay.index;
@@ -446,8 +422,6 @@ void boss::move()
 				}
 			}
 		}
-
-		
 	}
 	
 	else if(!m_isAlive)
@@ -458,7 +432,6 @@ void boss::move()
 			m_fY += m_Speed;
 		}
 	}
-
 }
 
 void boss::change(bool ischagne)
@@ -505,8 +478,6 @@ void boss::MoveEffectAniCount2()
 	}
 }
 
-
-
 void boss::FireEffectAniCount()
 {
 	++m_NomalEffectDelay.count;
@@ -546,8 +517,6 @@ void boss::fire()
 			
 }
 
-
-
 void boss::damaged(int damage)
 {
 	m_nCurrHP -= damage;
@@ -578,8 +547,6 @@ void boss::AppearAndDie()
 	}
 }
 
-
-
 void boss::AppearEffectAniCount()
 {
 	if (m_AppearEffectAniCount2.index <= 1)
@@ -598,9 +565,6 @@ void boss::AppearEffectAniCount()
 	}
 
 }
-
-
-
 
 boss::boss()
 {
