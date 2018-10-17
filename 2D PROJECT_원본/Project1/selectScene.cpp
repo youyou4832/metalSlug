@@ -20,7 +20,7 @@ HRESULT selectScene::init()
 
 void selectScene::release()
 {
-	SAFE_DELETE(m_pSelectBG);
+	
 }
 
 void selectScene::update()

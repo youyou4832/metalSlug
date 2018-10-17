@@ -11,7 +11,7 @@ HRESULT titleScene::init()
 
 void titleScene::release()
 {
-	SAFE_DELETE(m_pTitleBG);
+	
 }
 
 void titleScene::update()
