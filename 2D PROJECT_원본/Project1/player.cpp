@@ -7,7 +7,11 @@
 #define Jump_Height	100
 
 // #######################################################################
-// 12(금)까지 앉아서이동+앉아서공격+점프+폭탄공격+근거리공격+탈것탈출+죽음 구현
+// 13(토)까지 점프근거리공격(+AttBox충돌)+탈것탈출(슬러그에서 내릴 때 bool함수 변경)+죽음 구현
+// 14(일)까지 아이템 먹었을 때 헤비머신건
+// 15(월)까지 폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령
+//		 폭탄을 사용했을 때(갯수 > 0) 폭탄 던지는 모션 + 폭탄(미사일클래스)
+//			 
 // #######################################################################
 
 HRESULT player::init(float x, float y)
@@ -39,10 +43,9 @@ HRESULT player::init(float x, float y)
 	m_lower.pImg->setY(y);
 
 	m_fSpeed = 3.0f;
-	m_fJumpSpeed = 10.0f;
-	m_fJumpHeight = 100;
+	m_fJumpSpeed = 0.3f;
 	m_fCurrHeight = 0;
-	m_fGravity = 0;
+	m_fGravity = 10.0f;
 	m_fReplaceY = 0;
 	m_fAngle = 0;
 	m_fAttX = 50;
@@ -53,11 +56,14 @@ HRESULT player::init(float x, float y)
 	m_nDirY = DIR_Right;
 	m_isAct = false;
 	m_isAlive = true;
-
+	m_isJump = false;
+	
 	g_ptMouse = { WINSIZEX, WINSIZEY };
 
 	m_upper.rc = RectMake(m_upper.pImg->getX(), m_upper.pImg->getY(), m_upper.pAni->getFrameWidth() * 3, m_upper.pAni->getFrameHeight() * 3);
 	m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY(), m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
+	m_rcHit = RectMake(m_upper.pImg->getX(), m_upper.pImg->getY(), 50, 50);
+
 	ZeroMemory(&m_rcAtt, NULL);
 
 	// 미사일
@@ -71,13 +77,17 @@ HRESULT player::init(float x, float y)
 
 void player::update()
 {
+	// 애니메이션
+	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
+	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
+
+	// 등장 중일 경우 return
+	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return;
+
 	// 플레이어
 	setDir();
 	move();
 	actSet();
-
-	m_upper.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
-	m_lower.pAni->frameUpdate(TIMEMANAGER->getTimer()->getElapsedTime());
 
 	// 미사일
 	m_pMissileMgr->update();
@@ -85,17 +95,16 @@ void player::update()
 
 void player::actSet()
 {
-	/* ### 애니메이션 프레임 지정 ###
-	등장 중일 경우 return */
-	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return;
-
+	// ### 모션 지정 총 관리 함수 ###
+	
 	// 반복모션 제외, isPlaying == false일 경우
-	else if (m_upper.pAni->getIsPlaying() == false)
+	if (m_upper.pAni->getIsPlaying() == false)
 	{
 		if (m_nActUpper == UPPER_Appear)
 			m_lower.pImg->setY(WINSIZEY / 2 + 115);
 
-		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && 
+			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)
 		{
 			m_nActUpper = UPPER_Idle;
 			m_nActLower = LOWER_Idle;
@@ -136,7 +145,6 @@ void player::setUpper()
 			m_fReplaceY = 25;
 		}
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_Sit:		// 앉기
@@ -150,7 +158,6 @@ void player::setUpper()
 
 		m_fReplaceY = 45;
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_SitMove:
@@ -163,7 +170,6 @@ void player::setUpper()
 
 		m_fReplaceY = 45;
 
-		m_upper.pAni->start();
 		break;
 
 	case UPPER_Move:	// 이동
@@ -177,13 +183,39 @@ void player::setUpper()
 
 		m_fReplaceY = 25;
 
-		m_upper.pAni->start();
+		break;
+
+	case UPPER_Jump:
+		m_upper.pAni->init(UPPER_JumpWidth, UPPER_JumpHeight, UPPER_JumpWidth / UPPER_JumpFrame, UPPER_JumpHeight, UPPER_JumpY);
+
+		if (m_nDir == DIR_Left)
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpFrame, false, false);
+
+		else
+			m_upper.pAni->setPlayFrame(1, UPPER_JumpFrame, false, false);
+
+		m_fReplaceY = 45;
+
+		break;
+	
+	case UPPER_JumpMove:
+		m_upper.pAni->init(UPPER_JumpMoveWidth, UPPER_JumpMoveHeight, UPPER_JumpMoveWidth / UPPER_JumpMoveFrame, UPPER_JumpMoveHeight, UPPER_JumpMoveY);
+
+		if (m_nDir == DIR_Left)
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_JumpMoveFrame, false, false);
+
+		else
+			m_upper.pAni->setPlayFrame(1, UPPER_JumpMoveFrame, false, false);
+
+		m_fReplaceY = 45;
+
 		break;
 
 	case UPPER_Att:		// 공격은 fire() 함수에서
 		break;
 	}
 
+	m_upper.pAni->start();
 }
 
 void player::setLower()
@@ -205,7 +237,6 @@ void player::setLower()
 		else
 			m_lower.pAni->setPlayFrame(1, LOWER_IdleFrame, true, true);
 
-		m_lower.pAni->start();
 		break;
 
 	case LOWER_Move:	// 이동
@@ -220,12 +251,27 @@ void player::setLower()
 
 		m_fReplaceLowerY = -20;
 
-		m_lower.pAni->start();
+		break;
+		
+	case LOWER_Jump:	// 점프
+		m_lower.pAni->init(LOWER_JumpWidth, LOWER_JumpHeight, LOWER_JumpWidth / LOWER_JumpFrame, LOWER_MoveHeight, LOWER_JumpY);
+
+		if (m_nDir == DIR_Left)
+		{
+			m_lower.pAni->setPlayFrameReverse(1, LOWER_JumpFrame, false, false);
+		}
+		else
+			m_lower.pAni->setPlayFrame(1, LOWER_JumpFrame, false, false);
+
+		m_fReplaceLowerY = -50;
+
 		break;
 	}
 
 	if (m_nActLower != LOWER_Move)
 		m_fReplaceLowerY = 0;
+
+	m_lower.pAni->start();
 }
 
 void player::setDir()
@@ -263,6 +309,35 @@ void player::setDir()
 	else if (g_ptMouse.y > m_upper.pImg->getY() && m_fAngle > 4.2f && m_fAngle < 5.5f)	// 마우스 포인터가 캐릭터 아래에 있을 경우
 	{
 		m_nDirY = DIR_Down;
+	}
+}
+
+void player::setResourceRect()
+{
+	// ### 리소스 좌표 세팅 ###
+	// 리소스 사이즈와 위치가 일정하지 않기 때문에 세팅 필요
+	if (m_nActUpper != UPPER_Appear)
+	{
+		// 리소스 좌표 세팅: 다리를 중심으로, 상체를 올린다. (상체는 사이즈와 기준점 위치가 변하므로)
+		// 상, 하체 위치 업데이트
+		m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceLowerY,
+			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
+
+		if (m_nDir == DIR_Left)
+		{
+			// 캐릭터가 왼쪽을 보고 있으면 하체의 오른쪽에 상체의 오른쪽을 맞춰야 함
+			m_upper.rc.right = m_lower.rc.right;
+			m_upper.rc.left = m_upper.rc.right - m_upper.pAni->getFrameWidth() * 3;
+		}
+		else
+		{
+			// 캐릭터가 오른쪽을 보고 있으면 하체의 왼쪽에 상체의 왼쪽을 맞춰야 함
+			m_upper.rc.left = m_lower.rc.left;
+			m_upper.rc.right = m_upper.rc.left + m_upper.pAni->getFrameWidth() * 3;
+		}
+
+		m_upper.rc.bottom = m_lower.rc.top + m_fReplaceY;
+		m_upper.rc.top = m_upper.rc.bottom - m_upper.pAni->getFrameHeight() * 3;
 	}
 }
 
@@ -350,11 +425,24 @@ void player::fire()
 		m_fAttY,
 		m_fAngle, 10, i_player);
 
+	// 공격 할 때마다 프레임 초기화 (연속공격 모션)
 	m_upper.pAni->start();
 }
 
 void player::move()
 {
+	// (플레이어 <- 적 총알) 충돌 RECT UPDATE
+	m_rcHit.bottom = m_lower.rc.bottom;
+	m_rcHit.left = m_upper.pImg->getX();
+	m_rcHit.right = m_rcHit.left + PLAYER_RectWidth;
+
+	if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove)
+		m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight + 30;
+	else
+		m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight;
+
+	// 키 입력 처리
+	// 앉기
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
 		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
@@ -366,12 +454,74 @@ void player::move()
 		}
 	}
 
-	if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 10)
+	// 점프
+		// 플레이어가 점프 중일 때 gravity ++, 모션이 끝나면 gravity = 0 (맵에서 허공에 있을 때 모션을 UPPER_Jump로 바꿔 줌)
+		// 바닥에 닿으면 UPPER_Idle로 바꿔줌 (이렇게 되면 바닥에 닿았을 때 무한 Idle start 버그가 생김
+		// 픽셀충돌 시 m_nActUpper == UPPER_Jump 이면 UPPER_Idle로 바꿔줌
+		// 그 외의 경우에는 Y좌표만 해당 픽셀 충돌 위치에 고정시켜 줌
+
+		// 일자 맵 (픽셀충돌이 없는 맵)
+		// CurrHeight 사용
+	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
 	{
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		if (m_nActLower != LOWER_Jump)	// 제자리 jump 모션
 		{
 			m_isAct = true;
-			m_nActUpper = UPPER_Move;
+			m_isJump = true;
+
+			m_fCurrHeight = m_lower.pImg->getY();
+
+			m_nActUpper = UPPER_Jump;
+			m_nActLower = LOWER_Jump;
+		}
+		else if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
+			m_nActLower == LOWER_Move)	// // 이동하던 도중에 점프할 경우
+		{
+			m_isAct = true;
+			m_isJump = true;
+
+			m_fCurrHeight = m_lower.pImg->getY();
+
+			m_nActUpper = UPPER_JumpMove;
+			m_nActLower = LOWER_JumpMove;
+		}
+	}
+	
+	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == true)
+	{
+		if (m_fGravity > 0)
+		{
+			m_fGravity -= m_fJumpSpeed; 
+			m_isJump = false;
+			m_fGravity = 0;
+		}
+	}
+	else if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == false)
+	{
+		if (m_fGravity <= 10.0f)
+		{
+			m_fGravity += m_fJumpSpeed;
+			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
+		}
+		else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우
+		{
+			m_lower.pImg->setY(m_fCurrHeight);
+			m_isJump = false;
+			m_nActUpper = UPPER_Idle;
+			m_nActLower = LOWER_Idle;
+			m_fGravity = 10;
+		}
+	}
+
+	// 이동
+	if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0)			// 왼쪽 이동
+	{																		//	
+		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&		// 걷기, 공격	 아닐 때
+			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&		// 앉기, 앉아걷기	 아닐 때
+			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)		// 점프, 점프걷기	 아닐 때
+		{																	//
+			m_isAct = true;													//
+			m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
 		}
 		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
 		{
@@ -379,6 +529,17 @@ void player::move()
 			m_nActUpper = UPPER_SitMove;
 			m_nActLower = LOWER_NULL;
 			m_fSpeed = 1.0f;
+		}
+		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+		{
+			m_isAct = true;
+			m_isJump = true;
+
+			m_fCurrHeight = m_lower.pImg->getY();
+
+			m_nActUpper = UPPER_JumpMove;
+			m_nActLower = LOWER_JumpMove;
+
 		}
 
 		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
@@ -387,19 +548,31 @@ void player::move()
 		m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
 		m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
 	}
-	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX)
-	{
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
-		{
-			m_isAct = true;
-			m_nActUpper = UPPER_Move;
+	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX)	// 오른쪽 이동
+	{																			//
+		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격	 아닐 때
+			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기	 아닐 때
+			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)			// 점프, 점프걷기	 아닐 때
+		{																		//
+			m_isAct = true;														//
+			m_nActUpper = UPPER_Move;											// 걷기 모션으로 변경한다.
 		}
-		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
-		{
+		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)		// 앉아 있으면서 앉아걷기 모션이 아닐 때
+		{																		// 앉아걷기 모션으로 변경
 			m_isAct = true;
 			m_nActUpper = UPPER_SitMove;
 			m_nActLower = LOWER_NULL;
 			m_fSpeed = 1.0f;
+		}
+		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+		{
+			m_isAct = true;
+			m_isJump = true;
+
+			m_fCurrHeight = m_lower.pImg->getY();
+
+			m_nActUpper = UPPER_JumpMove;
+			m_nActLower = LOWER_JumpMove;
 		}
 
 		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
@@ -410,7 +583,7 @@ void player::move()
 	}
 
 	// 공격 (마우스 포인터)
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && m_nActUpper != UPPER_Sit)
+	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
 	{
 		if (m_nActUpper != UPPER_Att)
 		{
@@ -451,36 +624,15 @@ void player::move()
 		m_isAct = true;
 	}
 
-	// 리소스 좌표 세팅 (리소스 사이즈와 위치가 일정하지 않기 때문에 세팅 필요)
-	if (m_nActUpper != UPPER_Appear)
-	{
-		// 리소스 좌표 세팅: 다리를 중심으로, 상체를 올린다. (상체는 사이즈와 기준점 위치가 변하므로)
-		// 상, 하체 위치 업데이트
-		m_lower.rc = RectMake(m_lower.pImg->getX(), m_lower.pImg->getY() + m_lower.pAni->getFrameHeight() + m_fReplaceLowerY,
-			m_lower.pAni->getFrameWidth() * 3, m_lower.pAni->getFrameHeight() * 3);
-
-		if (m_nDir == DIR_Left)
-		{
-			// 캐릭터가 왼쪽을 보고 있으면 하체의 오른쪽에 상체의 오른쪽을 맞춰야 함
-			m_upper.rc.right = m_lower.rc.right;
-			m_upper.rc.left = m_upper.rc.right - m_upper.pAni->getFrameWidth() * 3;
-		}
-		else
-		{
-			// 캐릭터가 오른쪽을 보고 있으면 하체의 왼쪽에 상체의 왼쪽을 맞춰야 함
-			m_upper.rc.left = m_lower.rc.left;
-			m_upper.rc.right = m_upper.rc.left + m_upper.pAni->getFrameWidth() * 3;
-		}
-
-		m_upper.rc.bottom = m_lower.rc.top + m_fReplaceY;
-		m_upper.rc.top = m_upper.rc.bottom - m_upper.pAni->getFrameHeight() * 3;
-	}
-
+	// 죽음
 	if (m_isAlive == false)
 	{
 		//m_nActUpper = UPPER_Dead;
 		m_nActLower = NULL;
 	}
+
+	// ### 리소스 좌표 수정 ###
+	setResourceRect();
 }
 
 void player::release()
