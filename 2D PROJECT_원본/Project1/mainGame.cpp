@@ -2,6 +2,7 @@
 #include "mainGame.h"
 #include "effectManager.h"
 #include "bossScene.h"
+#include "titleScene.h"
 #include "selectScene.h"
 #include "introScene.h"
 #include "fightScene.h"
@@ -52,7 +53,7 @@ HRESULT mainGame::init()
 	SCENEMANAGER->addScene("selectScene", m_pSelectScene);
 	
 
-	setEnemyPosition();
+	//setEnemyPosition();
 	m_pIntroScene = new introScene;
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
 
@@ -62,7 +63,7 @@ HRESULT mainGame::init()
 	m_pFightScene = new fightScene;
 	SCENEMANAGER->addScene("fightScene", m_pFightScene);
 
-	SCENEMANAGER->changeScene("intro");
+	SCENEMANAGER->changeScene("titleScene");
 	
 	// 필요한 리소스 미리 로드
 

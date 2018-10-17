@@ -2,6 +2,8 @@
 class bossScene;
 class introScene;
 class fightScene;
+class titleScene;
+class selectScene;
 
 struct enemyPos {
 	POINT e_pos;
@@ -23,6 +25,8 @@ private:
 	bossScene*		m_pBossScene;
 	introScene*		m_pIntroScene;
 	fightScene*		m_pFightScene;
+	titleScene*		m_pTitleScene;
+	selectScene*	m_pSelectScene;
 
 	image*	m_pixel;
 	enemyPos m_enemyPos[TOTAL_ENEMY];
