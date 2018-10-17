@@ -4,8 +4,6 @@
 
 HRESULT enemyManager::init()
 {
-	ZeroMemory(&m_rcPlayer, NULL);
-
 	return S_OK;
 }
 
