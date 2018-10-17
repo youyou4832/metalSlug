@@ -192,6 +192,9 @@
     <ClInclude Include="bridge.h">
       <Filter>MainGame\bridge</Filter>
     </ClInclude>
+    <ClInclude Include="selectScene.h">
+      <Filter>2DGameFramework\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -298,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="bridge.cpp">
       <Filter>MainGame\bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="selectScene.cpp">
+      <Filter>2DGameFramework\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

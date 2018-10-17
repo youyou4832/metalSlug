@@ -4,6 +4,7 @@
 #include "titleScene.h"
 #include "bossScene.h"
 #include "TestScene.h"
+#include "selectScene.h"
 #include "introScene.h"
 #include "pixelCollision.h"
 
@@ -28,19 +29,24 @@ HRESULT mainGame::init()
 	SOUNDMANAGER->init();
 	
 	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
+	
+	
 	m_pTitleScene = new titleScene;
-	m_pTestScene = new TestScene;
+	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
 
+	m_pSelectScene = new selectScene;
+	SCENEMANAGER->addScene("selectScene", m_pSelectScene);
+	
 	m_pIntroScene = new introScene;
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
 
 	m_pBossScene = new bossScene;
 	SCENEMANAGER->addScene("bossScene", m_pBossScene);
 
-	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
+	m_pTestScene = new TestScene;
 	SCENEMANAGER->addScene("testScene", m_pTestScene);
-
-	SCENEMANAGER->changeScene("bossScene");
+	
+	SCENEMANAGER->changeScene("selectScene");
 
 	// 필요한 리소스 미리 로드
 
