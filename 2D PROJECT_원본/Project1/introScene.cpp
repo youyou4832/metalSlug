@@ -86,9 +86,9 @@ void introScene::BulletCollideToEnemy()
 {
 	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
 	vector<enemy *>::iterator enemyIter;
-
+	RECT playerRC = m_pPlayer->getRectHit();
 	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter) {
-		//¿¡³Ê¹Ì ÃÑ¾Ë
+		
 		vector<missile*> e_vMissile = (*enemyIter)->getMissileMgr()->getVecMissile();
 		vector<missile*>::iterator e_missileIter;
 		//ÇÃ·¹ÀÌ¾î ÃÑ¾Ë
@@ -103,11 +103,21 @@ void introScene::BulletCollideToEnemy()
 				(*p_missileIter)->setIsFire(false);
 			}
 		}
+		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
+			RECT rc;
+			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect())) {
+				m_pPlayer->setIsAlive(false);
+				(*e_missileIter)->setIsFire(false);
+			}
+		}
 	}
 }
 
 void introScene::BulletCollideToPlayer()
 {
+	RECT playerRC = m_pPlayer->getRectHit();
+	//¿¡³Ê¹Ì ÃÑ¾Ë
+	
 }
 
 void introScene::collider()

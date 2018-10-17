@@ -766,9 +766,8 @@ bool player::isReturnUpdate()
 		// 테스트
 		else if (m_upper.pAni->getIsPlaying() == false)
 		{
-			Sleep(1000);
 			//SCENEMANAGER->changeScene();
-			return false;
+			return true;
 		}	
 		
 		/*//원본

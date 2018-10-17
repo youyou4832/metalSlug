@@ -418,11 +418,13 @@ public:
 	inline bool getIsAttack() { return m_isAttack; }	// 플레이어가 공격중인지 체크
 	inline bool getIsGun() { return m_isGun; }
 
+	inline bool getIsAlive() { return m_isAlive; }
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
 	inline void setIsAttack(bool isAttack) { m_isAttack = isAttack; }
 	inline void setIsGun(bool isGun) { m_isGun = isGun; }
 	inline void setActUpper(short nActUpper) { m_nActUpper = nActUpper; }
+	inline RECT getRectHit() { return m_rcHit; }
 
 	inline missileManager* getMissileMgr()
 	{
