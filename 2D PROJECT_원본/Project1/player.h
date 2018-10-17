@@ -395,7 +395,6 @@ public:
 	void fireActSet();		// 공격 모션 세팅
 	void fireActSetLeft();
 	void fireActSetRight();
-	void fireAttBoxSet();	// 어택박스 세팅
 
 	// 캐릭터 리소스 위치 수정 함수 (모션마다 사이즈와 기준점 좌표가 달라서 세팅을 별도로 해줘야 함)
 	void setResourceRect();

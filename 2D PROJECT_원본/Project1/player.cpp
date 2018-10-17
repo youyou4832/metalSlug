@@ -283,7 +283,7 @@ void player::setUpper()
 		m_upper.pAni->init(UPPER_SitWidth, UPPER_SitHeight, UPPER_SitWidth / UPPER_SitFrame, UPPER_SitHeight, UPPER_SitY);
 
 		if (m_nDir == DIR_Left)
-			m_upper.pAni->setPlayFrameReverse(0, UPPER_SitFrame, false, false);
+			m_upper.pAni->setPlayFrameReverse(1, UPPER_SitFrame, false, false);
 
 		else
 			m_upper.pAni->setPlayFrame(1, UPPER_SitFrame, false, false);
@@ -1188,8 +1188,7 @@ void player::move()
 	// ¾É±â
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
-		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) ||
-			(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove) ||
+		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
 			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove))
 		{
 			if (m_isGun == true)
@@ -1201,6 +1200,21 @@ void player::move()
 			m_nActLower = LOWER_NULL;
 			m_isAct = true;
 		}
+	}
+
+	// Å°¸¦ ¶¿ °æ¿ì ¾É¾ÒÀ» ¶§ ´Ù½Ã ÀÏ¾î³²
+	else if (KEYMANAGER->isOnceKeyUp('S') &&
+		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove) ||
+		(m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
+	{
+		if (m_isGun == true)
+			m_nActUpper = UPPER_GunIdle;
+		else
+			m_nActUpper = UPPER_Idle;
+
+		m_nActLower = LOWER_Idle;
+		m_fSpeed = Move_Speed;
+		m_isAct = true;
 	}
 
 	// Á¡ÇÁ
@@ -1342,7 +1356,7 @@ void player::move()
 	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX &&
 		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)			// ¿À¸¥ÂÊ ÀÌµ¿
 	{																			//
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// °È±â, °ø°Ý			¾Æ´Ò ¶§
+		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// °È±â, °ø°Ý		¾Æ´Ò ¶§
 			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// ¾É±â, ¾É¾Æ°È±â		¾Æ´Ò ¶§
 			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// Á¡ÇÁ, Á¡ÇÁ°È±â		¾Æ´Ò ¶§
 			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// ½½·¯±× Å»Ãâ, Á×À½	¾Æ´Ò ¶§
@@ -1423,7 +1437,7 @@ void player::move()
 		}
 
 		// ¼­ÀÖ¾úÀ» °æ¿ì 'Idle'·Î º¯°æ
-		else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove && m_isGun == true)
+		else if (m_nActUpper != UPPER_GunAtt && m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove && m_isGun == true)
 			m_nActUpper = UPPER_GunIdle;
 
 		else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && m_isGun == false)
@@ -1434,21 +1448,6 @@ void player::move()
 			m_nActLower = LOWER_Idle;
 			m_isAct = true;
 		}
-	}
-	
-	// Å°¸¦ ¶¿ °æ¿ì ¾É¾ÒÀ» ¶§ ´Ù½Ã ÀÏ¾î³²
-	if (KEYMANAGER->isOnceKeyUp('S') &&
-		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove) ||
-		(m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
-	{
-		if (m_isGun == true)
-			m_nActUpper = UPPER_GunIdle;
-		else
-			m_nActUpper = UPPER_Idle;
-
-		m_nActLower = LOWER_Idle;
-		m_fSpeed = Move_Speed;
-		m_isAct = true;
 	}
 
 	// ### ¸®¼Ò½º ÁÂÇ¥ ¼öÁ¤ ###
@@ -1498,11 +1497,11 @@ void player::render(HDC hdc)
 	// Å×½ºÆ®
 	/*Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
 	sprintf_s(szText, "isAttack: %d, m_isGun: %d", m_isAttack, m_isGun);
-	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));
+	TextOut(hdc, g_ptMouse.x, g_ptMouse.y + 30, szText, strlen(szText));*/
 	_stprintf_s(szText, "m_nActUpper: %d", m_nActUpper);
 	TextOut(hdc, 100, 100, szText, strlen(szText));
 	_stprintf_s(szText, "m_nActLower: %d", m_nActLower);
-	TextOut(hdc, 100, 150, szText, strlen(szText));*/
+	TextOut(hdc, 100, 150, szText, strlen(szText));
 }
 
 void player::dataSave()
