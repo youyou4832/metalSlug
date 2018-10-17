@@ -180,11 +180,11 @@ void boss::render(HDC hdc)
 			m_pimgeffect->render(hdc, m_fX + 530, m_fY + 60, 0 + (81 * m_RageFireAinDelay.index), 0, 81, 89, 5);
 		}
 
-		if (m_AppearEffectAniCount2.index  < 2)
+		if (m_AppearEffectAniCount2.index < 2)
 		{
 			m_pimgeffect->render(hdc, m_fX, m_fY + 100,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
-			m_pimgeffect->render(hdc, m_fX+150, m_fY + 100,
+			m_pimgeffect->render(hdc, m_fX + 150, m_fY + 100,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
 			m_pimgeffect->render(hdc, m_fX + 300, m_fY + 100,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
@@ -193,10 +193,12 @@ void boss::render(HDC hdc)
 			m_pimgeffect->render(hdc, m_fX + 600, m_fY + 100,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
 		}
-		
-		m_pimgeffect->render(hdc, m_fX - 100, m_fY + 680, 0 + (264 * m_MoveEffectAniCount.index),
-			492 + (52 * m_MoveEffectAniCount2.index), 264, 52, 4);
 
+		else
+		{
+			m_pimgeffect->render(hdc, m_fX - 100, m_fY + 680, 0 + (264 * m_MoveEffectAniCount.index),
+				492 + (52 * m_MoveEffectAniCount2.index), 264, 52, 4);
+		}
 
 		if (m_BulletState == NOMAL_BULLET)
 			m_pmissileManager->render(hdc, CharInfo::i_nomalboss);
@@ -205,43 +207,41 @@ void boss::render(HDC hdc)
 			m_pmissileManager->render(hdc, CharInfo::i_rageboss);
 	}
 
-		else
+	else
+	{
+		m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pDieAni, 4.0);
+		if (m_AppearEffectAniCount2.index < 2)
 		{
-			m_pimgBoss->aniRender(hdc, m_fX, m_fY, m_pDieAni, 4.0);
-			m_pimgeffect->render(hdc, m_fX, WINSIZEY-(157*5),
+			m_pimgeffect->render(hdc, m_fX, WINSIZEY - 720 ,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
-			m_pimgeffect->render(hdc, m_fX + 150, WINSIZEY - (157 * 5),
+			m_pimgeffect->render(hdc, m_fX + 150, WINSIZEY- 720,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
-			m_pimgeffect->render(hdc, m_fX + 300, WINSIZEY - (157 * 5),
+			m_pimgeffect->render(hdc, m_fX + 300, WINSIZEY - 720,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
-			m_pimgeffect->render(hdc, m_fX + 450, WINSIZEY - (157 * 5),
+			m_pimgeffect->render(hdc, m_fX + 450, WINSIZEY - 720,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
-			m_pimgeffect->render(hdc, m_fX + 600, WINSIZEY - (157 * 5),
+			m_pimgeffect->render(hdc, m_fX + 600, WINSIZEY - 720,
 				0 + (65 * m_AppearEffectAniCount.index), 178 + (157 * m_AppearEffectAniCount2.index), 65, 157, 5);
 		}
-		//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-
 	}
+	//Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+
+}
 
 void boss::move()
 {
 	MoveEffectAniCount();
 	MoveEffectAniCount2();
 	
-	
 	if (m_isAppear == true && m_fY >= -10) //보스 등장씬(이펙트 아직 없음) 
 	{
 		m_fY -= m_AppearSpeed;
 		m_AppearSpeed += 0.8;
 
-		
-
 		if (m_fY <= 0)
 		{
 			m_isAppear = false; //등장후 씬이 움직이게 하기 위해
-			
 			m_pMoveAni->start();
-
 		}
 
 	}
@@ -321,7 +321,6 @@ void boss::move()
 
 			if (m_PatternState == S_RUSHMOVE) // 조금만 돌진
 			{
-
 				if (m_fX < 180 )
 				{
 					int plusup[] = { 1, 3, 5 };
@@ -395,7 +394,6 @@ void boss::move()
 					}
 					
 				}
-				
 			}
 
 			if (m_PatternState == BULLET_SHOOT) // 총알 슛
@@ -465,7 +463,6 @@ void boss::move()
 
 void boss::change(bool ischagne)
 {
-	
 	if (ischagne == true)
 	{
 		++m_ChangeDelay.count;
@@ -482,7 +479,6 @@ void boss::change(bool ischagne)
 			}
 		}
 	}
-	
 }
 
 void boss::MoveEffectAniCount()
@@ -586,7 +582,7 @@ void boss::AppearAndDie()
 
 void boss::AppearEffectAniCount()
 {
-	if (m_AppearEffectAniCount2.index < 2)
+	if (m_AppearEffectAniCount2.index <= 1)
 	{
 		++m_AppearEffectAniCount.count;
 		if (m_AppearEffectAniCount.count % 5 == 0) {
@@ -596,9 +592,11 @@ void boss::AppearEffectAniCount()
 				m_AppearEffectAniCount.index = 0;
 				++m_AppearEffectAniCount2.index;
 			}
+
 			m_AppearEffectAniCount.count = 0;
 		}
 	}
+
 }
 
 

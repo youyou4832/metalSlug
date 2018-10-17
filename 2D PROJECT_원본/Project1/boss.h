@@ -105,10 +105,10 @@ public:
 	void AppearEffectAniCount();	//boss 등장 씬 이펙트 애니메이션을 동작을 휘한 함수
 	
 	void MoveEffectAniCount();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수
-	void MoveEffectAniCount2();	//boss 움직이는 이펙트 에니메이션 동작을 위한 함수2
+	void MoveEffectAniCount2();		//boss 움직이는 이펙트 에니메이션 동작을 위한 함수2
 	
 	void FireEffectAniCount();		//boss nomal bullet 이펙트 에니메이션 동작을 위한 함수
-	void FireEffectAniCount2();	//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
+	void FireEffectAniCount2();		//boss cannon bullet 이펙트 에니메이션 동작을 위한 함수
 
 	//get & set 함수
 	float getX() { return m_fX; }
