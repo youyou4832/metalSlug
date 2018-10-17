@@ -9,11 +9,8 @@
 #define Sit_Speed		1.0f
 
 // #######################################################################
-// 근거리공격(+AttBox충돌) 작성해야 함
-// 
-// 아이템 먹었을 때 헤비머신건 진행중 (하체 reverse 앞으로 점프 리소스 수정
-// 15(월)까지 dataSave() 함수 작성해야 함 (맵 이동 시 init 대신 dataLoad 이용)
-//			  + 폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령, 폭탄은 missileManager에서 발사)
+// dataSave() 함수 작성해야 함 (맵 이동 시 init 대신 dataLoad 이용)
+//	폭탄공격(아이템을 먹으면 폭탄 갯수 증가=>아이템 클래스에서 플레이어에게 명령, 폭탄은 missileManager에서 발사)
 //		 폭탄을 사용했을 때(갯수 > 0) 폭탄 던지는 모션 + 폭탄(미사일클래스)
 // #######################################################################
 
@@ -35,13 +32,13 @@ HRESULT player::init(float x, float y)
 	m_upper.pAni->setFPS(FPS);
 	m_upper.pAni->setPlayFrame(1, UPPER_AppearFrame);
 	m_upper.pAni->start();
-	m_upper.pAni->setFrameUpdateSec(0.08f);
+	m_upper.pAni->setFrameUpdateSec(0.15f);
 
 	m_lower.pAni->init(1, 1, 1, 1);
 	m_lower.pAni->setFPS(FPS);
 	m_lower.pAni->setPlayFrame(0, 0);
 	m_lower.pAni->stop();
-	m_lower.pAni->setFrameUpdateSec(0.08f);
+	m_lower.pAni->setFrameUpdateSec(0.15f);
 
 	m_upper.pImg->setX(x);
 	m_upper.pImg->setY(y);
@@ -731,6 +728,7 @@ bool player::isReturnUpdate()
 
 		m_nActUpper = UPPER_Idle;
 		m_nActLower = LOWER_Idle;
+
 		m_isAct = true;
 
 		return true;
@@ -1191,16 +1189,25 @@ void player::move()
 		else
 			m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight;
 
-		// 키 입력 처리
-		// 앉기
-		if (KEYMANAGER->isStayKeyDown('S'))
+	// 공격 (마우스 포인터)
+	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) &&
+		m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
+		m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove &&
+		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)
+	{
+		fire();	// 공격
+	}
+
+	// 키 입력 처리
+	// 앉기
+	if (KEYMANAGER->isStayKeyDown('S'))
+	{
+		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
+			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove) &&
+			(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
 		{
-			if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
-				(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove) &&
-				(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
-			{
-				if (m_isGun == true)
-					m_nActUpper = UPPER_GunSit;
+			if (m_isGun == true)
+				m_nActUpper = UPPER_GunSit;
 
 				else
 					m_nActUpper = UPPER_Sit;
@@ -1337,12 +1344,17 @@ void player::move()
 				m_fSpeed = Sit_Speed;
 			}
 
-			else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+		if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+		{
+			if (m_nActUpper != UPPER_GunAtt && m_nActUpper != UPPER_GunAtt90 && m_nActUpper != UPPER_GunAtt270 &&
+				m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Att90 && m_nActUpper != UPPER_Att270)
 			{
 				if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
 					m_nActUpper = UPPER_GunIdle;
+
 				else
 					m_nActUpper = UPPER_JumpMove;
+			}
 
 				// 하체 점프 모션 세팅
 				if (m_nActLower != LOWER_JumpMove)
@@ -1352,9 +1364,12 @@ void player::move()
 				}
 			}
 
-			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
-				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
-				m_nActLower = LOWER_Move;
+		else if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
+		{
+			m_nActLower = LOWER_Move;
+			m_isAct = true;
+		}
 
 			m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
 			m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
@@ -1393,12 +1408,17 @@ void player::move()
 				m_fSpeed = Sit_Speed;
 			}
 
-			else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+		if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+		{
+			if (m_nActUpper != UPPER_GunAtt && m_nActUpper != UPPER_GunAtt90 && m_nActUpper != UPPER_GunAtt270 &&
+				m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Att90 && m_nActUpper != UPPER_Att270)
 			{
 				if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
 					m_nActUpper = UPPER_GunIdle;
+
 				else
 					m_nActUpper = UPPER_JumpMove;
+			}
 
 				// 하체 점프 모션 세팅
 				if (m_nActLower != LOWER_JumpMove)
@@ -1408,32 +1428,27 @@ void player::move()
 				}
 			}
 
-			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
-				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
-				m_nActLower = LOWER_Move;
+		else if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
+			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
+		{
+			m_nActLower = LOWER_Move;
+			m_isAct = true;
+		}
 
 			m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
 			m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
 		}
 
-		// 공격 (마우스 포인터)
-		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) &&
-			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
-			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death && m_nActUpper)
+	// 키를 뗄 경우 행동하지 않음으로 바꿈
+	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') &&
+		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)
+	{
+		// 앉아서 움직이고 있었을 경우 '앉아대기' 상태로 변경
+		if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit ||
+			m_nActUpper == UPPER_GunSitMove || m_nActUpper == UPPER_GunSit)
 		{
-			fire();	// 공격
-		}
-
-		// 키를 뗄 경우 행동하지 않음으로 바꿈
-		if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') &&
-			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)
-		{
-			// 앉아서 움직이고 있었을 경우 '앉아대기' 상태로 변경
-			if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit ||
-				m_nActUpper == UPPER_GunSitMove || m_nActUpper == UPPER_GunSit)
-			{
-				if (m_isGun == true)
-					m_nActUpper = UPPER_GunSit;
+			if (m_isGun == true)
+				m_nActUpper = UPPER_GunSit;
 
 				else
 					m_nActUpper = UPPER_Sit;
