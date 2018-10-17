@@ -11,8 +11,11 @@ private:
 	float m_UifX1;
 	float m_UifY1;
 
-	float m_UifX2;
-	float m_UifY2;
+	float m_LifeUifX;
+	float m_LifeUifY;
+
+	float m_BulltNumUifX;
+	float m_BulltNumUifY;
 
 	
 

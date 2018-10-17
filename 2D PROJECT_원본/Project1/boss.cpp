@@ -527,7 +527,7 @@ void boss::damaged(int damage)
 		m_pDieAni->start();
 	}
 
-	if (m_nCurrHP == 5)
+	if (m_BossState == NOMAL && m_nCurrHP <= 5)
 	{
 		m_BossState = CHANGE;
 		m_BulletState = RAGE_BULLET;

@@ -6,6 +6,7 @@ class boss;
 class animation;
 class player;
 class bridge;
+class ingameui;
 
 class bossScene :public scene
 {
@@ -20,9 +21,11 @@ private:
 	image	*	m_pimgeffect;
 
 	image*		m_tempBG;
+
 	boss	*	m_pBoss;
 	bridge	*	m_pBridge;
 	player	*	m_pPlayer;
+	ingameui*	m_pInGameUi;
 	RECT		m_rc;
 	RECT		m_rc2;
 
@@ -49,6 +52,7 @@ public:
 	virtual void render(HDC hdc);
 
 	void pixelCollide();
+	void gameoveChack(bool playerDie);
 
 	bossScene();
 	~bossScene();
