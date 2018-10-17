@@ -4,9 +4,9 @@
 
 HRESULT selectScene::init()
 {
-	m_pSelectBG = IMAGEMANAGER->addImage("selectScene", "image/selectScene/selectScene2.bmp",
-		WINSIZEX, WINSIZEY, true, RGB(255, 0 ,255));
-	m_pimgSelectUi = IMAGEMANAGER->addImage("SelectUi", "image/selectScene/charactersSelect2.bmp",
+	m_pSelectBG = IMAGEMANAGER->addImage("selectScene", "image/selectScene/selectScene.bmp",
+		WINSIZEX, WINSIZEY, false, RGB(255, 0 ,255));
+	m_pimgSelectUi = IMAGEMANAGER->addImage("SelectUi", "image/selectScene/charactersSelect.bmp",
 		256, 380, true, RGB(255, 0, 255));
 
 
