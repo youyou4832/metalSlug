@@ -2,6 +2,7 @@
 #include "introScene.h"
 #include "enemyManager.h"
 #include "player.h"
+#include "ingameui.h"
 
 HRESULT introScene::init()
 {
@@ -28,13 +29,12 @@ HRESULT introScene::init()
 	m_enemyMgr->setNormal("normal", WINSIZEX +400, WINSIZEY / 2 + 70, 5, CharInfo::i_normal, m_pPlayer, 3);
 	//m_enemyMgr->setTank("tank", WINSIZEX + 600, WINSIZEY / 2 + 70, 5, CharInfo::i_tank, m_pPlayer, 1);
 
-	
+	m_pInGameUi = new ingameui;
+	m_pInGameUi->init();
+
 	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
 	
 	
-	
-
-
 
 	return S_OK;
  }
@@ -43,12 +43,14 @@ void introScene::release()
 {
 	SAFE_DELETE(m_enemyMgr);
 	SAFE_DELETE(m_pPlayer);
+	SAFE_DELETE(m_pInGameUi);
 }
 
 void introScene::update()
 {
 	m_enemyMgr->update();
 	m_pPlayer->update();
+	m_pInGameUi->update();
 	collider();
 }
 
@@ -57,6 +59,7 @@ void introScene::render(HDC hdc)
 	m_introMap->render(hdc, 0, 0);
 	m_enemyMgr->render(hdc);
 	m_pPlayer->render(hdc);
+	m_pInGameUi->render(hdc);
 	//Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
 	EFFECTMANAGER->render(hdc,2);
 }

@@ -160,6 +160,7 @@
     <ClInclude Include="gameNode.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="imageManager.h" />
+    <ClInclude Include="ingameui.h" />
     <ClInclude Include="introScene.h" />
     <ClInclude Include="keyManager.h" />
     <ClInclude Include="mainGame.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="gameNode.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="imageManager.cpp" />
+    <ClCompile Include="ingameui.cpp" />
     <ClCompile Include="introScene.cpp" />
     <ClCompile Include="keyManager.cpp" />
     <ClCompile Include="mainGame.cpp" />

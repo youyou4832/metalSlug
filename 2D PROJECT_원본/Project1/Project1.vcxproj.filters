@@ -195,6 +195,9 @@
     <ClInclude Include="selectScene.h">
       <Filter>2DGameFramework\scene</Filter>
     </ClInclude>
+    <ClInclude Include="ingameui.h">
+      <Filter>2DGameFramework\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="selectScene.cpp">
       <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="ingameui.cpp">
+      <Filter>2DGameFramework\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

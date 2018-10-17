@@ -3,12 +3,14 @@
 class player;
 class enemyManager;
 class enemy;
+class ingameui;
 
 class introScene : public scene
 {
 private:
 	enemyManager*	m_enemyMgr;
 	player*	m_pPlayer;
+	ingameui* m_pInGameUi;
 	image*	m_introMap;
 
 	RECT gate;
