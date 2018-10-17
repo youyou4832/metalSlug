@@ -34,7 +34,8 @@ void ingameui::update()
 
 void ingameui::render(HDC hdc)
 {
-	m_pImgInGameUi->render(hdc, m_UifX1, m_UifY1, 0, 0, 141, 29, 3);
+	m_pImgInGameUi->render(hdc, m_UifX1, m_UifY1, 0, 0, 141, 29, 2);
+	m_pImgInGameUi->render(hdc, m_UifX1+450, m_UifY1, 0, 29, 164, 46, 2);
 }
 
 ingameui::ingameui()
