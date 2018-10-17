@@ -1189,7 +1189,8 @@ void player::move()
 	if (KEYMANAGER->isStayKeyDown('S'))
 	{
 		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
-			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove))
+			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove) &&
+			(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
 		{
 			if (m_isGun == true)
 				m_nActUpper = UPPER_GunSit;
@@ -1203,9 +1204,9 @@ void player::move()
 	}
 
 	// 키를 뗄 경우 앉았을 때 다시 일어남
-	else if (KEYMANAGER->isOnceKeyUp('S') &&
-		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove) ||
-		(m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
+	if (KEYMANAGER->isOnceKeyUp('S') &&
+		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove ||
+		m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
 	{
 		if (m_isGun == true)
 			m_nActUpper = UPPER_GunIdle;
