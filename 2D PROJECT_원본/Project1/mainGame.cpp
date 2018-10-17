@@ -42,7 +42,6 @@ HRESULT mainGame::init()
 	m_pixel = IMAGEMANAGER->addImage("pixel", "image/map/mainMap_pixel2.bmp", 8000, WINSIZEY, true, RGB(255, 0, 255));
 	
 	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
-	m_pTitleScene = new titleScene;
 
 	//setEnemyPosition();
 	m_pIntroScene = new introScene;
