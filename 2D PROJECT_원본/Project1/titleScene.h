@@ -5,7 +5,7 @@ class button;
 class titleScene : public scene
 {
 private:
-	image * m_pBG;
+	image * m_pTitleBG;
 
 public:
 	virtual HRESULT init();

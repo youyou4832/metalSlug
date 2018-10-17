@@ -2,6 +2,7 @@
 #include "mainGame.h"
 #include "effectManager.h"
 #include "bossScene.h"
+#include "selectScene.h"
 #include "introScene.h"
 #include "fightScene.h"
 
@@ -42,6 +43,14 @@ HRESULT mainGame::init()
 	m_pixel = IMAGEMANAGER->addImage("pixel", "image/map/mainMap_pixel2.bmp", 8000, WINSIZEY, true, RGB(255, 0, 255));
 	
 	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
+	
+	
+	m_pTitleScene = new titleScene;
+	SCENEMANAGER->addScene("titleScene", m_pTitleScene);
+
+	m_pSelectScene = new selectScene;
+	SCENEMANAGER->addScene("selectScene", m_pSelectScene);
+	
 
 	setEnemyPosition();
 	m_pIntroScene = new introScene;
