@@ -17,6 +17,8 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
+	virtual void collisionRect();
+
 	void collider();
 
 	introScene();

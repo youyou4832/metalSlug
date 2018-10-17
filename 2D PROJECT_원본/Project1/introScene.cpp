@@ -38,6 +38,8 @@ void introScene::release()
 
 void introScene::update()
 {
+	collisionRect();
+
 	m_enemyMgr->update();
 	m_pPlayer->update();
 	collider();
@@ -50,6 +52,31 @@ void introScene::render(HDC hdc)
 	m_pPlayer->render(hdc);
 	//Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
 	EFFECTMANAGER->render(hdc,2);
+}
+
+void introScene::collisionRect()
+{
+	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
+	vector<enemy *>::iterator enemyIter = vEnemy.begin();
+	RECT tempRC;
+
+	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter)
+	{
+		// 플레이어RC, vEnemy의 rect와 intersectRect
+		if (IntersectRect(&tempRC, &m_pPlayer->getRectAttBox(), &(*enemyIter)->getRect()) && m_pPlayer->getIsAttack() == true)
+		{
+			// 에너미가 살아있을 경우에만 충돌 처리
+			if ((*enemyIter)->getIsAlive() == true)
+			{
+				m_pPlayer->setCollide(true);
+				m_pPlayer->setIsAttack(false);
+				m_pPlayer->fire();
+				(*enemyIter)->setIsAlive(false);
+			}
+
+			break;
+		}
+	}
 }
 
 void introScene::collider()
