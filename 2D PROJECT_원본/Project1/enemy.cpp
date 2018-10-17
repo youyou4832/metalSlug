@@ -37,7 +37,7 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 	m_pMissileMgr = new missileManager;
 	m_pMissileMgr->init(szFileName, WINSIZEY, 0);
 	m_nFireCount = 0;
-	m_nRandFireCount = 10;
+	m_nRandFireCount = RANDOM->getFromIntTo(30, 50);;
 	m_fX = position.x;
 	m_fY = position.y;
 
@@ -56,6 +56,12 @@ HRESULT enemy::init(const char * szFileName, POINT position, int destX, int dest
 	m_fSpeed = speed;
 	isAlive = true;
 	deathCN = 0;
+	m_bulletSpeed = 5;
+
+	if (m_CharNum == CharInfo::i_normal) {
+		m_bulletSpeed = 8;
+	}
+	
 	if (m_CharNum == CharInfo::i_sandbag) {
 		m_currHP = m_MaxHP = 30;
 	}
@@ -231,11 +237,11 @@ void enemy::render(HDC hdc)
 
 void enemy::move()
 {
-	if (AttackCount == MaxAttack) {
+	/*if (AttackCount == MaxAttack) {
 		s_Move.isState = true;
 		s_Idle.isState = false;
 		s_Attack.isState = false;
-	}
+	}*/
 	/*m_fX += cosf(moveAngle) * m_fSpeed;
 	m_fY += -sinf(moveAngle) * m_fSpeed;*/
 	if (m_CharNum == CharInfo::i_sniper) {
@@ -293,20 +299,20 @@ void enemy::move()
 void enemy::fire()
 {
 	if (m_CharNum == CharInfo::i_sniper) {
-		m_pMissileMgr->fire(m_fX+ (m_pImg->getFrameWidth() / 2)*3, m_fY + (m_pImg->getHeight() / 2) * 3,
-			PI, 5, m_CharNum);
+			m_pMissileMgr->fire(m_fX + (m_pImg->getFrameWidth() / 2) * 3, m_fY + (m_pImg->getHeight() / 2) * 3,
+				PI, m_bulletSpeed, m_CharNum);
 	}
 	else if (m_CharNum == CharInfo::i_cannon) {
 		m_pMissileMgr->fire(m_fX, m_fY+30,
-			PI, 5, m_CharNum);
+			PI, m_bulletSpeed, m_CharNum);
 	}
 	else if (m_CharNum == CharInfo::i_normal) {
 		m_pMissileMgr->fire(m_fX - 50, m_fY,
-			PI, 8, m_CharNum);
+			PI, m_bulletSpeed, m_CharNum);
 	}
 	else if (m_CharNum == CharInfo::i_tank) {
 		m_pMissileMgr->fire(m_fX - 60, m_fY - 15,
-			PI, 5, m_CharNum);
+			PI, m_bulletSpeed, m_CharNum);
 	}
 }
 

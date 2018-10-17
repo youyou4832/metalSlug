@@ -56,6 +56,7 @@ private:
 	int m_currHP;
 	int m_MaxHP;
 	
+	SYNTHESIZE(float, m_bulletSpeed, BulletSpeed);
 	//RECT playerRC;
 	//static POINT position[5];
 	//static int index;

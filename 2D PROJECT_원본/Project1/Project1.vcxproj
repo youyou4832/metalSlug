@@ -165,6 +165,8 @@
     <ClInclude Include="mainGame.h" />
     <ClInclude Include="missile.h" />
     <ClInclude Include="missileManager.h" />
+    <ClInclude Include="npc.h" />
+    <ClInclude Include="npcManager.h" />
     <ClInclude Include="pixelCollision.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="progressBar.h" />
@@ -206,6 +208,8 @@
     <ClCompile Include="mainGame.cpp" />
     <ClCompile Include="missile.cpp" />
     <ClCompile Include="missileManager.cpp" />
+    <ClCompile Include="npc.cpp" />
+    <ClCompile Include="npcManager.cpp" />
     <ClCompile Include="pixelCollision.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="progressBar.cpp" />

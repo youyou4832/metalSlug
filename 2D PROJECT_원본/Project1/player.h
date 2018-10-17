@@ -261,6 +261,8 @@ private:
 	bool	m_isSlugIn;		// 슬러그에 탑승 중인가
 	bool	m_isSlugEscape;	// 슬러그에서 탈출 하는가 (true이면 탈출 모션 적용)
 
+	//float	m_bulletSpeed;
+	SYNTHESIZE(float, m_bulletSpeed, BulletSpeed);
 public:
 	HRESULT init(float x, float y);
 	void update();
@@ -292,6 +294,7 @@ public:
 
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }
 	inline void setCollide(bool isCollide) { m_isCollide = isCollide; }
+	
 
 	
 

@@ -71,6 +71,8 @@ HRESULT player::init(float x, float y)
 
 	m_pMissileMgr = new missileManager;
 	m_pMissileMgr->init("playerMissile", WINSIZEY, 10);
+
+	m_bulletSpeed = 10;
 	
 	return S_OK;
 }
@@ -85,9 +87,10 @@ void player::update()
 	if (m_nActUpper == UPPER_Appear && m_upper.pAni->getIsPlaying() == true)	return;
 
 	// 플레이어
+
 	setDir();
-	move();
 	actSet();
+	move();
 
 	// 미사일
 	m_pMissileMgr->update();
@@ -423,7 +426,7 @@ void player::fire()
 
 	m_pMissileMgr->fire(m_fAttX,			// 총알 발사
 		m_fAttY,
-		m_fAngle, 10, i_player);
+		m_fAngle, m_bulletSpeed, i_player);
 
 	// 공격 할 때마다 프레임 초기화 (연속공격 모션)
 	m_upper.pAni->start();
@@ -435,202 +438,203 @@ void player::move()
 	m_rcHit.bottom = m_lower.rc.bottom;
 	m_rcHit.left = m_upper.pImg->getX();
 	m_rcHit.right = m_rcHit.left + PLAYER_RectWidth;
+	if (g_saveData.isMoveMap == false) {
+		if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove)
+			m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight + 30;
+		else
+			m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight;
 
-	if (m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove)
-		m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight + 30;
-	else
-		m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight;
+		// 키 입력 처리
+		// 앉기
 
-	// 키 입력 처리
-	// 앉기
-	if (KEYMANAGER->isStayKeyDown('S'))
-	{
-		if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		if (KEYMANAGER->isStayKeyDown('S'))
 		{
+			if (m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+			{
+				m_isAct = true;
+
+				m_nActUpper = UPPER_Sit;
+				m_nActLower = LOWER_NULL;
+			}
+		}
+
+		// 점프
+			// 플레이어가 점프 중일 때 gravity ++, 모션이 끝나면 gravity = 0 (맵에서 허공에 있을 때 모션을 UPPER_Jump로 바꿔 줌)
+			// 바닥에 닿으면 UPPER_Idle로 바꿔줌 (이렇게 되면 바닥에 닿았을 때 무한 Idle start 버그가 생김
+			// 픽셀충돌 시 m_nActUpper == UPPER_Jump 이면 UPPER_Idle로 바꿔줌
+			// 그 외의 경우에는 Y좌표만 해당 픽셀 충돌 위치에 고정시켜 줌
+
+			// 일자 맵 (픽셀충돌이 없는 맵)
+			// CurrHeight 사용
+		else if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
+		{
+			if (m_nActLower != LOWER_Jump)	// 제자리 jump 모션
+			{
+				m_isAct = true;
+				m_isJump = true;
+
+				m_fCurrHeight = m_lower.pImg->getY();
+
+				m_nActUpper = UPPER_Jump;
+				m_nActLower = LOWER_Jump;
+			}
+			else if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
+				m_nActLower == LOWER_Move)	// // 이동하던 도중에 점프할 경우
+			{
+				m_isAct = true;
+				m_isJump = true;
+
+				m_fCurrHeight = m_lower.pImg->getY();
+
+				m_nActUpper = UPPER_JumpMove;
+				m_nActLower = LOWER_JumpMove;
+			}
+		}
+
+		if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == true)
+		{
+			if (m_fGravity > 0)
+			{
+				m_fGravity -= m_fJumpSpeed;
+				m_isJump = false;
+				m_fGravity = 0;
+			}
+		}
+		else if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == false)
+		{
+			if (m_fGravity <= 10.0f)
+			{
+				m_fGravity += m_fJumpSpeed;
+				m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
+			}
+			else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우
+			{
+				m_lower.pImg->setY(m_fCurrHeight);
+				m_isJump = false;
+				m_nActUpper = UPPER_Idle;
+				m_nActLower = LOWER_Idle;
+				m_fGravity = 10;
+			}
+		}
+
+		// 이동
+		if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0)			// 왼쪽 이동
+		{																		//	
+			if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&		// 걷기, 공격	 아닐 때
+				m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&		// 앉기, 앉아걷기	 아닐 때
+				m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)		// 점프, 점프걷기	 아닐 때
+			{																	//
+				m_isAct = true;													//
+				m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
+			}
+			else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
+			{
+				m_isAct = true;
+				m_nActUpper = UPPER_SitMove;
+				m_nActLower = LOWER_NULL;
+				m_fSpeed = 1.0f;
+			}
+			else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+			{
+				m_isAct = true;
+				m_isJump = true;
+
+				m_fCurrHeight = m_lower.pImg->getY();
+
+				m_nActUpper = UPPER_JumpMove;
+				m_nActLower = LOWER_JumpMove;
+
+			}
+
+			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+				m_nActLower = LOWER_Move;
+
+			m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
+			m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
+		}
+		else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX)	// 오른쪽 이동
+		{																			//
+			if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격	 아닐 때
+				m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기	 아닐 때
+				m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)			// 점프, 점프걷기	 아닐 때
+			{																		//
+				m_isAct = true;														//
+				m_nActUpper = UPPER_Move;											// 걷기 모션으로 변경한다.
+			}
+			else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)		// 앉아 있으면서 앉아걷기 모션이 아닐 때
+			{																		// 앉아걷기 모션으로 변경
+				m_isAct = true;
+				m_nActUpper = UPPER_SitMove;
+				m_nActLower = LOWER_NULL;
+				m_fSpeed = 1.0f;
+			}
+			else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
+			{
+				m_isAct = true;
+				m_isJump = true;
+
+				m_fCurrHeight = m_lower.pImg->getY();
+
+				m_nActUpper = UPPER_JumpMove;
+				m_nActLower = LOWER_JumpMove;
+			}
+
+			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
+				m_nActLower = LOWER_Move;
+
+			m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
+			m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
+		}
+
+		// 공격 (마우스 포인터)
+		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		{
+			if (m_nActUpper != UPPER_Att)
+			{
+				m_nActUpper = UPPER_Att;
+				m_isAct = true;
+			}
+
+			fire();	// 공격
+		}
+
+		// 키를 뗐을 경우 행동하지 않음으로 바꿈
+		if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D'))
+		{
+			if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit)
+			{
+				m_nActUpper = UPPER_Sit;
+				m_nActLower = LOWER_NULL;
+				m_isAct = true;
+
+				return;
+			}
+
+			else if (m_nActUpper != UPPER_Att)
+				m_nActUpper = UPPER_Idle;
+
+			m_nActLower = LOWER_Idle;
 			m_isAct = true;
 
-			m_nActUpper = UPPER_Sit;
-			m_nActLower = LOWER_NULL;
+
 		}
-	}
 
-	// 점프
-		// 플레이어가 점프 중일 때 gravity ++, 모션이 끝나면 gravity = 0 (맵에서 허공에 있을 때 모션을 UPPER_Jump로 바꿔 줌)
-		// 바닥에 닿으면 UPPER_Idle로 바꿔줌 (이렇게 되면 바닥에 닿았을 때 무한 Idle start 버그가 생김
-		// 픽셀충돌 시 m_nActUpper == UPPER_Jump 이면 UPPER_Idle로 바꿔줌
-		// 그 외의 경우에는 Y좌표만 해당 픽셀 충돌 위치에 고정시켜 줌
-
-		// 일자 맵 (픽셀충돌이 없는 맵)
-		// CurrHeight 사용
-	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE))
-	{
-		if (m_nActLower != LOWER_Jump)	// 제자리 jump 모션
+		// 앉았을 때 다시 일어남
+		if (KEYMANAGER->isOnceKeyUp('S'))
 		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_Jump;
-			m_nActLower = LOWER_Jump;
-		}
-		else if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&
-			m_nActLower == LOWER_Move)	// // 이동하던 도중에 점프할 경우
-		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_JumpMove;
-			m_nActLower = LOWER_JumpMove;
-		}
-	}
-	
-	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == true)
-	{
-		if (m_fGravity > 0)
-		{
-			m_fGravity -= m_fJumpSpeed; 
-			m_isJump = false;
-			m_fGravity = 0;
-		}
-	}
-	else if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove) && m_isJump == false)
-	{
-		if (m_fGravity <= 10.0f)
-		{
-			m_fGravity += m_fJumpSpeed;
-			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
-		}
-		else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우
-		{
-			m_lower.pImg->setY(m_fCurrHeight);
-			m_isJump = false;
 			m_nActUpper = UPPER_Idle;
 			m_nActLower = LOWER_Idle;
-			m_fGravity = 10;
+			m_fSpeed = 3.0f;
+			m_isAct = true;
 		}
-	}
 
-	// 이동
-	if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0)			// 왼쪽 이동
-	{																		//	
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&		// 걷기, 공격	 아닐 때
-			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&		// 앉기, 앉아걷기	 아닐 때
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)		// 점프, 점프걷기	 아닐 때
-		{																	//
-			m_isAct = true;													//
-			m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
-		}
-		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)
+		// 죽음
+		if (m_isAlive == false)
 		{
-			m_isAct = true;
-			m_nActUpper = UPPER_SitMove;
-			m_nActLower = LOWER_NULL;
-			m_fSpeed = 1.0f;
+			//m_nActUpper = UPPER_Dead;
+			m_nActLower = NULL;
 		}
-		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
-		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_JumpMove;
-			m_nActLower = LOWER_JumpMove;
-
-		}
-
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
-			m_nActLower = LOWER_Move;
-
-		m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
-		m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
 	}
-	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX)	// 오른쪽 이동
-	{																			//
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격	 아닐 때
-			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기	 아닐 때
-			m_nActUpper != UPPER_Jump && m_nActUpper != UPPER_JumpMove)			// 점프, 점프걷기	 아닐 때
-		{																		//
-			m_isAct = true;														//
-			m_nActUpper = UPPER_Move;											// 걷기 모션으로 변경한다.
-		}
-		else if (m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove)		// 앉아 있으면서 앉아걷기 모션이 아닐 때
-		{																		// 앉아걷기 모션으로 변경
-			m_isAct = true;
-			m_nActUpper = UPPER_SitMove;
-			m_nActLower = LOWER_NULL;
-			m_fSpeed = 1.0f;
-		}
-		else if (m_nActUpper == UPPER_Jump)			// 점프 도중에 이동할 경우
-		{
-			m_isAct = true;
-			m_isJump = true;
-
-			m_fCurrHeight = m_lower.pImg->getY();
-
-			m_nActUpper = UPPER_JumpMove;
-			m_nActLower = LOWER_JumpMove;
-		}
-
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL)
-			m_nActLower = LOWER_Move;
-
-		m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
-		m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
-	}
-
-	// 공격 (마우스 포인터)
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove)
-	{
-		if (m_nActUpper != UPPER_Att)
-		{
-			m_nActUpper = UPPER_Att;
-			m_isAct = true;
-		}
-
-		fire();	// 공격
-	}
-
-	// 키를 뗐을 경우 행동하지 않음으로 바꿈
-	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D'))
-	{
-		if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit)
-		{
-			m_nActUpper = UPPER_Sit;
-			m_nActLower = LOWER_NULL;
-			m_isAct = true;
-
-			return;
-		}
-
-		else if (m_nActUpper != UPPER_Att)
-			m_nActUpper = UPPER_Idle;
-
-		m_nActLower = LOWER_Idle;
-		m_isAct = true;
-
-		
-	}
-
-	// 앉았을 때 다시 일어남
-	if (KEYMANAGER->isOnceKeyUp('S'))
-	{
-		m_nActUpper = UPPER_Idle;
-		m_nActLower = LOWER_Idle;
-		m_fSpeed = 3.0f;
-		m_isAct = true;
-	}
-
-	// 죽음
-	if (m_isAlive == false)
-	{
-		//m_nActUpper = UPPER_Dead;
-		m_nActLower = NULL;
-	}
-
 	// ### 리소스 좌표 수정 ###
 	setResourceRect();
 }

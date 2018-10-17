@@ -67,6 +67,9 @@
     <Filter Include="MainGame\boss">
       <UniqueIdentifier>{f3a4fbcc-1d2d-400a-b4d9-1a302456266a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\NPC">
+      <UniqueIdentifier>{e4bee3a4-8bca-4a70-8b05-0a2f16412488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -189,6 +192,12 @@
     <ClInclude Include="fightScene.h">
       <Filter>2DGameFramework\scene</Filter>
     </ClInclude>
+    <ClInclude Include="npc.h">
+      <Filter>MainGame\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="npcManager.h">
+      <Filter>MainGame\NPC</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -295,6 +304,12 @@
     </ClCompile>
     <ClCompile Include="fightScene.cpp">
       <Filter>2DGameFramework\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="npc.cpp">
+      <Filter>MainGame\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="npcManager.cpp">
+      <Filter>MainGame\NPC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
