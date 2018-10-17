@@ -51,7 +51,7 @@ HRESULT mainGame::init()
 	m_pFightScene = new fightScene;
 	SCENEMANAGER->addScene("fightScene", m_pFightScene);
 
-	SCENEMANAGER->changeScene("fightScene");
+	SCENEMANAGER->changeScene("intro");
 	
 	// 필요한 리소스 미리 로드
 

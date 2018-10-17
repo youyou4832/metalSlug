@@ -1191,275 +1191,276 @@ void player::move()
 		else
 			m_rcHit.top = m_rcHit.bottom - PLAYER_RectHeight;
 
-	// 키 입력 처리
-	// 앉기
-	if (KEYMANAGER->isStayKeyDown('S'))
-	{
-		if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
-			(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove) &&
-			(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
+		// 키 입력 처리
+		// 앉기
+		if (KEYMANAGER->isStayKeyDown('S'))
+		{
+			if ((m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove) &&
+				(m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove) &&
+				(m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
+			{
+				if (m_isGun == true)
+					m_nActUpper = UPPER_GunSit;
+
+				else
+					m_nActUpper = UPPER_Sit;
+
+				m_nActLower = LOWER_NULL;
+				m_isAct = true;
+			}
+		}
+
+		// 키를 뗄 경우 앉았을 때 다시 일어남
+		if (KEYMANAGER->isOnceKeyUp('S') &&
+			(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove ||
+				m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
 		{
 			if (m_isGun == true)
-				m_nActUpper = UPPER_GunSit;
-
-			else
-				m_nActUpper = UPPER_Sit;
-
-			m_nActLower = LOWER_NULL;
-			m_isAct = true;
-		}
-	}
-
-	// 키를 뗄 경우 앉았을 때 다시 일어남
-	if (KEYMANAGER->isOnceKeyUp('S') &&
-		(m_nActUpper == UPPER_Sit || m_nActUpper == UPPER_SitMove ||
-		m_nActUpper == UPPER_GunSit || m_nActUpper == UPPER_GunSitMove))
-	{
-		if (m_isGun == true)
-			m_nActUpper = UPPER_GunIdle;
-		else
-			m_nActUpper = UPPER_Idle;
-
-		m_nActLower = LOWER_Idle;
-		m_fSpeed = Move_Speed;
-		m_isAct = true;
-	}
-
-	// 점프
-	else if (KEYMANAGER->isOnceKeyDown(VK_SPACE) && m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
-	{
-		// 이동하던 도중 jump할 경우 jumpMove모션으로 변경  
-		if (m_nActLower == LOWER_Move)
-		{
-			if (m_isGun == true)				// 총 착용시 상체 점프이동 => GunMove
-				m_nActUpper = UPPER_GunMove;
-			else
-				m_nActUpper = UPPER_JumpMove;
-
-			m_nActLower = LOWER_JumpMove;
-
-			m_fCurrHeight = m_lower.pImg->getY();	// 현재 Y좌표 저장
-			m_isAct = true;
-			m_isJump = true;
-
-			return;
-		}
-
-		// 제자리 jump 모션
-		else if (m_nActUpper != UPPER_Jump)
-		{
-			if (m_isGun == true)				// 총 착용시 상체 점프 => GunIdle
 				m_nActUpper = UPPER_GunIdle;
-			else
-				m_nActUpper = UPPER_Jump;
-
-			m_nActLower = LOWER_Jump;
-
-			m_fCurrHeight = m_lower.pImg->getY();	// 현재 Y좌표 저장
-			m_isAct = true;
-			m_isJump = true;
-		}
-	}
-
-	// 점프 => 상승
-	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove ||
-		m_nActUpper == UPPER_SlugEscape) && m_isJump == true)			// 슬러그 탈출도 점프 적용
-	{
-		if (m_fGravity > 0)
-		{
-			m_fGravity -= m_fJumpSpeed;
-			m_lower.pImg->setY(m_lower.pImg->getY() - m_fGravity);
-		}
-		else
-		{
-			m_isJump = false;
-			m_fGravity = 0;
-		}
-	}
-
-	// 점프 => 하강
-	if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove ||
-		m_nActUpper == UPPER_SlugEscape) && m_isJump == false)			// 슬러그 탈출도 점프 적용
-	{
-		if (m_fGravity <= 10.0f)
-		{
-			m_fGravity += m_fJumpSpeed;
-			m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
-		}
-		else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우 (땅에 닿았을 경우)
-		{
-			m_lower.pImg->setY(m_fCurrHeight);
-			m_fCurrHeight = 0;
-			m_isJump = false;
-
-			if (m_isGun == true)
-				m_nActUpper = UPPER_GunIdle;
-
 			else
 				m_nActUpper = UPPER_Idle;
 
 			m_nActLower = LOWER_Idle;
-			m_fGravity = 10;
-			m_isAct = true;
-		}
-	}
-
-	// 이동 => 좌
-	if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0 &&
-		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)			// 왼쪽 이동
-	{																			//	
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격			아닐 때
-			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
-			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
-			m_nActUpper != UPPER_GunMove &&
-			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove &&
-			m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때				
-		{																		//
-			if (m_isGun == true)												// 총 착용시
-				m_nActUpper = UPPER_GunMove;
-			else
-				m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
-
+			m_fSpeed = Move_Speed;
 			m_isAct = true;
 		}
 
-		else if ((m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove) ||	// 앉아 있으면서 앉아걷기 모션이 아닐 때
-			(m_nActUpper == UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
+		// 점프
+		else if (KEYMANAGER->isOnceKeyDown(VK_SPACE) && m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 		{
-			if (m_isGun == true)
-				m_nActUpper = UPPER_GunSitMove;									// 총 착용시
-			else
-				m_nActUpper = UPPER_SitMove;									// 앉아걷기 모션으로 변경
-
-			m_isAct = true;
-			m_nActLower = LOWER_NULL;
-			m_fSpeed = Sit_Speed;
-		}
-
-		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
-		{
-			if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
-				m_nActUpper = UPPER_GunIdle;
-			else
-				m_nActUpper = UPPER_JumpMove;
-
-			// 하체 점프 모션 세팅
-			if (m_nActLower != LOWER_JumpMove)
+			// 이동하던 도중 jump할 경우 jumpMove모션으로 변경  
+			if (m_nActLower == LOWER_Move)
 			{
+				if (m_isGun == true)				// 총 착용시 상체 점프이동 => GunMove
+					m_nActUpper = UPPER_GunMove;
+				else
+					m_nActUpper = UPPER_JumpMove;
+
 				m_nActLower = LOWER_JumpMove;
+
+				m_fCurrHeight = m_lower.pImg->getY();	// 현재 Y좌표 저장
+				m_isAct = true;
+				m_isJump = true;
+
+				return;
+			}
+
+			// 제자리 jump 모션
+			else if (m_nActUpper != UPPER_Jump)
+			{
+				if (m_isGun == true)				// 총 착용시 상체 점프 => GunIdle
+					m_nActUpper = UPPER_GunIdle;
+				else
+					m_nActUpper = UPPER_Jump;
+
+				m_nActLower = LOWER_Jump;
+
+				m_fCurrHeight = m_lower.pImg->getY();	// 현재 Y좌표 저장
+				m_isAct = true;
+				m_isJump = true;
+			}
+		}
+
+		// 점프 => 상승
+		if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove ||
+			m_nActUpper == UPPER_SlugEscape) && m_isJump == true)			// 슬러그 탈출도 점프 적용
+		{
+			if (m_fGravity > 0)
+			{
+				m_fGravity -= m_fJumpSpeed;
+				m_lower.pImg->setY(m_lower.pImg->getY() - m_fGravity);
+			}
+			else
+			{
+				m_isJump = false;
+				m_fGravity = 0;
+			}
+		}
+
+		// 점프 => 하강
+		if ((m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove ||
+			m_nActUpper == UPPER_SlugEscape) && m_isJump == false)			// 슬러그 탈출도 점프 적용
+		{
+			if (m_fGravity <= 10.0f)
+			{
+				m_fGravity += m_fJumpSpeed;
+				m_lower.pImg->setY(m_lower.pImg->getY() + m_fGravity);
+			}
+			else if (m_lower.pImg->getY() >= m_fCurrHeight)	// 점프 당시의 높이와 현재 높이가 같을 경우 (땅에 닿았을 경우)
+			{
+				m_lower.pImg->setY(m_fCurrHeight);
+				m_fCurrHeight = 0;
+				m_isJump = false;
+
+				if (m_isGun == true)
+					m_nActUpper = UPPER_GunIdle;
+
+				else
+					m_nActUpper = UPPER_Idle;
+
+				m_nActLower = LOWER_Idle;
+				m_fGravity = 10;
 				m_isAct = true;
 			}
 		}
 
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
+		// 이동 => 좌
+		if (KEYMANAGER->isStayKeyDown('A') && m_upper.pImg->getX() > 0 &&
+			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)			// 왼쪽 이동
+		{																			//	
+			if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격			아닐 때
+				m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
+				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
+				m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
+				m_nActUpper != UPPER_GunMove &&
+				m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove &&
+				m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때				
+			{																		//
+				if (m_isGun == true)												// 총 착용시
+					m_nActUpper = UPPER_GunMove;
+				else
+					m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
+
+				m_isAct = true;
+			}
+
+			else if ((m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove) ||	// 앉아 있으면서 앉아걷기 모션이 아닐 때
+				(m_nActUpper == UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
+			{
+				if (m_isGun == true)
+					m_nActUpper = UPPER_GunSitMove;									// 총 착용시
+				else
+					m_nActUpper = UPPER_SitMove;									// 앉아걷기 모션으로 변경
+
+				m_isAct = true;
+				m_nActLower = LOWER_NULL;
+				m_fSpeed = Sit_Speed;
+			}
+
+			else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+			{
+				if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
+					m_nActUpper = UPPER_GunIdle;
+				else
+					m_nActUpper = UPPER_JumpMove;
+
+				// 하체 점프 모션 세팅
+				if (m_nActLower != LOWER_JumpMove)
+				{
+					m_nActLower = LOWER_JumpMove;
+					m_isAct = true;
+				}
+			}
+
+			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
+				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 				m_nActLower = LOWER_Move;
 
-		m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
-		m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
-	}
-
-	// 이동 => 우
-	else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX &&
-		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)			// 오른쪽 이동
-	{																			//
-		if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격		아닐 때
-			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
-			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
-			m_nActUpper != UPPER_GunMove &&
-			m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove &&
-			m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때		)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때
-		{																		//
-			if (m_isGun == true)												// 총 착용시
-				m_nActUpper = UPPER_GunMove;
-			else
-				m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
-
-			m_isAct = true;
+			m_upper.pImg->setX(m_upper.pImg->getX() - m_fSpeed);
+			m_lower.pImg->setX(m_lower.pImg->getX() - m_fSpeed);
 		}
 
-		else if ((m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove) ||	// 앉아 있으면서 앉아걷기 모션이 아닐 때
-			(m_nActUpper == UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
-		{
-			if (m_isGun == true)
-				m_nActUpper = UPPER_GunSitMove;									// 총 착용시
-			else
-				m_nActUpper = UPPER_SitMove;									// 앉아걷기 모션으로 변경
+		// 이동 => 우
+		else if (KEYMANAGER->isStayKeyDown('D') && m_upper.pImg->getX() < WINSIZEX &&
+			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)			// 오른쪽 이동
+		{																			//
+			if (m_nActUpper != UPPER_Move && m_nActUpper != UPPER_Att &&			// 걷기, 공격		아닐 때
+				m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&			// 앉기, 앉아걷기		아닐 때
+				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove &&		// 점프, 점프걷기		아닐 때
+				m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death &&	// 슬러그 탈출, 죽음	아닐 때
+				m_nActUpper != UPPER_GunMove &&
+				m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove &&
+				m_nActUpper != UPPER_Knife && m_nActUpper != UPPER_KnifeGun)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때		)		// 총 무브, 총 앉기, 총 앉아걷기 아닐 때
+			{																		//
+				if (m_isGun == true)												// 총 착용시
+					m_nActUpper = UPPER_GunMove;
+				else
+					m_nActUpper = UPPER_Move;										// 걷기 모션으로 변경한다.
 
-			m_isAct = true;
-			m_nActLower = LOWER_NULL;
-			m_fSpeed = Sit_Speed;
-		}
-
-		else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
-		{
-			if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
-				m_nActUpper = UPPER_GunIdle;
-			else
-				m_nActUpper = UPPER_JumpMove;
-
-			// 하체 점프 모션 세팅
-			if (m_nActLower != LOWER_JumpMove)
-			{
-				m_nActLower = LOWER_JumpMove;
 				m_isAct = true;
 			}
-		}
 
-		if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
-			m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
+			else if ((m_nActUpper == UPPER_Sit && m_nActUpper != UPPER_SitMove) ||	// 앉아 있으면서 앉아걷기 모션이 아닐 때
+				(m_nActUpper == UPPER_GunSit && m_nActUpper != UPPER_GunSitMove))
+			{
+				if (m_isGun == true)
+					m_nActUpper = UPPER_GunSitMove;									// 총 착용시
+				else
+					m_nActUpper = UPPER_SitMove;									// 앉아걷기 모션으로 변경
+
+				m_isAct = true;
+				m_nActLower = LOWER_NULL;
+				m_fSpeed = Sit_Speed;
+			}
+
+			else if (m_nActLower == LOWER_Jump || m_nActLower == LOWER_JumpMove)	// 점프 도중에 이동할 경우
+			{
+				if (m_isGun == true)												// 총 착용시 상체 점프 => GunIdle
+					m_nActUpper = UPPER_GunIdle;
+				else
+					m_nActUpper = UPPER_JumpMove;
+
+				// 하체 점프 모션 세팅
+				if (m_nActLower != LOWER_JumpMove)
+				{
+					m_nActLower = LOWER_JumpMove;
+					m_isAct = true;
+				}
+			}
+
+			if (m_nActLower != LOWER_Move && m_nActLower != LOWER_NULL &&
+				m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove)
 				m_nActLower = LOWER_Move;
 
 			m_upper.pImg->setX(m_upper.pImg->getX() + m_fSpeed);
 			m_lower.pImg->setX(m_lower.pImg->getX() + m_fSpeed);
 		}
 
-	// 공격 (마우스 포인터)
-	if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) &&
-		m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
-		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death && m_nActUpper )
-	{
-		fire();	// 공격
-	}
-
-	// 키를 뗄 경우 행동하지 않음으로 바꿈
-	if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') &&
-		m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)
-	{
-		// 앉아서 움직이고 있었을 경우 '앉아대기' 상태로 변경
-		if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit ||
-			m_nActUpper == UPPER_GunSitMove || m_nActUpper == UPPER_GunSit)
+		// 공격 (마우스 포인터)
+		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON) &&
+			m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove &&
+			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death && m_nActUpper)
 		{
-			if (m_isGun == true)
-				m_nActUpper = UPPER_GunSit;
+			fire();	// 공격
+		}
 
-			else
-				m_nActUpper = UPPER_Sit;
+		// 키를 뗄 경우 행동하지 않음으로 바꿈
+		if (KEYMANAGER->isOnceKeyUp('A') || KEYMANAGER->isOnceKeyUp('D') &&
+			m_nActUpper != UPPER_SlugEscape && m_nActUpper != UPPER_Death)
+		{
+			// 앉아서 움직이고 있었을 경우 '앉아대기' 상태로 변경
+			if (m_nActUpper == UPPER_SitMove || m_nActUpper == UPPER_Sit ||
+				m_nActUpper == UPPER_GunSitMove || m_nActUpper == UPPER_GunSit)
+			{
+				if (m_isGun == true)
+					m_nActUpper = UPPER_GunSit;
 
-			m_nActLower = LOWER_NULL;
-			m_isAct = true;
+				else
+					m_nActUpper = UPPER_Sit;
+
+				m_nActLower = LOWER_NULL;
+				m_isAct = true;
 
 				return;
 			}
 
-		// 서있었을 경우 'Idle'로 변경
-		else if (m_nActUpper != UPPER_GunAtt && m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove && m_isGun == true)
-			m_nActUpper = UPPER_GunIdle;
+			// 서있었을 경우 'Idle'로 변경
+			else if (m_nActUpper != UPPER_GunAtt && m_nActUpper != UPPER_GunSit && m_nActUpper != UPPER_GunSitMove && m_isGun == true)
+				m_nActUpper = UPPER_GunIdle;
 
-		else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && m_isGun == false)
-			m_nActUpper = UPPER_Idle;
+			else if (m_nActUpper != UPPER_Att && m_nActUpper != UPPER_Sit && m_nActUpper != UPPER_SitMove && m_isGun == false)
+				m_nActUpper = UPPER_Idle;
 
-		if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove && m_isJump == false)
-		{
-			m_nActLower = LOWER_Idle;
-			m_isAct = true;
+			if (m_nActLower != LOWER_Jump && m_nActLower != LOWER_JumpMove && m_isJump == false)
+			{
+				m_nActLower = LOWER_Idle;
+				m_isAct = true;
+			}
 		}
-	}
 
-	// ### 리소스 좌표 수정 ###
-	setResourceRect();
+		// ### 리소스 좌표 수정 ###
+		setResourceRect();
+	}
 }
 
 void player::release()
