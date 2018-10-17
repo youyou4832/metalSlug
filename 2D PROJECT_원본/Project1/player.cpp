@@ -731,7 +731,7 @@ bool player::isReturnUpdate()
 		return true;
 	}
 
-	else if (m_isCollide == true && (m_nActUpper == UPPER_Knife || m_nActUpper == UPPER_KnifeGun))
+	else if (m_nActUpper == UPPER_Knife || m_nActUpper == UPPER_KnifeGun)
 	{
 		return false;
 	}
