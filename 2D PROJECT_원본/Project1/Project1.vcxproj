@@ -150,6 +150,7 @@
     <ClInclude Include="animation.h" />
     <ClInclude Include="boss.h" />
     <ClInclude Include="bossScene.h" />
+    <ClInclude Include="bridge.h" />
     <ClInclude Include="button.h" />
     <ClInclude Include="commonMacroFunction.h" />
     <ClInclude Include="effect.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="boss.cpp" />
     <ClCompile Include="bossScene.cpp" />
+    <ClCompile Include="bridge.cpp" />
     <ClCompile Include="button.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="effectManager.cpp" />

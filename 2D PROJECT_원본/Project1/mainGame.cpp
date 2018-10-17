@@ -40,6 +40,9 @@ HRESULT mainGame::init()
 	IMAGEMANAGER->addImage("item", "image/npc/item.bmp", 0, 0, 110, 120, 5, 6, true, RGB(255, 0, 255));
 	EFFECTMANAGER->addEffect("tankEffect", "image/enemy/tank_effect.bmp", 800, 42, 50, 42, 20, TIMEMANAGER->getElapsedTime(), 10);
 	m_pixel = IMAGEMANAGER->addImage("pixel", "image/map/mainMap_pixel2.bmp", 8000, WINSIZEY, true, RGB(255, 0, 255));
+	
+	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
+	m_pTitleScene = new titleScene;
 
 	//setEnemyPosition();
 	m_pIntroScene = new introScene;

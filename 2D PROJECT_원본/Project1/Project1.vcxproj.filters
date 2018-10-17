@@ -70,6 +70,9 @@
     <Filter Include="MainGame\NPC">
       <UniqueIdentifier>{e4bee3a4-8bca-4a70-8b05-0a2f16412488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\bridge">
+      <UniqueIdentifier>{6846a429-05fa-48a2-a86f-0929d3cf63e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -198,6 +201,9 @@
     <ClInclude Include="npcManager.h">
       <Filter>MainGame\NPC</Filter>
     </ClInclude>
+    <ClInclude Include="bridge.h">
+      <Filter>MainGame\bridge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -310,6 +316,9 @@
     </ClCompile>
     <ClCompile Include="npcManager.cpp">
       <Filter>MainGame\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge.cpp">
+      <Filter>MainGame\bridge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
