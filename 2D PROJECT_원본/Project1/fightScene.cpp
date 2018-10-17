@@ -3,6 +3,8 @@
 #include "player.h"
 #include "enemyManager.h"
 #include "npcManager.h"
+#include "missileManager.h"
+
 HRESULT fightScene::init()
 {
 	
@@ -20,8 +22,8 @@ HRESULT fightScene::init()
 		m_npcMgr = new npcManager;
 		m_enemyMgr->init();
 		m_fightMapX = 0;
-		//setEnemy();
-		m_npcMgr->setNPC("npc", WINSIZEX/2, WINSIZEY/2-300, 5);
+		setEnemy();
+		//m_npcMgr->setNPC("npc", WINSIZEX/2, WINSIZEY/2-300, 5);
 		//이미지
 		
 		m_pPlayer->init(100, WINSIZEY / 2);
@@ -33,7 +35,7 @@ HRESULT fightScene::init()
 	}
 	else {
 		m_enemyMgr->init();
-		//setEnemy();
+		setEnemy();
 	}
 
 	
@@ -52,17 +54,19 @@ void fightScene::release()
 
 void fightScene::update()
 {
+	m_pPlayer->update();
+	m_npcMgr->update();
 	if (!g_saveData.isMoveMap) {
 		gravity();
 		m_enemyMgr->update();
-		
+		BulletCollideToEnemy();
 		collider();
 	}
 	else {
 		mapMove();
 	}
-	m_pPlayer->update();
-	m_npcMgr->update();
+	
+	
 }
 
 void fightScene::render(HDC hdc)
@@ -75,6 +79,37 @@ void fightScene::render(HDC hdc)
 
 	//Rectangle(hdc, m_moveMap.left, m_moveMap.top, m_moveMap.right, m_moveMap.bottom);
 	EFFECTMANAGER->render(hdc, 2);
+}
+
+void fightScene::BulletCollideToEnemy()
+{
+	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
+	vector<enemy *>::iterator enemyIter;
+	RECT playerRC = m_pPlayer->getRectHit();
+	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter) {
+
+		vector<missile*> e_vMissile = (*enemyIter)->getMissileMgr()->getVecMissile();
+		vector<missile*>::iterator e_missileIter;
+		//플레이어 총알
+		vector<missile*> p_vMissile = m_pPlayer->getMissileMgr()->getVecMissile();
+		vector<missile*>::iterator p_missileIter;
+		for (p_missileIter = p_vMissile.begin(); p_missileIter != p_vMissile.end(); ++p_missileIter) {
+			RECT rc;
+			//플레이어 총알과 에네미 충돌
+			if ((*p_missileIter)->getIsFire() && (*enemyIter)->getIsAlive() && IntersectRect(&rc, &(*enemyIter)->getRect(), &(*p_missileIter)->getRect()) && (*enemyIter)->getDeathState() == false) {
+				(*enemyIter)->setCurrHP((*enemyIter)->getCurrHP() - 1);
+				(*enemyIter)->hit();
+				(*p_missileIter)->setIsFire(false);
+			}
+		}
+		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
+			RECT rc;
+			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect())) {
+				m_pPlayer->setIsAlive(false);
+				(*e_missileIter)->setIsFire(false);
+			}
+		}
+	}
 }
 
 void fightScene::setEnemy()

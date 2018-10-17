@@ -19,7 +19,6 @@ public:
 
 	void knifeCollideToEnemy();
 	void BulletCollideToEnemy();
-	void BulletCollideToPlayer();
 
 	void collider();
 

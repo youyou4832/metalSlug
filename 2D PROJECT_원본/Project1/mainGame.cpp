@@ -43,7 +43,7 @@ HRESULT mainGame::init()
 	
 	IMAGEMANAGER->addImage("magenta", "image/map/magenta.bmp", WINSIZEX, WINSIZEY,false,0);
 
-	//setEnemyPosition();
+	setEnemyPosition();
 	m_pIntroScene = new introScene;
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
 

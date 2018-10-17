@@ -6,7 +6,7 @@ class animation
 private:
 	int		m_nFrameNum;					// 프레임 수
 	std::vector<POINT>	m_vecFrameList;		// 프레임 x, y
-	std::vector<int>	m_vecPlayList;		// 프레임 플레이 리스트 (프레임 순서)
+	std::vector<int>	 m_vecPlayList;		// 프레임 플레이 리스트 (프레임 순서)
 
 	int		m_nFrameWidth;
 	int		m_nFrameHeight;

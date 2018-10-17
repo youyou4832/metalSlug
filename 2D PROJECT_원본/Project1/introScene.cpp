@@ -112,14 +112,6 @@ void introScene::BulletCollideToEnemy()
 		}
 	}
 }
-
-void introScene::BulletCollideToPlayer()
-{
-	RECT playerRC = m_pPlayer->getRectHit();
-	//¿¡³Ê¹Ì ÃÑ¾Ë
-	
-}
-
 void introScene::collider()
 {
 	RECT upper_rc = m_pPlayer->getRectUpper();
