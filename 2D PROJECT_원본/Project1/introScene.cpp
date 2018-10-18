@@ -29,6 +29,7 @@ HRESULT introScene::init()
 	
 	UiCount = 0;
 	isUiStart = true;
+	isPlayerDie = false;
 
 	m_missionUifX = 500;
 	m_missionUifY = WINSIZEY / 4;
@@ -53,6 +54,7 @@ void introScene::update()
 	BulletCollideToEnemy();
 	collider();
 	UiDelayCount();
+	//GameoverChack();
 	
 }
 
@@ -78,7 +80,7 @@ void introScene::render(HDC hdc)
 
 	else if(m_pPlayer->getIsAlive())
 	{
-		if (m_UiDelay.index % 2 == 0 && isUiStart) // 모든 목숨을 소모한 후 제거
+		if (m_UiDelay.index % 2 == 0 && isUiStart) //
 		{
 			m_pImgINGameUi->render(hdc, m_missionUifX, m_missionUifY, 0, 0, 190, 32, 3);
 
@@ -87,11 +89,6 @@ void introScene::render(HDC hdc)
 				m_pImgINGameUi->render(hdc, m_missionUifX + 130, m_missionUifY + 150, 0, 96, 148, 32, 3);
 			}
 
-			
-			if(UiCount == 25)
-			{
-				SCENEMANAGER->changeScene("gameoveScene");
-			}
 		}
 	}
 
@@ -108,6 +105,10 @@ void introScene::UiDelayCount()
 		++UiCount;
 		if (m_UiDelay.count % 5 == 0) {
 			++m_UiDelay.index;
+			if (m_UiDelay.index == 25) {
+				isPlayerDie = true;
+			}
+
 			if (m_UiDelay.index == 30) {
 				m_UiDelay.index = 0;
 				UiCount = 0;
@@ -171,6 +172,13 @@ void introScene::BulletCollideToEnemy()
 				(*e_missileIter)->setIsFire(false);
 			}
 		}
+	}
+}
+void introScene::GameoverChack()
+{
+	if (isPlayerDie)
+	{
+		//SCENEMANAGER->changeScene("titleScene");
 	}
 }
 void introScene::collider()

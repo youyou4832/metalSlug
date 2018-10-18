@@ -27,6 +27,7 @@ private:
 	float m_missionUifY;
 
 	bool isUiStart;
+	bool isPlayerDie;
 
 public:
 	virtual HRESULT init();
@@ -38,6 +39,7 @@ public:
 	void UiDelayCount();
 	void knifeCollideToEnemy();
 	void BulletCollideToEnemy();
+	void GameoverChack();
 
 	void collider();
 
