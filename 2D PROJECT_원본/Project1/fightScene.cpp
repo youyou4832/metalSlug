@@ -4,6 +4,7 @@
 #include "enemyManager.h"
 #include "npcManager.h"
 #include "missileManager.h"
+#include "ingameui.h"
 
 HRESULT fightScene::init()
 {
@@ -31,6 +32,10 @@ HRESULT fightScene::init()
 		m_enemyMgr->setSniper("sniper", WINSIZEX / 2 + 100, WINSIZEY / 2 - 10, 5, m_pPlayer);
 		m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 400, WINSIZEY / 2 + 70, 5, m_pPlayer, 1, false);*/
 		m_moveMap = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
+
+		m_pInGameUi = new ingameui;
+		m_pInGameUi->init();
+		
 	}
 	else {
 		m_enemyMgr->init();
@@ -46,6 +51,7 @@ HRESULT fightScene::init()
 
 void fightScene::release()
 {
+	SAFE_DELETE(m_pInGameUi);
 	SAFE_DELETE(m_enemyMgr);
 	SAFE_DELETE(m_pPlayer);
 	SAFE_DELETE(m_npcMgr);
@@ -55,6 +61,7 @@ void fightScene::update()
 {
 	m_pPlayer->update();
 	m_npcMgr->update();
+	m_pInGameUi->update();
 	if (!g_saveData.isMoveMap) {
 		gravity();
 		m_enemyMgr->update();
@@ -77,6 +84,7 @@ void fightScene::render(HDC hdc)
 	m_enemyMgr->render(hdc);
 	m_pPlayer->render(hdc);
 	m_npcMgr->render(hdc);
+	m_pInGameUi->render(hdc);
 
 	//Rectangle(hdc, m_moveMap.left, m_moveMap.top, m_moveMap.right, m_moveMap.bottom);
 	EFFECTMANAGER->render(hdc, 2);

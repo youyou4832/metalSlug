@@ -6,6 +6,7 @@
 #include "selectScene.h"
 #include "introScene.h"
 #include "fightScene.h"
+#include "gameoverScene.h"
 
 void mainGame::setBackBuffer()
 {
@@ -63,7 +64,10 @@ HRESULT mainGame::init()
 	m_pFightScene = new fightScene;
 	SCENEMANAGER->addScene("fightScene", m_pFightScene);
 
-	SCENEMANAGER->changeScene("fightScene");
+	m_pGameOverScene = new gameoverScene;
+	SCENEMANAGER->addScene("gameoveScene", m_pGameOverScene);
+
+	SCENEMANAGER->changeScene("intro");
 	
 	// 필요한 리소스 미리 로드
 

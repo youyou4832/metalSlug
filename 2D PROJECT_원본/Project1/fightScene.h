@@ -4,12 +4,15 @@
 class player;
 class enemyManager;
 class npcManager;
+class ingameui;
+
 class fightScene : public scene
 {
 private:
 	enemyManager*	m_enemyMgr;
 	npcManager* m_npcMgr;
 	player*	m_pPlayer;
+	ingameui* m_pInGameUi;
 	image*	m_fightMap;
 	image* m_pixel;
 

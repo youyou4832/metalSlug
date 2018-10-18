@@ -1,0 +1,18 @@
+ui1
+in game UI1 141 *29 1개
+in game UI2 164 31 1개
+
+ui2
+game start 폰트288(32) * 32(총 37개 5줄 )
+game continue 440(44)* 48 총 10개 
+game 안내 ui 512(32) * 31 16개
+숫자 폰트  80(8 * 10) * 8 10개
+특수 문자 폰트 20 * 8 1개
+
+
+ui3
+
+mission 1 190*32	1개
+start 	148*32	1개
+clear	148*32	1개
+fail	110*32	1개
