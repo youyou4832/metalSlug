@@ -30,7 +30,9 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
-	void BulletCollideToEnemy();
+	void bulletCollideToEnemy();
+	void bulletCollideToWall();
+	void playerCollideToNPC();
 	void setEnemy();
 	void collider();
 	void gravity();

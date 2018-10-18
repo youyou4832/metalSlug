@@ -25,10 +25,14 @@ private:
 	n_tagState m_item;
 	SYNTHESIZE(float, m_fY, NPCPosY);
 	SYNTHESIZE(float, m_fX, NPCPosX);
+	SYNTHESIZE(bool, m_isGive, IsGive);
+	float m_itemX;
+	float m_itemY;
 	int m_speed;
 	int m_charNum;
 	bool m_isAlive;
 	bool m_checkRotation = false;
+	
 
 public:
 	HRESULT init(const char* szFileName, float x, float y, int speed, int charNum);
@@ -44,7 +48,17 @@ public:
 	inline void setMoveState(bool isMove) { m_move.isState = isMove; }
 	inline bool getMoveState() { return m_move.isState; }
 	inline void setFallState(bool isFall) { m_fall.isState = isFall; }
+	inline bool getFallState() { return m_fall.isState; }
 	inline bool getIsAlive() { return m_isAlive; }
+	inline RECT getRect() { return m_rc; }
+	inline void setIsGiveItem(bool isGiveItem) { m_giveItem.isState = isGiveItem; }
+	inline bool getIsGiveItem() { return m_giveItem.isState; }
+	inline void setItemState(bool state) { m_item.isState = state; }
+	inline bool getItemState() { return m_item.isState; }
+	inline RECT getItemRect() { return m_itemRC; }
+	inline void setRopeHitState(bool state) { m_ropeHit.isState = state; }
+	inline bool getRopeHitState() { return m_ropeHit.isState; }
+	
 	npc();
 	~npc();
 };

@@ -15,8 +15,8 @@ HRESULT npc::init(const char * szFileName, float x, float y, int speed, int char
 	m_isAlive = true;
 	m_hang.isState = true;
 	m_rc = RectMake(m_fX, m_fY, 64, 171);
-
-	m_item.isState = true;
+	m_isGive = false;
+	m_item.isState = false;
 	return S_OK;
 }
 
@@ -54,10 +54,19 @@ void npc::render(HDC hdc)
 			else if (m_move.isState) {
 				m_pImg->render(hdc, m_fX, m_fY + 40, 34 * m_move.index, 215, 34, 41, 3);
 			}
+			else if (m_giveItem.isState) {
+				m_pImg->render(hdc, m_fX, m_fY + 40, 48 * m_giveItem.index, 256, 48, 38, 3);
+			}
+			else if (m_yesSir.isState) {
+				m_pImg->render(hdc, m_fX, m_fY + 40, 41 * m_yesSir.index, 294, 41, 40, 3);
+			}
+			else if (m_runAway.isState) {
+				m_pImg->render(hdc, m_fX, m_fY + 40, 42 * m_runAway.index, 334, 42, 41, 3);
+			}
 		}
 	}
 	if (m_item.isState) {
-		m_itemImg->render(hdc, m_fX - 70, m_fY + 110, 22 * m_item.index, 20, 22, 20, 3);
+		m_itemImg->render(hdc, m_itemX + 10, m_itemY + 110, 22 * m_item.index, 20, 22, 20, 3);
 	}
 }
 
@@ -101,6 +110,45 @@ void npc::npcAnimation()
 			m_move.count = 0;
 		}
 	}
+	else if (m_giveItem.isState) {
+		++m_giveItem.count;
+		if (m_giveItem.count % 5 == 0) {
+			++m_giveItem.index;
+			if (m_giveItem.index == 11) {
+				m_giveItem.isState = false;
+				m_yesSir.isState = true;
+				m_item.isState = true;
+				m_itemX = m_fX;
+				m_itemY = m_fY;
+				m_giveItem.index = 0;
+			}
+			m_giveItem.count = 0;
+		}
+	}
+	else if (m_yesSir.isState) {
+		++m_yesSir.count;
+		if (m_yesSir.count % 5 == 0) {
+			++m_yesSir.index;
+			if (m_yesSir.index == 14) {
+				m_yesSir.isState = false;
+				m_runAway.isState = true;
+				m_yesSir.index = 0;
+			}
+			m_yesSir.count = 0;
+		}
+	}
+	else if (m_runAway.isState) {
+		++m_runAway.count;
+		if (m_runAway.count % 5 == 0) {
+			++m_runAway.index;
+			move();
+			if (m_runAway.index == 8) {
+				m_runAway.index = 0;
+			}
+			m_yesSir.count = 0;
+		}
+	}
+
 
 	if (m_ropeHit.isState) {
 		++m_ropeHit.count;
@@ -128,17 +176,23 @@ void npc::itemAnimation()
 			}
 			m_item.count = 0;
 		}
-		m_itemRC = RectMake(m_fX - 70, m_fY + 110, 66, 60);
+		m_itemRC = RectMake(m_itemX, m_itemY + 110, 66, 60);
 	}
 }
 
 void npc::move()
 {
-	m_fX -= m_speed;
+	if (m_move.isState) {
+		m_fX -= m_speed;
+	}
+	else if (m_runAway.isState) {
+		m_fX -= 20;
+	}
 	if (m_fX < 0) {
 		m_isAlive = false;
 	}
 	m_rc = RectMake(m_fX, m_fY + 40, 102, 123);
+	
 }
 
 npc::npc()

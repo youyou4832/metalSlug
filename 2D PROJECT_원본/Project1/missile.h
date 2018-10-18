@@ -13,7 +13,7 @@ protected:
 	RECT	m_rc;
 	//int		m_radius;
 	//float	m_fSpeed;
-	float	m_fX, m_fY;
+	//float	m_fX, m_fY;
 	float	m_fFiredX, m_fFiredY;
 	float	m_fAngle;
 	float	m_fRange;
@@ -26,7 +26,8 @@ protected:
 
 
 	int m_charNum;
-
+	SYNTHESIZE(float, m_fX, PositionX);
+	SYNTHESIZE(float, m_fY, PositionY);
 	SYNTHESIZE(float, m_fSpeed, fSpeed);
 
 public:

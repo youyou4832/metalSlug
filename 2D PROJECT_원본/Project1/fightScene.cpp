@@ -23,7 +23,7 @@ HRESULT fightScene::init()
 		m_enemyMgr->init();
 		m_fightMapX = 0;
 		setEnemy();
-		//m_npcMgr->setNPC("npc", WINSIZEX/2, WINSIZEY/2-300, 5);
+		m_npcMgr->setNPC("npc", WINSIZEX/2, WINSIZEY/2-300, 5);
 		//이미지
 		
 		m_pPlayer->init(100, WINSIZEY / 2);
@@ -31,7 +31,6 @@ HRESULT fightScene::init()
 		m_enemyMgr->setSniper("sniper", WINSIZEX / 2 + 100, WINSIZEY / 2 - 10, 5, m_pPlayer);
 		m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 400, WINSIZEY / 2 + 70, 5, m_pPlayer, 1, false);*/
 		m_moveMap = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
-		
 	}
 	else {
 		m_enemyMgr->init();
@@ -59,8 +58,10 @@ void fightScene::update()
 	if (!g_saveData.isMoveMap) {
 		gravity();
 		m_enemyMgr->update();
-		BulletCollideToEnemy();
+		bulletCollideToEnemy();
 		collider();
+		bulletCollideToWall();
+		playerCollideToNPC();
 	}
 	else {
 		mapMove();
@@ -72,7 +73,7 @@ void fightScene::update()
 void fightScene::render(HDC hdc)
 {
 	m_fightMap->render(hdc, m_fightMapX,0);
-	m_pixel->render(hdc, m_fightMapX, 0);
+	//m_pixel->render(hdc, m_fightMapX, 0);
 	m_enemyMgr->render(hdc);
 	m_pPlayer->render(hdc);
 	m_npcMgr->render(hdc);
@@ -81,10 +82,14 @@ void fightScene::render(HDC hdc)
 	EFFECTMANAGER->render(hdc, 2);
 }
 
-void fightScene::BulletCollideToEnemy()
+void fightScene::bulletCollideToEnemy()
 {
 	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
 	vector<enemy *>::iterator enemyIter;
+
+	vector<npc*> n_vMissile = m_npcMgr->getVecNPC();
+	vector<npc*>::iterator npcIter;
+
 	RECT playerRC = m_pPlayer->getRectHit();
 	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter) {
 
@@ -95,11 +100,17 @@ void fightScene::BulletCollideToEnemy()
 		vector<missile*>::iterator p_missileIter;
 		for (p_missileIter = p_vMissile.begin(); p_missileIter != p_vMissile.end(); ++p_missileIter) {
 			RECT rc;
+			RECT rc2;
 			//플레이어 총알과 에네미 충돌
 			if ((*p_missileIter)->getIsFire() && (*enemyIter)->getIsAlive() && IntersectRect(&rc, &(*enemyIter)->getRect(), &(*p_missileIter)->getRect()) && (*enemyIter)->getDeathState() == false) {
 				(*enemyIter)->setCurrHP((*enemyIter)->getCurrHP() - 1);
 				(*enemyIter)->hit();
 				(*p_missileIter)->setIsFire(false);
+			}
+			for (npcIter = n_vMissile.begin(); npcIter != n_vMissile.end(); ++npcIter) {
+				if ((*p_missileIter)->getIsFire() && (*npcIter)->getIsAlive() && IntersectRect(&rc2, &(*p_missileIter)->getRect(), &(*npcIter)->getRect()) && !(*npcIter)->getRopeHitState()) {
+					(*npcIter)->setRopeHitState(true);
+				}
 			}
 		}
 		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
@@ -109,6 +120,70 @@ void fightScene::BulletCollideToEnemy()
 				(*e_missileIter)->setIsFire(false);
 			}
 		}
+	}
+}
+
+void fightScene::bulletCollideToWall()
+{
+	vector<enemy *> vEnemy = m_enemyMgr->getVecEnemy();
+	vector<enemy *>::iterator enemyIter;
+	for (enemyIter = vEnemy.begin(); enemyIter != vEnemy.end(); ++enemyIter) {
+		vector<missile*> e_vMissile = (*enemyIter)->getMissileMgr()->getVecMissile();
+		vector<missile*>::iterator e_missileIter;
+		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
+			if ((*e_missileIter)->getIsFire()) {
+				COLORREF color = GetPixel(m_pixel->getMemDC(), (*e_missileIter)->getPositionX() - m_fightMapX, (*e_missileIter)->getPositionY());
+				int r = GetRValue(color);
+				int g = GetGValue(color);
+				int b = GetBValue(color);
+
+				if (!(r == 255 && g == 0 && b == 255))
+				{
+					(*e_missileIter)->setIsFire(false);
+
+					break;
+				}
+			}
+		}
+		
+	}
+	//플레이어 총알
+	vector<missile*> p_vMissile = m_pPlayer->getMissileMgr()->getVecMissile();
+	vector<missile*>::iterator p_missileIter;
+	for (p_missileIter = p_vMissile.begin(); p_missileIter != p_vMissile.end(); ++p_missileIter) {
+		if ((*p_missileIter)->getIsFire()) {
+			COLORREF color = GetPixel(m_pixel->getMemDC(), (*p_missileIter)->getPositionX() - m_fightMapX, (*p_missileIter)->getPositionY());
+			int r = GetRValue(color);
+			int g = GetGValue(color);
+			int b = GetBValue(color);
+
+			if (!(r == 255 && g == 0 && b == 255))
+			{
+				(*p_missileIter)->setIsFire(false);
+
+				break;
+			}
+		}
+	}
+}
+
+void fightScene::playerCollideToNPC()
+{
+	vector<npc*> n_vMissile = m_npcMgr->getVecNPC();
+	vector<npc*>::iterator npcIter;
+
+	for (npcIter = n_vMissile.begin(); npcIter != n_vMissile.end(); ++npcIter) {
+		RECT rc;
+		RECT rc2;
+		if ((*npcIter)->getIsAlive() && m_pPlayer->getIsAlive() && IntersectRect(&rc,&(*npcIter)->getRect(),&m_pPlayer->getRectHit()) && (*npcIter)->getIsGive() == false) {
+			(*npcIter)->setIsGiveItem(true);
+			(*npcIter)->setMoveState(false);
+			(*npcIter)->setIsGive(true);
+		}
+		if ((*npcIter)->getItemState() && m_pPlayer->getIsAlive() && IntersectRect(&rc2, &(*npcIter)->getItemRect(), &m_pPlayer->getRectHit())) {
+			(*npcIter)->setItemState(false);
+		}
+		
 	}
 }
 
@@ -178,7 +253,7 @@ void fightScene::gravity()
 			if ((!(*n_iter)->getHangState() && !(*n_iter)->getMoveState()) || (*n_iter)->getMoveState()) {
 				(*n_iter)->setNPCPosY((*n_iter)->getNPCPosY() + 8);
 
-				for (int i = (*n_iter)->getNPCPosY() + 150; i < (*n_iter)->getNPCPosY() + 171; ++i) {
+				for (int i = (*n_iter)->getNPCPosY() + 150; i < (*n_iter)->getNPCPosY() + 171 - m_fightMapX; ++i) {
 					COLORREF color = GetPixel(m_pixel->getMemDC(), (*n_iter)->getNPCPosX(), i);
 
 					int r = GetRValue(color);
@@ -188,8 +263,10 @@ void fightScene::gravity()
 					if (!(r == 255 && g == 0 && b == 255))
 					{
 						(*n_iter)->setNPCPosY((*n_iter)->getNPCPosY() - ((*n_iter)->getNPCPosY() + 171 - i));
-						(*n_iter)->setMoveState(true);
-						(*n_iter)->setFallState(false);
+						if ((*n_iter)->getFallState()) {
+							(*n_iter)->setMoveState(true);
+							(*n_iter)->setFallState(false);
+						}
 
 						break;
 					}
