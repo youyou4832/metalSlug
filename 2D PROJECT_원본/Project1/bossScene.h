@@ -56,6 +56,7 @@ private:
 	int m_front = 0;
 
 	bool isClearUiStart;
+	bool bossClear;
 
 
 public:
@@ -66,7 +67,7 @@ public:
 
 	void ClearUiDelayCount();
 	void pixelCollide();
-	void gameoveChack(bool playerDie);
+	void gameClearChack();
 	void bossDieChack();
 
 	bossScene();

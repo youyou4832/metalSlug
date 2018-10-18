@@ -86,6 +86,12 @@ void introScene::render(HDC hdc)
 			{
 				m_pImgINGameUi->render(hdc, m_missionUifX + 130, m_missionUifY + 150, 0, 96, 148, 32, 3);
 			}
+
+			
+			if(UiCount == 25)
+			{
+				SCENEMANAGER->changeScene("gameoveScene");
+			}
 		}
 	}
 
@@ -102,7 +108,7 @@ void introScene::UiDelayCount()
 		++UiCount;
 		if (m_UiDelay.count % 5 == 0) {
 			++m_UiDelay.index;
-			if (m_UiDelay.index == 20) {
+			if (m_UiDelay.index == 30) {
 				m_UiDelay.index = 0;
 				UiCount = 0;
 				isUiStart = false;

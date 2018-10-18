@@ -51,6 +51,7 @@ HRESULT bossScene::init()
 	m_bridge2 = IMAGEMANAGER->findImage("maxBridge2");
 	m_bridge3 = IMAGEMANAGER->findImage("maxBridge2");
 	
+	bossClear = false;
 	
 	return S_OK;
 }
@@ -104,14 +105,16 @@ void bossScene::update()
 		}
 	}
 
-	bossDieChack();
+	m_rc = RectMake(m_pBoss->getX()+700, m_pixelCurrY, 50 ,50);
+	m_rc2 = RectMake(m_pBoss->getX() + 700, m_pixelCurrY-150, 50, 50);
+
 	if (isClearUiStart)
 	{
 		ClearUiDelayCount();
 	}
+	bossDieChack();
+	gameClearChack();
 	//pixelCollide();
-	m_rc = RectMake(m_pBoss->getX()+700, m_pixelCurrY, 50 ,50);
-	m_rc2 = RectMake(m_pBoss->getX() + 700, m_pixelCurrY-150, 50, 50);
 
 }
 
@@ -158,7 +161,11 @@ void bossScene::ClearUiDelayCount()
 		++m_ClearUiCount;
 		if (m_ClearDelay.count % 5 == 0) {
 			++m_ClearDelay.index;
-			if (m_ClearDelay.index == 20) {
+
+			if (m_ClearDelay.index == 25) {
+				bossClear = true;
+			}
+			if (m_ClearDelay.index == 30) {
 				m_ClearDelay.index = 0;
 				m_ClearUiCount = 0;
 				isClearUiStart = false;
@@ -199,11 +206,11 @@ void bossScene::pixelCollide()
 	}
 }
 
-void bossScene::gameoveChack(bool playerDie)
+void bossScene::gameClearChack()
 {
-	if (!playerDie)
+	if (bossClear)
 	{
-		SCENEMANAGER->changeScene("gameoveScene");
+		SCENEMANAGER->changeScene("titleScene");
 	}
 }
 
