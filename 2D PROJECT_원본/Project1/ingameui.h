@@ -5,10 +5,10 @@ class boss;
 
 
 
-struct UiDelay {
-	int index = 0;
-	int count = 0;
-};
+//struct UiDelay {
+//	int index = 0;
+//	int count = 0;
+//};
 
 class ingameui
 {
@@ -21,9 +21,9 @@ private:
 	boss   * m_pBoss;
 
 	
-	UiDelay m_UiDelay;
+	/*UiDelay m_UiDelay;*/
 
-	int UiCount;
+	//int UiCount;
 	float m_UifX1;
 	float m_UifY1;
 
@@ -45,7 +45,7 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
-	void UiDelayCount();
+	/*void UiDelayCount();*/
 	ingameui();
 	~ingameui();
 };

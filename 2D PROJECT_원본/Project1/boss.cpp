@@ -426,7 +426,7 @@ void boss::move()
 	
 	else if(!m_isAlive)
 	{
-		if (!m_isAppear && (m_fX >= -1200 && m_fY <= 2000)) {
+		if (!m_isAppear && m_fY <= 2000) {
 			
 			AppearAndDie();
 			m_fY += m_Speed;

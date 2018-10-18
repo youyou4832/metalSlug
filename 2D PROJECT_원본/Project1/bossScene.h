@@ -8,6 +8,11 @@ class player;
 class bridge;
 class ingameui;
 
+struct ClearUiDelay {
+	int index = 0;
+	int count = 0;
+};
+
 class bossScene :public scene
 {
 private:
@@ -21,6 +26,7 @@ private:
 	image	*	m_pimgeffect;
 
 	image*		m_tempBG;
+	image*		m_pImgClearUi;
 
 	boss	*	m_pBoss;
 	bridge	*	m_pBridge;
@@ -29,6 +35,11 @@ private:
 	RECT		m_rc;
 	RECT		m_rc2;
 
+	ClearUiDelay m_ClearDelay;
+
+	int m_ClearUiCount;
+	float m_ClearUifX;
+	float m_ClearUifY;
 
 	float m_mapPosX;
 	float m_mapPosX2;
@@ -44,6 +55,9 @@ private:
 	int m_pixelCurrY;
 	int m_front = 0;
 
+	bool isClearUiStart;
+	bool bossClear;
+
 
 public:
 	virtual HRESULT init();
@@ -51,8 +65,10 @@ public:
 	virtual void update();
 	virtual void render(HDC hdc);
 
+	void ClearUiDelayCount();
 	void pixelCollide();
-	void gameoveChack(bool playerDie);
+	void gameClearChack();
+	void bossDieChack();
 
 	bossScene();
 	~bossScene();

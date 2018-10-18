@@ -9,7 +9,8 @@ HRESULT introScene::init()
 {
 	//이미지
 	m_introMap = IMAGEMANAGER->addImage("introMap", "image/map/map_Intro.bmp", WINSIZEX, WINSIZEY, false, 0);
-	
+	m_pImgINGameUi = IMAGEMANAGER->addImage("inGameUI3", "image/ui/ingameui2.bmp",
+		190, 128, true, RGB(255, 0, 255));
 	// 플레이어
 	m_pPlayer = new player;
 	m_pPlayer->init(100, -140);
@@ -26,7 +27,12 @@ HRESULT introScene::init()
 
 	gate = RectMakeCenter(WINSIZEX - 20, WINSIZEY / 2, 40, WINSIZEY);
 	
-	
+	UiCount = 0;
+	isUiStart = true;
+	isPlayerDie = false;
+
+	m_missionUifX = 500;
+	m_missionUifY = WINSIZEY / 4;
 
 	return S_OK;
  }
@@ -47,6 +53,9 @@ void introScene::update()
 	m_pInGameUi->update();
 	BulletCollideToEnemy();
 	collider();
+	UiDelayCount();
+	//GameoverChack();
+	
 }
 
 void introScene::render(HDC hdc)
@@ -55,8 +64,59 @@ void introScene::render(HDC hdc)
 	m_enemyMgr->render(hdc);
 	m_pPlayer->render(hdc);
 	m_pInGameUi->render(hdc);
+
+	if (isUiStart)
+	{
+		if (m_UiDelay.index % 2 == 0 && isUiStart)
+		{
+			m_pImgINGameUi->render(hdc, m_missionUifX, m_missionUifY, 0, 0, 190, 32, 3);
+
+			if (UiCount >= 15)
+			{
+				m_pImgINGameUi->render(hdc, m_missionUifX + 65, m_missionUifY + 150, 0, 32, 148, 32, 3);
+			}
+		}
+	}
+
+	else if(m_pPlayer->getIsAlive())
+	{
+		if (m_UiDelay.index % 2 == 0 && isUiStart) //
+		{
+			m_pImgINGameUi->render(hdc, m_missionUifX, m_missionUifY, 0, 0, 190, 32, 3);
+
+			if (UiCount >= 15)
+			{
+				m_pImgINGameUi->render(hdc, m_missionUifX + 130, m_missionUifY + 150, 0, 96, 148, 32, 3);
+			}
+
+		}
+	}
+
+
 	//Rectangle(hdc, gate.left, gate.top, gate.right, gate.bottom);
 	EFFECTMANAGER->render(hdc,2);
+}
+
+void introScene::UiDelayCount()
+{
+	if (isUiStart)
+	{
+		++m_UiDelay.count;
+		++UiCount;
+		if (m_UiDelay.count % 5 == 0) {
+			++m_UiDelay.index;
+			if (m_UiDelay.index == 25) {
+				isPlayerDie = true;
+			}
+
+			if (m_UiDelay.index == 30) {
+				m_UiDelay.index = 0;
+				UiCount = 0;
+				isUiStart = false;
+			}
+			m_UiDelay.count = 0;
+		}
+	}
 }
 
 void introScene::knifeCollideToEnemy()
@@ -112,6 +172,13 @@ void introScene::BulletCollideToEnemy()
 				(*e_missileIter)->setIsFire(false);
 			}
 		}
+	}
+}
+void introScene::GameoverChack()
+{
+	if (isPlayerDie)
+	{
+		//SCENEMANAGER->changeScene("titleScene");
 	}
 }
 void introScene::collider()
