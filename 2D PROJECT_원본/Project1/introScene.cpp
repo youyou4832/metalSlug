@@ -120,6 +120,7 @@ void introScene::collider()
 	RECT lower_rc = m_pPlayer->getRectLower();
 	RECT rc;
 	if (IntersectRect(&rc, &upper_rc, &gate)) {
+		m_pPlayer->dataSave();
 		SCENEMANAGER->changeScene("fightScene");
 	}
 }

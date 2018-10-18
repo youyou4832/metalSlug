@@ -159,12 +159,21 @@ void player::update()
 		dataSave();
 	if (KEYMANAGER->isOnceKeyDown(VK_F2))		// 불러오기
 		dataLoad();
+	if (KEYMANAGER->isOnceKeyDown('r') || KEYMANAGER->isOnceKeyDown('R')) {
+		initRevive(m_fStartX, m_fStartY);
+		m_nActUpper = UPPER_Idle;
+		m_nActLower = LOWER_Idle;
+		m_isAct = true;
+		m_nLife = 3;
+	}
 
 	// ######### 테스트 ##########
 
 	// 아이템 (총 먹으면 총알 이미지 바뀜)
 	if (m_isGun == true && m_pMissileMgr->getImageName() != "playerGunMissile")
 		m_pMissileMgr->setImageName("playerGunMissile");
+	else if (m_isGun == false && m_pMissileMgr->getImageName() != "playerMissile")
+		m_pMissileMgr->setImageName("playerMissile");
 
 	// update 초반에 return 하는 실행문을 관리하는 함수
 	if (isReturnUpdate() == false)	return;

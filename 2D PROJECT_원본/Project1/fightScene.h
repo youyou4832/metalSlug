@@ -24,7 +24,7 @@ private:
 	int m_currScene = 1;
 
 	bool m_isMapMove = false;
-
+	bool m_isAllDie = false;
 	float currY;
 
 public:

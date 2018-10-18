@@ -42,8 +42,8 @@ void npc::render(HDC hdc)
 {
 	if (m_isAlive) {
 		if (m_pImg) {
-			Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
-			Rectangle(hdc, m_itemRC.left, m_itemRC.top, m_itemRC.right, m_itemRC.bottom);
+		/*	Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
+			Rectangle(hdc, m_itemRC.left, m_itemRC.top, m_itemRC.right, m_itemRC.bottom);*/
 			if (m_hang.isState) {
 				m_pImg->render(hdc, m_fX, m_fY, 21 * m_hang.index, 35, 21, 57, 3);
 				m_pImg->render(hdc, m_fX + 9, m_fY-140, 16 * m_ropeHit.index, 92, 16, 48, 3);

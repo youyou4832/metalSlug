@@ -54,7 +54,7 @@ HRESULT mainGame::init()
 	SCENEMANAGER->addScene("selectScene", m_pSelectScene);
 	
 
-	//setEnemyPosition();
+	setEnemyPosition();
 	m_pIntroScene = new introScene;
 	SCENEMANAGER->addScene("intro", m_pIntroScene);
 
@@ -67,7 +67,7 @@ HRESULT mainGame::init()
 	m_pGameOverScene = new gameoverScene;
 	SCENEMANAGER->addScene("gameoveScene", m_pGameOverScene);
 
-	SCENEMANAGER->changeScene("intro");
+	SCENEMANAGER->changeScene("fightScene");
 	
 	// 필요한 리소스 미리 로드
 

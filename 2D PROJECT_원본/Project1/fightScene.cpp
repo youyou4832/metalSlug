@@ -28,6 +28,7 @@ HRESULT fightScene::init()
 		//ÀÌ¹ÌÁö
 		
 		m_pPlayer->init(100, WINSIZEY / 2);
+		m_pPlayer->dataLoad();
 		/*m_enemyMgr->setSniper("sniper", WINSIZEX / 2 - 100, WINSIZEY / 2 + 30, 5, m_pPlayer);
 		m_enemyMgr->setSniper("sniper", WINSIZEX / 2 + 100, WINSIZEY / 2 - 10, 5, m_pPlayer);
 		m_enemyMgr->setCannon("cannon", WINSIZEX / 2 + 400, WINSIZEY / 2 + 70, 5, m_pPlayer, 1, false);*/
@@ -63,12 +64,13 @@ void fightScene::update()
 	m_npcMgr->update();
 	m_pInGameUi->update();
 	if (!g_saveData.isMoveMap) {
-		gravity();
+		
 		m_enemyMgr->update();
 		bulletCollideToEnemy();
 		collider();
 		bulletCollideToWall();
 		playerCollideToNPC();
+		gravity();
 	}
 	else {
 		mapMove();
@@ -190,6 +192,7 @@ void fightScene::playerCollideToNPC()
 		}
 		if ((*npcIter)->getItemState() && m_pPlayer->getIsAlive() && IntersectRect(&rc2, &(*npcIter)->getItemRect(), &m_pPlayer->getRectHit())) {
 			(*npcIter)->setItemState(false);
+			m_pPlayer->setIsGun(true);
 		}
 		
 	}
@@ -247,11 +250,6 @@ void fightScene::gravity()
 		}
 	}
 
-	if (m_pPlayer->getLowerImgX() > WINSIZEX-1) {
-		g_saveData.isMoveMap = true;
-		m_mapMoveDest = m_fightMapX - 1600;
-		++m_currScene;
-	}
 	
 	vector<npc*> vNPC = m_npcMgr->getVecNPC();
 	vector<npc*>::iterator n_iter;
@@ -280,6 +278,19 @@ void fightScene::gravity()
 					}
 				}
 			}
+		}
+	}
+
+
+	if (m_pPlayer->getLowerImgX() > WINSIZEX - 1) {
+		if (m_currScene == 5) {
+			SCENEMANAGER->changeScene("bossScene");
+		}
+		else {
+			m_enemyMgr->getVecEnemy().clear();
+			g_saveData.isMoveMap = true;
+			m_mapMoveDest = m_fightMapX - 1600;
+			++m_currScene;
 		}
 	}
 }
