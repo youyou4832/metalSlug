@@ -24,6 +24,11 @@ public:
 	{
 		return m_vecMissile;
 	}
+
+	// 미사일의 이미지를 바꿔주는 image Getter, Setter 함수
+	inline const char * getImageName() { return m_szImageName; }
+	inline void setImageName(const char * szImageName) { m_szImageName = szImageName; }
+
 	//inline void setTarget(player* pTarget) { m_pTarget = pTarget; }
 
 	missileManager();

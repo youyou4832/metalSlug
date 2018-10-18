@@ -333,6 +333,10 @@ private:
 	ACT_UPPER	m_ACT_UPPER;
 	ACT_LOWER	m_ACT_LOWER;
 
+	// 맵 플레이어 시작점 위치
+	float	m_fStartX;
+	float	m_fStartY;
+
 	RECT	m_rcHit;			// 히트 박스 (플레이어가 공격 당하는 RECT)
 	RECT	m_rcAtt;			// 어택 박스 (플레이어의 공격이 발사되는 위치의 RECT)
 	float	m_fAttX;			// 어택 박스 X좌표 (적과 근접 충돌 확인, 총알 발사 위치)
@@ -361,6 +365,7 @@ private:
 	bool	m_isAct;		// 행동을 했는지 안 했는지 확인
 	bool	m_isGun;		// 총을 들고 있는가
 	bool	m_isAttack;		// 공격중인가
+	bool	m_isInvincible;		// 무적 상태인가
 
 	// enemy 또는 map 충돌에서 받아와야 하는 정보
 	bool	m_isAlive;		// 생존여부
@@ -370,15 +375,22 @@ private:
 	bool	m_isSlugIn;		// 슬러그에 탑승 중인가
 	bool	m_isSlugEscape;	// 슬러그에서 탈출 하는가 (true이면 탈출 모션 적용)
 
-	// 아이템
-	short	m_nBombNum;		// 폭탄 갯수
+	// 아이템, 목숨
+	short	m_nLife;
+	short	m_nAlpha;		// 무적 시간 중 깜빡임 표현을 위한 알파값
+
+	// 시스템
+	float	m_fElapsedTimeStart;	// 시작 시간 저장 (TIMEMANAGER->getTimer()->getWorldTime()을 받아 옴
+	float	m_fElapsedTimeEnd;		// 끝 시간 저장
 
 	//float	m_bulletSpeed;
 	SYNTHESIZE(float, m_bulletSpeed, BulletSpeed);
 public:
 	HRESULT init(float x, float y);
+	HRESULT initRevive(float x, float y);
+
 	void update();
-	void move();
+	void move(bool pixelCollide = false);
 	void release();
 	void render(HDC hdc);
 
@@ -417,6 +429,7 @@ public:
 	inline RECT getRectAttBox() { return m_rcAtt; }		// AttBox가 적과 충돌했을 경우 m_isscollide = true (근접공격)
 	inline bool getIsAttack() { return m_isAttack; }	// 플레이어가 공격중인지 체크
 	inline bool getIsGun() { return m_isGun; }
+	inline bool getIsInvincible() { return m_isInvincible; }
 
 	inline bool getIsAlive() { return m_isAlive; }
 	inline void setIsAlive(bool isAlive) { m_isAlive = isAlive; }

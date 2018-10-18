@@ -12,6 +12,8 @@ public:
 	// 세이브 
 	void txtSave(const char* saveFileName, std::vector<std::string> vecStr);
 	char* vectorArrayCombine(std::vector<std::string> vecArray);
+	void txtSaveInt(const char* saveFileName, std::vector<int> vecInt);
+	char* vectorArrayCombineInt(std::vector<int> vecArray);
 
 	// 로드
 	std::vector<std::string> txtLoad(const char* loadFileName);

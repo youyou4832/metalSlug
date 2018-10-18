@@ -93,9 +93,10 @@ public:
 	// ¾ËÆÄ ºí·»µå ·»´õ
 	void alphaRender(HDC hdc, BYTE alpha);
 	void alphaRender(HDC hdc, int destX, int destY, BYTE alpha);
+	void alphaRender(HDC hdc, int destX, int destY, int sourX, int sourY, int sourWidth, int sourHeight, int scalar = 1, BYTE alpha = 100);
 
 	// ¾Ö´Ï¸ÞÀÌ¼Ç ·»´õ
-	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1, bool reverse = false);
+	void aniRender(HDC hdc, int destX, int destY, animation* ani, int scalar = 1, bool reverse = false, int alpha = 0);
 	
 
 	void setTransColor(bool trans, COLORREF transColor);

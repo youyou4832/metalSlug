@@ -47,7 +47,6 @@ void introScene::update()
 	m_pInGameUi->update();
 	BulletCollideToEnemy();
 	collider();
-	
 }
 
 void introScene::render(HDC hdc)
@@ -108,7 +107,7 @@ void introScene::BulletCollideToEnemy()
 		}
 		for (e_missileIter = e_vMissile.begin(); e_missileIter != e_vMissile.end(); ++e_missileIter) {
 			RECT rc;
-			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect())) {
+			if ((*e_missileIter)->getIsFire() && m_pPlayer->getIsAlive() && IntersectRect(&rc, &playerRC, &(*e_missileIter)->getRect()) && m_pPlayer->getIsInvincible() == false) {
 				m_pPlayer->setIsAlive(false);
 				(*e_missileIter)->setIsFire(false);
 			}

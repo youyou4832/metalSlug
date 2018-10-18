@@ -3,7 +3,7 @@
 
 
 HRESULT missileManager::init(const char* szImageName, float range, int maxCount)
-{
+{	
 	m_fRange = range;
 	m_nMaxCount = maxCount;
 	m_szImageName = szImageName;
