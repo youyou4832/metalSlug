@@ -388,10 +388,9 @@ private:
 public:
 	HRESULT init(float x, float y);
 	HRESULT initRevive(float x, float y);
-	HRESULT initMoveMap();
 
 	void update();
-	void move();
+	void move(bool pixelCollide = false);
 	void release();
 	void render(HDC hdc);
 

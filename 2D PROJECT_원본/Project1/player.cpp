@@ -144,14 +144,6 @@ HRESULT player::initRevive(float x, float y)
 	return S_OK;
 }
 
-//HRESULT player::initMoveMap()
-//{
-//	m_isGun = g_saveData.isGun;
-//	m_nLife = g_saveData.nLife;
-//
-//	return S_OK;
-//}
-
 void player::update()
 {
 	// ######### 테스트 ##########
@@ -170,10 +162,9 @@ void player::update()
 
 	// ######### 테스트 ##########
 
-	// 아이템
+	// 아이템 (총 먹으면 총알 이미지 바뀜)
 	if (m_isGun == true && m_pMissileMgr->getImageName() != "playerGunMissile")
 		m_pMissileMgr->setImageName("playerGunMissile");
-
 
 	// update 초반에 return 하는 실행문을 관리하는 함수
 	if (isReturnUpdate() == false)	return;
@@ -857,44 +848,6 @@ void player::fireActSet()
 	// 모션 변경 : 오른쪽
 	else
 		fireActSetRight();
-
-	/*// 기본 공격
-	if (m_isGun == false && m_isCollide == false)
-	{
-		if (m_nDirY == DIR_Up)				// 위
-			m_nActUpper = UPPER_Att90;
-
-		else if (m_nDirY == DIR_Down)		// 아래
-			m_nActUpper = UPPER_Att270;
-
-		else
-			m_nActUpper = UPPER_Att;		// 좌, 우
-	}
-
-	// 총 공격
-	else if (m_isGun == true && m_isCollide == false)
-	{
-		if (m_nDirY == DIR_Up)				// 위
-			m_nActUpper = UPPER_GunAtt90;
-
-		else if (m_nDirY == DIR_Down)		// 아래
-			m_nActUpper = UPPER_GunAtt270;
-
-		else
-			m_nActUpper = UPPER_GunAtt;		// 좌, 우
-	}
-
-	// 근접 공격 세팅 및 충돌 해제
-	else if (m_isCollide == true)
-	{
-		if (m_isGun == true)				// 총
-			m_nActUpper = UPPER_KnifeGun;
-
-		else if (m_isGun == false)			// 기본
-			m_nActUpper = UPPER_Knife;
-
-		m_isCollide = false;
-	}*/
 }
 
 void player::fireActSetLeft()
@@ -1111,7 +1064,7 @@ void player::fireActSetRight()
 	}
 }
 
-void player::move()
+void player::move(bool pixelCollide /*false*/)
 {
 	// (플레이어 <- 적 총알) 충돌 RECT UPDATE
 	m_rcHit.bottom = m_lower.rc.bottom;
@@ -1435,48 +1388,20 @@ void player::render(HDC hdc)
 	Rectangle(hdc, m_rcHit.left, m_rcHit.top, m_rcHit.right, m_rcHit.bottom);*/
 	//Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);
 
-	// 무적 상태가 아닐 때
-	if (m_isInvincible == false)
+	if (m_nDir == DIR_Left)
 	{
-		if (m_nDir == DIR_Left)
-		{
-			if (m_nActLower != LOWER_NULL)
-				m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
+		if (m_nActLower != LOWER_NULL)
+			m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
 
-			m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
-		}
-
-		else if (m_nDir == DIR_Right)
-		{
-			if (m_nActLower != LOWER_NULL)
-				m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
-
-			m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
-		}
+		m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
 	}
-	
-	// 무적 상태라면 깜빡인다.
-	else if (m_isInvincible == true)
+
+	else if (m_nDir == DIR_Right)
 	{
-		if (m_nDir == DIR_Left)
-		{
-			if (m_nActLower != LOWER_NULL)
-				m_lower.pImgReverse->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3, false, 200);
-				//m_lower.pImgReverse->alphaRender(hdc, m_lower.rc.left, m_lower.rc.top, 200);
+		if (m_nActLower != LOWER_NULL)
+			m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3);
 
-			m_upper.pImgReverse->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3, false, 200);
-			//m_upper.pImgReverse->alphaRender(hdc, m_upper.rc.left, m_upper.rc.top, 200);
-		}
-
-		else if (m_nDir == DIR_Right)
-		{
-			if (m_nActLower != LOWER_NULL)
-				m_lower.pImg->aniRender(hdc, m_lower.rc.left, m_lower.rc.top, m_lower.pAni, 3, false, 200);
-				//m_lower.pImgReverse->alphaRender(hdc, m_lower.rc.left, m_lower.rc.top, 200);
-
-			m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3, false, 200);
-			//m_upper.pImgReverse->alphaRender(hdc, m_upper.rc.left, m_upper.rc.top, 200);
-		}
+		m_upper.pImg->aniRender(hdc, m_upper.rc.left, m_upper.rc.top, m_upper.pAni, 3);
 	}
 
 	// 미사일
@@ -1485,32 +1410,26 @@ void player::render(HDC hdc)
 
 	// 테스트
 	/*Rectangle(hdc, m_rcAtt.left, m_rcAtt.top, m_rcAtt.right, m_rcAtt.bottom);*/
-	sprintf_s(szText, "invincible : %d", m_isInvincible);
+	/*sprintf_s(szText, "invincible : %d", m_isInvincible);
 	TextOut(hdc, 400, 50, szText, strlen(szText));
 	sprintf_s(szText, "worldTime : %f", TIMEMANAGER->getTimer()->getWorldTime());
 	TextOut(hdc, 400, 100, szText, strlen(szText));
 	_stprintf_s(szText, "isAlive: %d", m_isAlive);
 	TextOut(hdc, 400, 150, szText, strlen(szText));
 	_stprintf_s(szText, "nLife: %d", m_nLife);
-	TextOut(hdc, 400, 200, szText, strlen(szText));
+	TextOut(hdc, 400, 200, szText, strlen(szText));*/
 }
 
 void player::dataSave()
 {
-	vector<int> vSaveData;
-
-	vSaveData.push_back(m_isGun);
-	vSaveData.push_back(m_nLife);
-
-	TXTDATA->txtSaveInt("data/playerData.txt", vSaveData);
+	g_saveData.isGun = m_isGun;
+	g_saveData.nLife = m_nLife;
 }
 
 void player::dataLoad()
 {
-	vector<int> vLoadData = TXTDATA->txtLoadInt("data/playerData.txt");
-
-	m_isGun = vLoadData[0];
-	m_nLife = vLoadData[1];
+	m_isGun = g_saveData.isGun;
+	m_nLife = g_saveData.nLife;
 }
 
 

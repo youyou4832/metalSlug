@@ -42,12 +42,11 @@ void introScene::update()
 {
 	knifeCollideToEnemy();
 
-	//m_enemyMgr->update();
+	m_enemyMgr->update();
 	m_pPlayer->update();
 	m_pInGameUi->update();
 	BulletCollideToEnemy();
 	collider();
-	
 }
 
 void introScene::render(HDC hdc)
