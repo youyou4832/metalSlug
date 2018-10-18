@@ -27,9 +27,9 @@ void npc::release()
 
 void npc::update()
 {
-	if (KEYMANAGER->isStayKeyDown(VK_SPACE)) {
+	/*if (KEYMANAGER->isStayKeyDown(VK_SPACE)) {
 		m_ropeHit.isState = true;
-	}
+	}*/
 	if (m_isAlive) {
 		npcAnimation();
 	}

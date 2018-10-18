@@ -260,7 +260,7 @@ void fightScene::gravity()
 				(*n_iter)->setNPCPosY((*n_iter)->getNPCPosY() + 8);
 
 				for (int i = (*n_iter)->getNPCPosY() + 150; i < (*n_iter)->getNPCPosY() + 171 - m_fightMapX; ++i) {
-					COLORREF color = GetPixel(m_pixel->getMemDC(), (*n_iter)->getNPCPosX(), i);
+					COLORREF color = GetPixel(m_pixel->getMemDC(), (*n_iter)->getNPCPosX() - m_fightMapX, i);
 
 					int r = GetRValue(color);
 					int g = GetGValue(color);
