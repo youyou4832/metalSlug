@@ -12,6 +12,9 @@ HRESULT bossScene::init()
 		WINSIZEX, WINSIZEY, false, 0);
 	m_pimgSubBG = IMAGEMANAGER->findImage("map");
 
+	m_pImgClearUi = IMAGEMANAGER->addImage("inGameUI3", "image/ui/ingameui2.bmp",
+		190, 128, true, RGB(255, 0, 255));
+
 	m_tempBG = new image;
 	m_tempBG->init("magenta", WINSIZEX, WINSIZEY, false, 0);
 	m_pimgeffect = IMAGEMANAGER->addImage("boss", "image/boss/BossEffect.bmp",
@@ -27,6 +30,12 @@ HRESULT bossScene::init()
 	m_bridgePosX2 = WINSIZEX;
 	m_bridgePosX3 = WINSIZEX*2 + 800;
 	
+
+	m_ClearUiCount = 0;
+	m_ClearUifX = 500;
+	m_ClearUifY = WINSIZEY / 4;
+	isClearUiStart = false;
+
 	m_pPlayer = new player;
 	m_pPlayer->init(WINSIZEX / 2, WINSIZEY / 2);
 
@@ -41,6 +50,7 @@ HRESULT bossScene::init()
 	m_bridge = IMAGEMANAGER->findImage("maxBridge");
 	m_bridge2 = IMAGEMANAGER->findImage("maxBridge2");
 	m_bridge3 = IMAGEMANAGER->findImage("maxBridge2");
+	
 	
 	return S_OK;
 }
@@ -93,6 +103,12 @@ void bossScene::update()
 			m_bridgePosX3 = WINSIZEX * 2;
 		}
 	}
+
+	bossDieChack();
+	if (isClearUiStart)
+	{
+		ClearUiDelayCount();
+	}
 	//pixelCollide();
 	m_rc = RectMake(m_pBoss->getX()+700, m_pixelCurrY, 50 ,50);
 	m_rc2 = RectMake(m_pBoss->getX() + 700, m_pixelCurrY-150, 50, 50);
@@ -119,9 +135,37 @@ void bossScene::render(HDC hdc)
 	m_pBoss->render(hdc);
 	m_pInGameUi->render(hdc);
 
+	if (m_ClearDelay.index % 2 == 0 && isClearUiStart) // 보스 클리어 시
+	{
+		m_pImgClearUi->render(hdc, m_ClearUifX, m_ClearUifY, 0, 0, 190, 32, 3);
+
+		if (m_ClearUiCount >= 15)
+		{
+			m_pImgClearUi->render(hdc, m_ClearUifX + 65, m_ClearUifY + 150, 0, 64, 148, 32, 3);
+		}
+	}
+
 	Rectangle(hdc, m_rc.left, m_rc.top, m_rc.right, m_rc.bottom);
 	Rectangle(hdc, m_rc2.left, m_rc2.top, m_rc2.right, m_rc2.bottom);
 	
+}
+
+void bossScene::ClearUiDelayCount()
+{
+	if (isClearUiStart)
+	{
+		++m_ClearDelay.count;
+		++m_ClearUiCount;
+		if (m_ClearDelay.count % 5 == 0) {
+			++m_ClearDelay.index;
+			if (m_ClearDelay.index == 20) {
+				m_ClearDelay.index = 0;
+				m_ClearUiCount = 0;
+				isClearUiStart = false;
+			}
+			m_ClearDelay.count = 0;
+		}
+	}
 }
 
 void bossScene::pixelCollide()
@@ -160,6 +204,14 @@ void bossScene::gameoveChack(bool playerDie)
 	if (!playerDie)
 	{
 		SCENEMANAGER->changeScene("gameoveScene");
+	}
+}
+
+void bossScene::bossDieChack()
+{
+	if (!m_pBoss->getisAlive())
+	{
+		isClearUiStart = true;
 	}
 }
 
